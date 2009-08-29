@@ -6,7 +6,19 @@ working environment for anyone using Emacs for dynamic languages. The
 main advantage of the Starter Kit is that it provides better default
 settings and bundles many useful libraries.
 
-The latest version is at http://github.com/technomancy/emacs-starter-kit/
+The latest version is at http://github.com/jart/emacs-starter-kit/
+
+The latest "official" version is at http://github.com/technomancy/emacs-starter-kit/
+
+## Notes Regarding This Fork
+
+(jart 2009/08) I created this fork of emacs-starter-kit to write
+documentation and offer better "out of the box" support for the
+following pieces of software:
+
+- Python
+- Mercurial
+- Erlang
 
 ## Learning
 
@@ -38,6 +50,67 @@ single instance using the starter kit, try the following invocation:
 Note that having a ~/.emacs file might override the starter kit
 loading, so if you've having trouble loading it, make sure that file
 is not present.
+
+### Quick Start Ubuntu
+
+This will get you set up with a nice happy GUI version of emacs:
+
+    $ sudo apt-get install emacs-snapshot emacs-snapshot-el ispell \
+                           js2-mode css-mode php-mode
+    $ git clone git://github.com/jart/emacs-starter-kit.git
+    $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
+
+You can press `F1` at any time to make the menu bar show up.
+
+Type `M-x package-list-packages` to see cool extra stuff you can
+install.
+
+### Important: How To Not Hurt Your Wrists Using Emacs
+
+People commonly choose editors like emacs and vi because they can edit
+code more efficiently by keeping their fingers on "home row" rather
+than constantly switching between the keyboard and mouse.
+
+By default on modern keyboards, emacs kind-bindings are very painful
+to type.  If you want to get the most out of emacs and make your
+programming experience as happy as possible without getting carpal
+tunnel syndrome, you should strongly consider doing the following:
+
+1. Swap the caps lock and ctrl key!!!  Emacs is simply no fun at all
+   if you don't do this!  Ubuntu and Mac OS X make this relatively
+   easy.  There is also a registry hack you can Google to do this on
+   Windows.
+
+2. Pick something else to replace Ctrl-X.  The `j` key is a pretty
+   good because you can stay on home row and the default key-binding
+   for `C-j` isn't like super-important or anything.
+
+       ;; put this in your custom.el if you use QWERTY
+       (global-set-key (kbd "C-j") ctl-x-map)
+
+   This little shortcut lets you type `C-j` instead of `C-x`
+   automatically without having to rewrite every single key-binding.
+
+   If you use a Dvorak keyboard, the `u` key is an excellent choice!
+
+       ;; put this in "custom.el" this if you use Dvorak
+       (global-set-key (kbd "C-u") ctl-x-map)
+
+   Also note that `custom.el` is in the `.gitignore` file so changes
+   you make there won't be forced upon anyone else who might be
+   cloning your repository.
+
+3. Consider using `C-h` instead of backspace.  This isn't super
+   important, but just help eliminate a little unnecessary reaching.
+
+       (global-set-key (kbd "C-h") 'delete-backward-char)
+       (global-set-key (kbd "M-h") 'backward-kill-word)
+       ;; GNU readline/Mac OS X have this by default:
+       (global-set-key (kbd "C-M-h") 'backward-kill-word)
+
+   If you're using emacs in a terminal, certain ones might put up a
+   little bit of a fight.  on mac os there is actually an option to
+   make `C-h` function as backspace.
 
 ## Structure
 
