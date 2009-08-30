@@ -10,6 +10,9 @@
   (turn-off-tool-bar)
   (blink-cursor-mode -1))
 
+;; you might want this
+;; (setq require-final-newline t)
+
 (add-hook 'before-make-frame-hook 'turn-off-tool-bar)
 
 (mouse-wheel-mode t)
@@ -25,6 +28,8 @@
       color-theme-is-global t
       delete-by-moving-to-trash t
       shift-select-mode nil
+      column-number-mode 1
+      make-backup-files nil
       truncate-partial-width-windows nil
       uniquify-buffer-name-style 'forward
       whitespace-style '(trailing lines space-before-tab
@@ -60,6 +65,9 @@
 ;; Highlight matching parentheses when the point is on them.
 (show-paren-mode 1)
 
+;; Overwrite highlighted text if you start typing
+(delete-selection-mode t)
+
 ;; ido-mode is like magic pixie dust!
 (when (> emacs-major-version 21)
   (ido-mode t)
@@ -87,8 +95,8 @@
 (delete 'try-expand-list hippie-expand-try-functions-list)
 
 ;; Don't clutter up directories with files~
-(setq backup-directory-alist `(("." . ,(expand-file-name
-                                        (concat dotfiles-dir "backups")))))
+;(setq backup-directory-alist `(("." . ,(expand-file-name
+;                                        (concat dotfiles-dir "backups")))))
 
 ;; nxhtml stuff
 (setq mumamo-chunk-coloring 'submode-colored
