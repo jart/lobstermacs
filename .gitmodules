@@ -1,0 +1,6 @@
+[submodule "vendor/pysmell"]
+	path = vendor/pysmell
+	url = git://github.com/orestis/pysmell.git
+[submodule "vendor/distel"]
+	path = vendor/distel
+	url = git://github.com/kunley/distel.git
