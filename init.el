@@ -29,7 +29,7 @@
 (require 'saveplace)
 (require 'ffap)
 (require 'uniquify)
-(require 'ansi-color)
+;(require 'ansi-color)
 (require 'recentf)
 (require 'mercurial)
 (require 'erlang)
@@ -61,7 +61,8 @@
 
 (regen-autoloads)
 
-(color-theme-zenburn)
+(when window-system
+  (color-theme-zenburn))
 
 (load custom-file 'noerror)
 
