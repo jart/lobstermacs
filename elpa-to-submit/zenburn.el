@@ -142,6 +142,15 @@ to values."
                                         :foreground zenburn-yellow))
                       " %a"))
 
+(setq rst-adornment-faces-alist (quote ((t . highlight-current-line)
+                                        (t . font-lock-keyword-face)
+                                        (1 . font-lock-keyword-face)
+                                        (2 . font-lock-keyword-face)
+                                        (3 . font-lock-keyword-face)
+                                        (4 . font-lock-keyword-face)
+                                        (5 . font-lock-keyword-face)
+                                        (6 . font-lock-keyword-face))))
+
 (setq gnus-logo-colors `(,zenburn-bg+2 ,zenburn-bg+1)
       gnus-mode-line-image-cache
       '(image :type xpm :ascent center :data "/* XPM */
