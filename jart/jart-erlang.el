@@ -11,7 +11,7 @@
 ;; Ubuntu:
 ;; sudo apt-get install erlang erlang-dev erlang-doc
 
-(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/distel/elisp"))
+(add-to-list 'load-path (concat dotfiles-dir "/vendor/distel/elisp"))
 (require 'distel)
 (distel-setup)
 (add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
