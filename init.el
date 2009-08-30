@@ -58,6 +58,9 @@
 (require 'starter-kit-js)
 
 (regen-autoloads)
+
+(color-theme-zenburn)
+
 (load custom-file 'noerror)
 
 ;; Work around a bug on OS X where system-name is FQDN
