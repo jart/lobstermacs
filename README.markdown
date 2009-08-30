@@ -165,38 +165,38 @@ to type.  If you want to get the most out of emacs and make your
 programming experience as happy as possible without getting carpal
 tunnel syndrome, you should strongly consider doing the following:
 
-1. Swap the caps lock and ctrl key!!!  Emacs is simply no fun at all
-   if you don't do this!  Ubuntu and Mac OS X make this relatively
-   easy.  There is also a registry hack you can Google to do this on
-   Windows.
+1.  Swap the caps lock and ctrl key!!!  Emacs is simply no fun at all
+    if you don't do this!  Ubuntu and Mac OS X make this relatively
+    easy.  There is also a registry hack you can Google to do this on
+    Windows.
 
-2. Pick something else to replace Ctrl-X.  The `j` key is a pretty
-   good because you can stay on home row and the default key-binding
-   for `C-j` isn't like super-important or anything.
+2.  Pick something else to replace Ctrl-X.  The `j` key is a pretty
+    good because you can stay on home row and the default key-binding
+    for `C-j` isn't like super-important or anything.
 
-       ;; put this in your custom.el if you use QWERTY
-       (global-set-key (kbd "C-j") ctl-x-map)
+        ;; put this in your custom.el if you use QWERTY
+        (global-set-key (kbd "C-j") ctl-x-map)
 
-   This little shortcut lets you type `C-j` instead of `C-x`
-   automatically without having to rewrite every single key-binding.
+    This little shortcut lets you type `C-j` instead of `C-x`
+    automatically without having to rewrite every single key-binding.
 
-   If you use a Dvorak keyboard, the `u` key is an excellent choice!
+    If you use a Dvorak keyboard, the `u` key is an excellent choice!
 
-       ;; put this in "custom.el" this if you use Dvorak
-       (global-set-key (kbd "C-u") ctl-x-map)
+        ;; put this in "custom.el" this if you use Dvorak
+        (global-set-key (kbd "C-u") ctl-x-map)
 
-   Also note that `custom.el` is in the `.gitignore` file so changes
-   you make there won't be forced upon anyone else who might be
-   cloning your repository.
+    Also note that `custom.el` is in the `.gitignore` file so changes
+    you make there won't be forced upon anyone else who might be
+    cloning your repository.
 
-3. Consider using `C-h` instead of backspace.  This isn't super
-   important, but just help eliminate a little unnecessary reaching.
+3.  Consider using `C-h` instead of backspace.  This isn't super
+    important, but just help eliminate a little unnecessary reaching.
 
-       (global-set-key (kbd "C-h") 'delete-backward-char)
-       (global-set-key (kbd "M-h") 'backward-kill-word)
-       ;; GNU readline/Mac OS X have this by default:
-       (global-set-key (kbd "C-M-h") 'backward-kill-word)
+        (global-set-key (kbd "C-h") 'delete-backward-char)
+        (global-set-key (kbd "M-h") 'backward-kill-word)
+        ;; GNU readline/Mac OS X have this by default:
+        (global-set-key (kbd "C-M-h") 'backward-kill-word)
 
-   If you're using emacs in a terminal, certain ones might put up a
-   little bit of a fight.  on mac os there is actually an option to
-   make `C-h` function as backspace.
+    If you're using emacs in a terminal, certain ones might put up a
+    little bit of a fight.  on mac os there is actually an option to
+    make `C-h` function as backspace.
