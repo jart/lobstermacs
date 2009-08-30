@@ -7,6 +7,10 @@
                                    'inf-ruby
                                    'js2-mode
                                    'css-mode
+                                   'eproject
+                                   'findr
+                                   'magit
+                                   'yasnippet-bundle
                                    ;; 'nxml
                                    'gist
                                    'paredit)
