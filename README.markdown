@@ -29,6 +29,22 @@ You may also find the [PeepCode Meet Emacs
 screencast](http://peepcode.com/products/meet-emacs) helpful. The
 [Emacs Wiki](http://emacswiki.org) is also very handy.
 
+### Tips
+
+- You can press `F1` at any time to make the menu bar show up.
+
+- If you picked *one feature* to learn, it should be "IDO"--one of
+  emacs' most hyped features.  IDO lets you navigate and switch
+  between a large number of files, very efficiently and intuitively.
+
+- Type `M-x package-list-packages` to see cool ELPA packages you can
+  install.
+
+- Look at `starter-kit-bindings.el` to learn the keyboard shortcuts
+  Emacs Starter Kit offers your over "vanilla" emacs.
+
+- You can make emacs prettier by typing `M-x color-theme-zenburn`
+
 ## Installation
 
 1. Install Emacs (at least version 22)
@@ -60,58 +76,6 @@ This will get you set up with a nice happy GUI version of emacs:
     $ git clone git://github.com/jart/emacs-starter-kit.git
     $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
 
-You can press `F1` at any time to make the menu bar show up.
-
-Type `M-x package-list-packages` to see cool extra stuff you can
-install.
-
-### Important: How To Not Hurt Your Wrists Using Emacs
-
-People commonly choose editors like emacs and vi because they can edit
-code more efficiently by keeping their fingers on "home row" rather
-than constantly switching between the keyboard and mouse.
-
-By default on modern keyboards, emacs kind-bindings are very painful
-to type.  If you want to get the most out of emacs and make your
-programming experience as happy as possible without getting carpal
-tunnel syndrome, you should strongly consider doing the following:
-
-1. Swap the caps lock and ctrl key!!!  Emacs is simply no fun at all
-   if you don't do this!  Ubuntu and Mac OS X make this relatively
-   easy.  There is also a registry hack you can Google to do this on
-   Windows.
-
-2. Pick something else to replace Ctrl-X.  The `j` key is a pretty
-   good because you can stay on home row and the default key-binding
-   for `C-j` isn't like super-important or anything.
-
-       ;; put this in your custom.el if you use QWERTY
-       (global-set-key (kbd "C-j") ctl-x-map)
-
-   This little shortcut lets you type `C-j` instead of `C-x`
-   automatically without having to rewrite every single key-binding.
-
-   If you use a Dvorak keyboard, the `u` key is an excellent choice!
-
-       ;; put this in "custom.el" this if you use Dvorak
-       (global-set-key (kbd "C-u") ctl-x-map)
-
-   Also note that `custom.el` is in the `.gitignore` file so changes
-   you make there won't be forced upon anyone else who might be
-   cloning your repository.
-
-3. Consider using `C-h` instead of backspace.  This isn't super
-   important, but just help eliminate a little unnecessary reaching.
-
-       (global-set-key (kbd "C-h") 'delete-backward-char)
-       (global-set-key (kbd "M-h") 'backward-kill-word)
-       ;; GNU readline/Mac OS X have this by default:
-       (global-set-key (kbd "C-M-h") 'backward-kill-word)
-
-   If you're using emacs in a terminal, certain ones might put up a
-   little bit of a fight.  on mac os there is actually an option to
-   make `C-h` function as backspace.
-
 ## Structure
 
 The init.el file is where everything begins. It's the first file to
@@ -126,16 +90,23 @@ into packages, and the bundling of them is temporary. For these
 libraries, autoloads will be generated and kept in the loaddefs.el
 file. This allows them to be loaded on demand rather than at startup.
 
-There are also a few files that are meant for code that doesn't belong
-in the Starter Kit. First, the user-specific-config file is the file
-named after your user with the extension ".el". In addition, if a
-directory named after your user exists, it will be added to the
-load-path, and any elisp files in it will be loaded. Finally, the
-Starter Kit will look for a file named after the current hostname
-ending in ".el" which will allow host-specific configuration. This is
-where you should put code that you don't think would be useful to
-everyone. That will allow you to merge with newer versions of the
-starter-kit without conflicts.
+### Personal Customizations
+
+Anything you customize using emacs' configuration GUI will be saved to
+`config.el` which is ignored by git.
+
+Some customizations don't belong in Emacs Starter Kit, and you may
+only want them to load just for yourself, or load only on certain
+computers.  Here's how to do it:
+
+- User Specific: Make a file named `your_username.el` and it will be
+  loaded automatically.  You could also make a folder named
+  `your_username` if you have a bunch of `.el` files.
+
+- Host Specific: Make a file named `hostname.el` or a folder named
+  `hostname`.  If you're not sure what your host-name is, you can ask
+  emacs by highlighting the following expression and pressing `C-x
+  C-e`: (system-name)
 
 ## Emacs Lisp Package Archive
 
@@ -182,3 +153,50 @@ The latest version is at http://github.com/technomancy/emacs-starter-kit/
 
 On Unix, /home/$USER/.emacs.d, on windows Documents and Settings/%your
 user name%/Application Data
+
+## Important: How To Not Hurt Your Wrists Using Emacs
+
+People commonly choose editors like emacs and vi because they can edit
+code more efficiently by keeping their fingers on "home row" rather
+than constantly switching between the keyboard and mouse.
+
+By default on modern keyboards, emacs kind-bindings are very painful
+to type.  If you want to get the most out of emacs and make your
+programming experience as happy as possible without getting carpal
+tunnel syndrome, you should strongly consider doing the following:
+
+1. Swap the caps lock and ctrl key!!!  Emacs is simply no fun at all
+   if you don't do this!  Ubuntu and Mac OS X make this relatively
+   easy.  There is also a registry hack you can Google to do this on
+   Windows.
+
+2. Pick something else to replace Ctrl-X.  The `j` key is a pretty
+   good because you can stay on home row and the default key-binding
+   for `C-j` isn't like super-important or anything.
+
+       ;; put this in your custom.el if you use QWERTY
+       (global-set-key (kbd "C-j") ctl-x-map)
+
+   This little shortcut lets you type `C-j` instead of `C-x`
+   automatically without having to rewrite every single key-binding.
+
+   If you use a Dvorak keyboard, the `u` key is an excellent choice!
+
+       ;; put this in "custom.el" this if you use Dvorak
+       (global-set-key (kbd "C-u") ctl-x-map)
+
+   Also note that `custom.el` is in the `.gitignore` file so changes
+   you make there won't be forced upon anyone else who might be
+   cloning your repository.
+
+3. Consider using `C-h` instead of backspace.  This isn't super
+   important, but just help eliminate a little unnecessary reaching.
+
+       (global-set-key (kbd "C-h") 'delete-backward-char)
+       (global-set-key (kbd "M-h") 'backward-kill-word)
+       ;; GNU readline/Mac OS X have this by default:
+       (global-set-key (kbd "C-M-h") 'backward-kill-word)
+
+   If you're using emacs in a terminal, certain ones might put up a
+   little bit of a fight.  on mac os there is actually an option to
+   make `C-h` function as backspace.
