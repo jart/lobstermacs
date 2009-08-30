@@ -69,6 +69,13 @@
 ;; Should be able to eval-and-replace anywhere.
 (global-set-key (kbd "C-c e") 'eval-and-replace)
 
+;; These key-bindings make it very easy to navigate through grep
+;; results, compile errors, etc.
+(global-set-key (kbd "C-x C-n") 'next-error)
+(global-set-key (kbd "C-x C-p") 'previous-error)
+(global-set-key [f11] 'next-error)
+(global-set-key [f12] 'previous-error)
+
 ;; Applications
 
 (global-set-key (kbd "C-c j") (lambda () (interactive) (switch-or-start 'jabber-connect "*-jabber-*")))
