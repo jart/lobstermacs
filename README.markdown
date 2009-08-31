@@ -78,7 +78,7 @@ is not present.
 This will get you set up with a nice happy GUI version of emacs:
 
     $ sudo apt-get install emacs-snapshot emacs-snapshot-el ispell \
-                           js2-mode css-mode php-mode
+                           js2-mode css-mode php-mode git
     $ git clone git://github.com/jart/emacs-starter-kit.git
     $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
 
