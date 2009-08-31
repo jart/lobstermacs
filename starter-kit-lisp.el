@@ -79,5 +79,10 @@
      (idle-highlight +1)
      (run-coding-hook))))
 
+(add-hook 'emacs-lisp-mode-hook
+          '(lambda ()
+             (company-mode)
+             ))
+
 (provide 'starter-kit-lisp)
 ;; starter-kit-lisp.el ends here

@@ -2,7 +2,6 @@
 (require 'python)
 (define-key python-mode-map (kbd "<return>") 'newline-and-indent)
 
-;; (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
 ;; (add-hook 'python-mode-hook
 ;;           '(lambda ()
 ;;              (require 'pymacs)

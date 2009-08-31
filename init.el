@@ -49,6 +49,10 @@
 
 ;; Load up starter kit customizations
 
+;; until they fix the elpa package thing
+(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
+(autoload 'company-mode "company" nil t)
+
 (require 'starter-kit-defuns)
 (require 'starter-kit-bindings)
 (require 'starter-kit-misc)

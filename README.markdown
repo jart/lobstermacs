@@ -1,14 +1,16 @@
 # Emacs Starter Kit
 
+![ScreenShot](http://lobstertech.com/media/misc/starter-kit.png)
+
 This should provide a saner set of defaults than you get normally with
 Emacs. It's intended for beginners, but it should provide a reasonable
 working environment for anyone using Emacs for dynamic languages. The
 main advantage of the Starter Kit is that it provides better default
 settings and bundles many useful libraries.
 
-The latest version is at http://github.com/jart/emacs-starter-kit/
+The latest version is at <http://github.com/jart/emacs-starter-kit/>
 
-The latest "official" version is at http://github.com/technomancy/emacs-starter-kit/
+The latest "official" version is at <http://github.com/technomancy/emacs-starter-kit/>
 
 ## Notes Regarding This Fork
 
@@ -33,7 +35,7 @@ screencast](http://peepcode.com/products/meet-emacs) helpful. The
 
 - You can press `F1` at any time to make the menu bar show up.
 
-- If you picked *one feature* to learn, it should be "IDO"--one of
+- If you picked *one feature* to learn, it should be "IDO"---one of
   emacs' most hyped features.  IDO lets you navigate and switch
   between a large number of files, very efficiently and intuitively.
 
@@ -43,7 +45,11 @@ screencast](http://peepcode.com/products/meet-emacs) helpful. The
 - Look at `starter-kit-bindings.el` to learn the keyboard shortcuts
   Emacs Starter Kit offers your over "vanilla" emacs.
 
-- You can make emacs prettier by typing `M-x color-theme-zenburn`
+- When you edit different types of files, different "modes" will be
+  automatically loaded.  Each mode has its own special keyboard
+  shortcuts to help you out.  To have emacs tell you what shortcuts
+  are available at any given time and tell you what they do, you can
+  press `C-x h m`.
 
 ## Installation
 
@@ -107,6 +113,25 @@ computers.  Here's how to do it:
   `hostname`.  If you're not sure what your host-name is, you can ask
   emacs by highlighting the following expression and pressing `C-x
   C-e`: (system-name)
+
+Here is an example of some customizations you might choose to make in
+your `username.el` file:
+
+    ;; see starter-kit-misc.el for more browser choices
+    (setq browse-url-browser-function 'browse-url-firefox)
+
+    (setq require-final-newline t)
+    (menu-bar-mode t)
+    (scroll-bar-mode nil)
+
+    ;; if you don't want emacs to flicker and flash:
+    (setq ring-bell-function 'ignore)
+    (setq visible-bell nil)
+
+    (global-set-key [f9] 'eshell)
+    (global-set-key [f10] 'compile)
+    (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+    (global-set-key (kbd "C-x b") 'ibuffer)
 
 ## Emacs Lisp Package Archive
 
