@@ -2,6 +2,9 @@
 ;;
 ;; Part of the Emacs Starter Kit
 
+;; Avoid error: "Variable binding depth exceeds max-specpdl-size"
+(setq max-specpdl-size 32000)
+
 (when window-system
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
   (turn-off-tool-bar)
