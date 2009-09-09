@@ -77,10 +77,15 @@ is not present.
 
 This will get you set up with a nice happy GUI version of emacs:
 
-    $ sudo apt-get install emacs-snapshot emacs-snapshot-el ispell \
-                           js2-mode css-mode php-mode git
+    $ sudo apt-get install git-core emacs-snapshot emacs-snapshot-el ispell
     $ git clone git://github.com/jart/emacs-starter-kit.git
     $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
+
+If you like to write code in Erlang:
+
+    $ sudo apt-get install erlang erlang-dev erlang-manpages build-essential
+    $ cd emacs-starter-kit/vendor/distel
+    $ make install
 
 ## Structure
 
