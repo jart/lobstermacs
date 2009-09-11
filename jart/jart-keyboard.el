@@ -5,7 +5,11 @@
 (global-set-key (kbd "C-x C-v") vc-prefix-map)
 (global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "M-h") 'backward-kill-word)
-(global-set-key (kbd "C-M-h") 'backward-kill-word)
+
+(eval-after-load 'paredit
+  '(progn
+     (define-key paredit-mode-map (kbd "C-h") 'paredit-backward-delete)
+     (define-key paredit-mode-map (kbd "M-h") 'paredit-backward-kill-word)))
 
 ;; Some keybindings I like that others might not
 

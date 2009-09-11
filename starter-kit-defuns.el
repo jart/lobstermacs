@@ -96,7 +96,7 @@ Symbols matching the text at point are put first in the completion list."
 (add-hook 'coding-hook 'local-comment-auto-fill)
 (add-hook 'coding-hook 'turn-on-hl-line-mode)
 (add-hook 'coding-hook 'pretty-lambdas)
-  
+
 (defun run-coding-hook ()
   "Enable things that are convenient across all coding buffers."
   (run-hooks 'coding-hook))
@@ -206,6 +206,29 @@ Symbols matching the text at point are put first in the completion list."
        (lambda (endp delimiter)
          (equal (char-syntax (char-before)) ?\")))
   (paredit-mode 1))
+
+(defmacro nevar-fail (primary failover)
+  "Runs primary code.  If primary code fails, then executes
+  failover code."
+  `(condition-case exc
+       ,primary
+     ('error
+      (message (format "Caught exception: [%s]" exc))
+      ,failover)))
+
+(defun paredit-close-parenthesis-safe ()
+  "How do you expect me to rebalance my parens if you won't let
+  me type omg!"
+  (interactive)
+  (nevar-fail (paredit-close-parenthesis)
+              (insert ")")))
+
+(defun paredit-close-parenthesis-and-newline-safe ()
+  "How do you expect me to rebalance my parens if you won't let
+  me type omg!"
+  (interactive)
+  (nevar-fail (paredit-close-parenthesis-and-newline-safe)
+              (insert ")")))
 
 ;; A monkeypatch to cause annotate to ignore whitespace
 (defun vc-git-annotate-command (file buf &optional rev)
