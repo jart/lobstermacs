@@ -60,7 +60,9 @@
 (global-font-lock-mode t)
 
 ;; You really don't need this; trust me.
-(menu-bar-mode -1)
+;; jart: the menu bar really helps in GTK mode ._.
+(unless window-system
+  (menu-bar-mode -1))
 
 ;; Save a list of recent files visited.
 (recentf-mode 1)
