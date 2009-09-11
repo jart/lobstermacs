@@ -89,6 +89,9 @@ Symbols matching the text at point are put first in the completion list."
 (defun turn-off-tool-bar ()
   (tool-bar-mode -1))
 
+(defun turn-on-company ()
+  (company-mode t))
+
 (add-hook 'coding-hook 'local-column-number-mode)
 (add-hook 'coding-hook 'local-comment-auto-fill)
 (add-hook 'coding-hook 'turn-on-hl-line-mode)
