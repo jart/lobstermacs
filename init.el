@@ -32,7 +32,6 @@
 (require 'ansi-color)
 (require 'recentf)
 (require 'mercurial)
-(require 'erlang)
 
 ;; backport some functionality to Emacs 22 if needed
 (require 'dominating-file)
@@ -62,6 +61,7 @@
 (require 'starter-kit-perl)
 (require 'starter-kit-ruby)
 (require 'starter-kit-js)
+(require 'starter-kit-python)
 
 (regen-autoloads)
 

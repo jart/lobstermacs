@@ -5,6 +5,14 @@
 ;; You know, like Readline.
 (global-set-key (kbd "C-M-h") 'backward-kill-word)
 
+;; Additional Paredit bindings
+(eval-after-load 'paredit
+  '(progn
+     (define-key paredit-mode-map (kbd ")")   'paredit-close-parenthesis-safe)
+     (define-key paredit-mode-map (kbd "M-)") 'paredit-close-parenthesis-and-newline-safe)
+     (define-key paredit-mode-map (kbd "M-s") 'paredit-forward-slurp-sexp)
+     (define-key paredit-mode-map (kbd "C-M-h") 'paredit-backward-kill-word)))
+
 ;; Align your code in a pretty way.
 (global-set-key (kbd "C-x \\") 'align-regexp)
 
