@@ -3,13 +3,13 @@
 ;; Part of the jart Emacs Starter Kit
 
 (eval-after-load 'python
-  '(progn)
+  '(progn
      (define-key python-mode-map (kbd "<return>") 'newline-and-indent)
      (define-key lisp-mode-shared-map (kbd "C-c l") "lambda")
      (add-hook 'python-mode-hook 'run-coding-hook)
      (add-hook 'python-mode-hook 'idle-highlight)
-     ;; (add-hook 'python-mode-hook 'esk-paredit-nonlisp)
      ))
+     ;; (add-hook 'python-mode-hook 'esk-paredit-nonlisp)
 
 ;; (defun turn-on-company-python ()
 ;;   (require 'pymacs)
