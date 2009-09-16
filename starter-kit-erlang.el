@@ -52,6 +52,25 @@
 ;; 
 ;; http://bc.tech.coop/blog/070528.html
 
+;; STUFF
+
+;; Command line arguments for Erlang
+
+;; Something like this is very convenient when working locally but you
+;; will probably get errors if you try to create a shell on a remote
+;; system because it will try to load sasl and stuff when it's already
+;; running and give you name conflicts.
+
+;; (setq inferior-erlang-machine-options '("-sname" "emacs"
+;;                                         "-boot" "start_sasl"
+;;                                         "-s" "reloader"))
+
+;; ;; This is needed for Distel setup (do we really need this??)
+;; (let ((distel-dir (concat dotfiles-dir "/vendor/distel/elisp")))
+;;   (unless (member distel-dir load-path)
+;;     ;; Add distel-dir to the end of load-path
+;;     (setq load-path (append load-path (list distel-dir)))))
+
 (defun sanitize-erlang-mode ()
   ;;(set-fill-column 78)
   (setq indent-tabs-mode nil)
@@ -100,28 +119,12 @@ Bug: Will fail if two emacsen are open using an erlang shell."
   (add-to-list 'load-path (concat dotfiles-dir "/vendor/distel/elisp"))
   (require 'distel)
   (distel-setup)
-  (add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
-  (add-to-list 'auto-mode-alist '("\\.hrl\\'" . erlang-mode))
   (add-hook 'erlang-mode-hook 'erlang-setup-default-shell)
   (add-hook 'erlang-mode-hook 'sanitize-erlang-mode)
   (add-hook 'erlang-shell-mode-hook 'sanitize-erlang-shell-mode))
 
-;; Command line arguments for Erlang
-
-;; Something like this is very convenient when working locally but you
-;; will probably get errors if you try to create a shell on a remote
-;; system because it will try to load sasl and stuff when it's already
-;; running and give you name conflicts.
-
-;; (setq inferior-erlang-machine-options '("-sname" "emacs"
-;;                                         "-boot" "start_sasl"
-;;                                         "-s" "reloader"))
-
-;; ;; This is needed for Distel setup (do we really need this??)
-;; (let ((distel-dir (concat dotfiles-dir "/vendor/distel/elisp")))
-;;   (unless (member distel-dir load-path)
-;;     ;; Add distel-dir to the end of load-path
-;;     (setq load-path (append load-path (list distel-dir)))))
+(add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
+(add-to-list 'auto-mode-alist '("\\.hrl\\'" . erlang-mode))
 
 (provide 'starter-kit-erlang)
 ;;; starter-kit-erlang.el ends here
