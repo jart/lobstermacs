@@ -1,4 +1,8 @@
 
+;; flyspell omg i don't need you complaining about every little
+;; technical acronym :(
+(add-hook 'rst-mode-hook 'turn-off-flyspell)
+
 (setq browse-url-browser-function 'browse-url-firefox)
 (setq require-final-newline t)
 ;; omg i don't want things to flicker and flash and beep every darn

@@ -43,16 +43,6 @@
       xterm-mouse-mode t
       save-place-file (concat dotfiles-dir "places"))
 
-;; Set this to whatever browser you use
-;; (setq browse-url-browser-function 'browse-url-firefox)
-;; (setq browse-url-browser-function 'browse-default-macosx-browser)
-;; (setq browse-url-browser-function 'browse-default-windows-browser)
-;; (setq browse-url-browser-function 'browse-default-kde)
-;; (setq browse-url-browser-function 'browse-default-epiphany)
-;; (setq browse-url-browser-function 'browse-default-w3m)
-;; (setq browse-url-browser-function 'browse-url-generic
-;;       browse-url-generic-program "~/src/conkeror/conkeror")
-
 ;; Transparently open compressed files
 (auto-compression-mode t)
 
@@ -94,9 +84,13 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 (random t) ;; Seed the random-number generator
 
-;; ReST files typically have the header ".. -*-restructuredtext-*-"
-;; which emacs isn't going to understand without this alias
+;; ReST files from bitbucket in particular have the header
+;; ".. -*-restructuredtext-*-" which emacs isn't going to understand
+;; without this alias
 (defalias 'restructuredtext-mode 'rst-mode)
+
+;; ReST
+(add-hook 'rst-adjust-hook 'rst-toc-update)
 
 ;; Hippie expand: at times perhaps too hip
 (delete 'try-expand-line hippie-expand-try-functions-list)
@@ -123,6 +117,7 @@
 (add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xslt$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
+(add-to-list 'auto-mode-alist '("\\.rst$" . rst-mode))
 
 ;; Default to unified diffs
 (setq diff-switches "-u")

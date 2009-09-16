@@ -1,41 +1,85 @@
 
 ;; If you actually want to understand Emacs' crazy customization
-;; language, this file might help you.
+;; language, this file might help you get a "feel" for how it works.
 
 ;; Press `C-x C-e` at the end of each of these lines to better
 ;; conceptual understanding of Moon Code.  Press `C-h f` to ask emacs
-;; what a particular function does.
+;; what a particular function does.  If that doesn't work try using
+;; `C-h a` to search for a name.
 
+;; Resources:
+;;  http://steve-yegge.blogspot.com/2008_01_01_archive.html
+;;  http://www.emacswiki.org/cgi-bin/emacs-en?CategoryCode
+;;  http://cl-cookbook.sourceforge.net/strings.html
+
+(setq debug-on-error t)
 (message "hello kitty")
+'(message "hello kitty")
+(find-file "~/.bashrc")
 (global-set-key (kbd "C-x C-x") 'doctor)
+;; now press `C-x C-x`
 
+'((apple . "red"))
+
+2
 "string"
 (+ 2 2)
 (- 5 2)
 (+ 2 2 2)
 (+ 2 (- 5 2))
 (+ 2 (- 5 2) (- 5 2))
+()
 
 (list)
 (list 3 4 1 5 2)
 '(3 4 1 5 2)
 
 '(hello there)
+(quote (hello there))
 '(hello there (+ 2 2))
 (list 'hello 'there)
 (list 'hello 'there (+ 2 2))
 (sort (list 3 4 1 5 2))
 
-'(+ 2 2)
-(eval '(+ 2 2))
+'(+ 2 2 2)
+(eval '(+ 2 2 2))
+(apply '+ '(2 2 2))
 
-(map atom '+ (list 2 3 4 5))
 
-;; symbols
+;; user input
+(defun asker (name)
+  "this is my documentation for 'asker'"
+  (interactive "sWhat's your name: ")
+  (message (format "Thank you %s, have a lovely day :D" name)))
+;; now type M-x asker
+(if (y-or-n-p "Do it?")
+    (do-something)
+  (do-something-else))
+
+
+;; working with the current buffer
+buffer-file-name
+(current-buffer)
+(search-forward "system-name")
+(search-backward "current [Bb]uffer")
+(save-excursion
+  (search-forward "system-name")
+  (move-beginning-of-line nil)
+  (insert ";; a new comment appears!\n"))
+
+
+;; the fine line: variables/atoms, code/lists
 system-name
+system-type
+system-configuration
+system-configuration-options
 'system-name
+(atom 'system-name)
+(stringp system-name)
 (setq mooncode "MOONCODE")
+'(setq mooncode "MOONCODE")
 mooncode
+
 
 (message system-name)
 (concat "hello " "kitty")
@@ -60,6 +104,7 @@ mooncode
   "i'm back!")
 
 ;; boolean logic
+;; http://www.emacswiki.org/emacs-en/ComparisonFunctions
 t
 nil
 (not t)
@@ -70,6 +115,8 @@ nil
 (zerop 0) ; Return t if number is zero.
 (string= "what a pain" "what a pain")
 (eq 2 2)
+(= 2 2)
+(/= 2 3)
 (> 5 2)
 (< 5 2)
 (<= 5 5)
@@ -78,10 +125,32 @@ nil
 (if (eq (+ 2 2) 5)
     "compy is broken"
   "universe is safe")
+(if (eq (+ 2 2) 4)
+    (progn
+      (+ 2 2)
+      (+ 2 2)
+      "i just did 3 things"))
 (unless (eq (+ 2 2) 4)
     "compy is broken")
 (unless (eq (+ 2 2) 4)
   (do-something))
+;; case statement
+(cond
+ ((= (+ 2 2) 5) "this is so not true lol")
+ ((= 2 2) "happiness")
+ (t "all other conditions returned nil"))
+
+;; try/FINALLY clause:
+(unwind-protect
+    (error "hello")
+  (insert "hi"))
+
+;; try/EXCEPT clause:
+(condition-case ex
+    (error "hello")
+  ('error (message (format "omg: [%s]" ex))))
+(condition-case ex
+  ('error (message (format "omg: [%s]" ex))))
 
 (setq i 0)
 (while (< i 10)
@@ -96,15 +165,23 @@ nil
       (sit-for 0 pause)
       (insert (substring misery i (+ i 1))))))
 
-
 ;; strings
+;; Do M-x apropos RET \bstring\b RET to see a list of functions related to strings.
 (substring "hello" 0 1)
 (substring "hello" 1 2)
+(string-match "h" "hello")
+(string-match "ell" "hello")
+;; this uses regular expressions so be careful
+(string-match "o$" "hello")
+(string-match "ll$" "hello")
+(replace-regexp-in-string " " "-" "is this the place i used to call fatherland")
 (split-string "war,is,peace" ",")
 (downcase "OMG what you know about Emacs dawg?")
 (upcase "OMG what you know about Emacs dawg?")
 (capitalize "bob dole")
-
+;; join list of strings
+(mapconcat 'identity (list "hello" "little" "kitty") "__")
+(split-string "war,is,peace" ",")
 
 ;; type checking
 (null nil)
@@ -117,6 +194,16 @@ nil
 (arrayp "a string i guess")
 (atom 'system-name)
 (atom 666)
+;; is function declared?
+(fboundp 'message)
+
+;; type-casting
+(intern "hello")      ;; string -> atom
+(make-symbol "hello") ;; string -> atom
+(symbol-name 'hi)     ;; atom -> string
+(eval `(,(intern "message") "take THAT moon code"))
+(number-to-string 256)
+(string-to-number "256")
 
 
 ;; make your own functions
@@ -135,6 +222,7 @@ nil
   (interactive)
   (message "Hello Kitty!"))
 ;; now type M-x my_own_command
+
 
 
 ;; lambda calculus or something (type lam-bda without to make that symbol
@@ -156,9 +244,31 @@ nil
                                   (message "omg you're so crazy")))
 
 
+;; working with files
+(file-exists-p "/tmp")
+(expand-file-name "../../../etc/passwd")
+(file-name-extension "/the/dir/filez.pdf")
+
+
+;; running shell commands
+(shell-command-to-string "ls")
+(shell-command "ls")
+(progn (shell-command "ls -al" "*ls-results-buf*")
+       (switch-to-buffer-other-window "*ls-results-buf*")
+       (end-of-buffer)
+       (insert "\n---------------\n")
+       (insert "Enjoy your command results!!\n"))
+
+
+;; working with lists like arrays
 (length (list 1 2 3))
 (nth 0 (list 6 7 8))
 (nth 2 (list 6 7 8))
+;; is element in list?
+(memq 'there (list 'hi 'there))
+(memq 'dog (list 'hi 'there)))
+(memq system-type '(ms-dos windows-nt))
+(memq system-type '(ms-dos windows-nt))
 ;; head of list
 (car '(+ 2 2))
 (car '())
@@ -181,12 +291,52 @@ nil
 (pop mylist)
 (push 6 mylist)
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ADVANCED MOON CODE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-`(hello there (+ 2 2))
-`(hello there ,(+ 2 2))
+;; backtics are generally useful for generating code
+(list 'format "your system: %s" 'system-name)
+'(format "your system: %s" system-name)
+`(format "your system: %s" system-name)
+(eval `(format "your system: %s" system-name))
+`(format "your system: %s" ,system-name)
+(eval `(format "your system: %s" ,system-name))
+
+(defmacro 5x (codez)
+  `(progn
+     ,codez
+     ,codez
+     ,codez
+     ,codez
+     ,codez))
+
+(5x
+ (insert "hello "))
+
+(macroexpand
+ '(5x
+   (insert "hello ")))
+
+(defmacro nevar-fail (primary failover)
+  "Runs primary code.  If primary code fails, then executes
+  failover code."
+  `(condition-case exc
+       ,primary
+     ('error
+      (message (format "Caught exception: [%s]" exc))
+      ,failover)))
+
+(nevar-fail (message "hello") (message "backup code"))
+(nevar-fail (error "omg") (message "backup code"))
+
+`(progn
+   (message (+ 2 2))
+   (message ,(+ 2 2))
+   (message ,system-name)
+   (message ,system-name))
+
 `(hello there ,@'(2 3 4))
 `(hello there ,@(list 2 3 4))
 
@@ -197,10 +347,20 @@ nil
 
 (sort (list 2 3 4 5) '<)
 ;; sum
+
 (reduce #'+ (list 2 3 4 5))
 (reduce '+ (list 2 3 4 5) :initial-value 20)
+
 ;; map (doubler)
 (mapcar (lambda (x) (* x 2)) (list 2 3 4 5))
+
+;; flatten list
+(nconc (list  "hi" "there") (list  "yo" "yo"))
+(mapcar (lambda (x) (list "-f" x)) (list "file1" "file2" "file3"))
+(mapcan (lambda (x) (list "-f" x)) (list "file1" "file2" "file3"))
+(eval (cons 'concat (mapcan (lambda (x) (list "-f" x)) (list "file1" "file2" "file3"))))
+(mapconcat (lambda (x) (concat "-f " x)) (list "file1" "file2" "file3") " ")
+
 
 (defun factorial (x)
   (if (zerop x)
