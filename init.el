@@ -65,6 +65,7 @@
 (require 'starter-kit-rst)
 (require 'starter-kit-c)
 (require 'starter-kit-python)
+(require 'starter-kit-erlang)
 
 (regen-autoloads)
 
