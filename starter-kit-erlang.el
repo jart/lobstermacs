@@ -113,15 +113,16 @@ Bug: Will fail if two emacsen are open using an erlang shell."
     (setq inferior-erlang-machine-options oldopts)))
 
 (eval-after-load 'erlang
-  (load "erlang_appwiz" t nil)
-  (require 'erlang)
-  (require 'erlang-start)
-  (add-to-list 'load-path (concat dotfiles-dir "/vendor/distel/elisp"))
-  (require 'distel)
-  (distel-setup)
-  (add-hook 'erlang-mode-hook 'erlang-setup-default-shell)
-  (add-hook 'erlang-mode-hook 'sanitize-erlang-mode)
-  (add-hook 'erlang-shell-mode-hook 'sanitize-erlang-shell-mode))
+  '(progn
+    (load "erlang_appwiz" t nil)
+    (require 'erlang)
+    (require 'erlang-start)
+    (add-to-list 'load-path (concat dotfiles-dir "/vendor/distel/elisp"))
+    (require 'distel)
+    (distel-setup)
+    (add-hook 'erlang-mode-hook 'erlang-setup-default-shell)
+    (add-hook 'erlang-mode-hook 'sanitize-erlang-mode)
+    (add-hook 'erlang-shell-mode-hook 'sanitize-erlang-shell-mode)))
 
 (add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
 (add-to-list 'auto-mode-alist '("\\.hrl\\'" . erlang-mode))
