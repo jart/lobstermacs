@@ -17,6 +17,7 @@
      (define-key paredit-mode-map (kbd ")")   'paredit-close-parenthesis-safe)
      (define-key paredit-mode-map (kbd "M-)") 'paredit-close-parenthesis-and-newline-safe)
      (define-key paredit-mode-map (kbd "M-s") 'paredit-forward-slurp-sexp)
+     (define-key paredit-mode-map (kbd "M-v") 'paredit-forward-barf-sexp)
      (define-key paredit-mode-map (kbd "C-M-h") 'paredit-backward-kill-word)))
 
 ;; Align your code in a pretty way.
