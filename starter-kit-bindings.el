@@ -5,9 +5,15 @@
 ;; You know, like Readline.
 (global-set-key (kbd "C-M-h") 'backward-kill-word)
 
+;; If we're typing on a region and press backspace, the region should die.
+(global-set-key (kbd "C-d") 'delete-char-dwim)
+(global-set-key (kbd "<DEL>") 'delete-backward-char-dwim)
+
 ;; Additional Paredit bindings
 (eval-after-load 'paredit
   '(progn
+     (define-key paredit-mode-map (kbd "C-d") 'paredit-forward-delete)
+     (define-key paredit-mode-map (kbd "<DEL>") 'paredit-backward-delete)
      (define-key paredit-mode-map (kbd ")")   'paredit-close-parenthesis-safe)
      (define-key paredit-mode-map (kbd "M-)") 'paredit-close-parenthesis-and-newline-safe)
      (define-key paredit-mode-map (kbd "M-s") 'paredit-forward-slurp-sexp)

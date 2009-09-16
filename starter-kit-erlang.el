@@ -1,3 +1,6 @@
+;;; starter-kit-erlang.el --- Erlang/Distel Support
+;;
+;; Part of the jart's Emacs Starter Kit.
 
 ;; SETUP
 
@@ -49,36 +52,61 @@
 ;; 
 ;; http://bc.tech.coop/blog/070528.html
 
-(add-to-list 'load-path (concat dotfiles-dir "/vendor/distel/elisp"))
-(load "erlang_appwiz" t nil)
-(require 'erlang)
-(require 'erlang-start)
-(require 'distel)
-(distel-setup)
+(defun sanitize-erlang-mode ()
+  ;;(set-fill-column 78)
+  (setq indent-tabs-mode nil)
+  ;; add Erlang functions to an imenu menu
+  ;;(imenu-add-to-menubar "imenu")
+  (define-key erlang-mode-map (kbd "<return>") 'newline-and-indent)
+  ;;(define-key erlang-mode-map (kbd "M-/") 'erl-complete)
+  (define-key erlang-mode-map (kbd "M-?") 'erl-complete)
+  (define-key erlang-mode-map (kbd "M-.") 'erl-find-source-under-point))
 
-(add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
-(add-to-list 'auto-mode-alist '("\\.hrl\\'" . erlang-mode))
+(defun sanitize-erlang-shell-mode ()
+  ;;(define-key erlang-shell-mode-map (kbd "M-/") 'erl-complete)
+  (define-key erlang-shell-mode-map (kbd "M-?") 'erl-complete)
+  (define-key erlang-shell-mode-map (kbd "M-.") 'erl-find-source-under-point))
 
-(add-hook 'erlang-mode-hook
-	  '(lambda ()
-             (set-fill-column 78)
-             (setq indent-tabs-mode nil)
-             ;; add Erlang functions to an imenu menu
-             ;;(imenu-add-to-menubar "imenu")
-             (define-key erlang-mode-map (kbd "<return>") 'newline-and-indent)
-             ;;(define-key erlang-mode-map (kbd "M-/") 'erl-complete)
-             (define-key erlang-mode-map (kbd "M-?") 'erl-complete)
-             (define-key erlang-mode-map (kbd "M-.") 'erl-find-source-under-point)))
+(defun erlang-setup-default-shell ()
+  "Creates a new interactive erlang shell named 'emacs@yourhost'
+which can easily be connected to by Distel.  If an erlang shell
+has already been created, does nothing.
 
-(add-hook 'erlang-shell-mode-hook
-	  (lambda ()
-            ;;(define-key erlang-shell-mode-map (kbd "M-/") 'erl-complete)
-            (define-key erlang-shell-mode-map (kbd "M-?") 'erl-complete)
-            (define-key erlang-shell-mode-map (kbd "M-.") 'erl-find-source-under-point)))
+Bug: Will fail if two emacsen are open using an erlang shell."
+  (interactive)
+  (let ((oldopts inferior-erlang-machine-options))
+    (setq inferior-erlang-machine-options '("-sname" "emacs"))
+    ;; only create if it doesn't exist
+    (if (null (get-buffer erlang-shell-buffer-name))
+        (progn
+          ;; make the shell but don't steal the focus
+          (let ((curbuf (current-buffer)))
+            (erlang-shell)
+            (switch-to-buffer curbuf))
+          ;; let distel know about this node and upload its wacky
+          ;; modules so auto-completion can *just work*
+          (let ((node-name (concat "emacs@" (erl-determine-hostname))))
+            (setq erl-nodename-cache (intern node-name))
+            (setq distel-modeline-node node-name)
+            (force-mode-line-update)
+            (sleep-for 2) ; give it a little time to init
+            (erl-ping (intern node-name)))))
+    (setq inferior-erlang-machine-options oldopts)))
+
+(eval-after-load 'erlang
+  (load "erlang_appwiz" t nil)
+  (require 'erlang)
+  (require 'erlang-start)
+  (add-to-list 'load-path (concat dotfiles-dir "/vendor/distel/elisp"))
+  (require 'distel)
+  (distel-setup)
+  (add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
+  (add-to-list 'auto-mode-alist '("\\.hrl\\'" . erlang-mode))
+  (add-hook 'erlang-mode-hook 'erlang-setup-default-shell)
+  (add-hook 'erlang-mode-hook 'sanitize-erlang-mode)
+  (add-hook 'erlang-shell-mode-hook 'sanitize-erlang-shell-mode))
 
 ;; Command line arguments for Erlang
-
-(setq inferior-erlang-machine-options nil)
 
 ;; Something like this is very convenient when working locally but you
 ;; will probably get errors if you try to create a shell on a remote
@@ -94,3 +122,6 @@
 ;;   (unless (member distel-dir load-path)
 ;;     ;; Add distel-dir to the end of load-path
 ;;     (setq load-path (append load-path (list distel-dir)))))
+
+(provide 'starter-kit-erlang)
+;;; starter-kit-erlang.el ends here

@@ -235,5 +235,31 @@ Symbols matching the text at point are put first in the completion list."
   (let ((name (file-relative-name file)))
     (vc-git-command buf 0 name "blame" "-w" rev)))
 
+;; credit: chris capel's emacs file
+(defun close-or-bury-window ()
+  "Closes the open window or buries it if it's the only
+open window.  Example:
+
+    (progn
+      (erlang-shell)
+      (close-or-bury-window))
+"
+  (interactive)
+  (if (= (count-windows) 1)
+      (bury-buffer)
+          (delete-window)))
+
+;; credit: chris capel's emacs file
+(defun delete-char-dwim ()
+  (interactive)
+  (if (ensure-mark)
+      (delete-active-region)
+    (delete-char 1)))
+(defun delete-backward-char-dwim ()
+  (interactive)
+  (if (ensure-mark)
+      (delete-active-region)
+    (delete-backward-char 1)))
+
 (provide 'starter-kit-defuns)
 ;;; starter-kit-defuns.el ends here
