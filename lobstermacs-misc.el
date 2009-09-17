@@ -2,6 +2,11 @@
 ;;
 ;; Part of Lobstermacs.
 
+;; Lots here stolen from topfunky
+
+(server-start)
+(prefer-coding-system 'utf-8)
+
 ;; Avoid error: "Variable binding depth exceeds max-specpdl-size"
 (setq max-specpdl-size 32000
       column-number-mode 1
@@ -43,6 +48,34 @@
 (global-set-key (kbd "C-x C-p") 'previous-error)
 (global-set-key [f11] 'next-error)
 (global-set-key [f12] 'previous-error)
+
+;; Some Mac-friendly key counterparts
+(global-set-key (kbd "M-s") 'save-buffer)
+(global-set-key (kbd "M-z") 'undo)
+
+;; Save backups in one place Put autosave files (ie #foo#) in one
+;; place, *not* scattered all over the file system!
+(defvar autosave-dir
+  (concat "/tmp/emacs_autosaves/" (user-login-name) "/"))
+(make-directory autosave-dir t)
+(defun auto-save-file-name-p (filename)
+  (string-match "^#.*#$" (file-name-nondirectory filename)))
+(defun make-auto-save-file-name ()
+  "Override default emacs behavior"
+  (concat autosave-dir
+          (if buffer-file-name
+              (concat "#" (file-name-nondirectory buffer-file-name) "#")
+            (expand-file-name
+             (concat "#%" (buffer-name) "#")))))
+
+;; Plain Text
+;;; Stefan Monnier <foo at acm.org>. It is the opposite of
+;;; fill-paragraph. Takes a multi-line paragraph and makes
+;;; it into a single line of text.
+(defun unfill-paragraph ()
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
 
 (provide 'lobstermacs-misc)
 ;;; lobstermacs-misc.el ends here
