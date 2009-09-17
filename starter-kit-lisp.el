@@ -9,20 +9,19 @@
 (define-key lisp-mode-shared-map (kbd "C-c v") 'eval-buffer)
 
 ;; this kind of belongs in a themes file
-(when window-system
-  (defface esk-paren-face
-    '((((class color) (background dark))
-       (:foreground "grey10"))
-      (((class color) (background light))
-       (:foreground "grey55")))
-    "Face used to dim parentheses."
-    :group 'starter-kit-faces))
+;; (when window-system
+;;   (defface esk-paren-face
+;;     '((((class color) (background dark))
+;;        (:foreground "grey10"))
+;;       (((class color) (background light))
+;;        (:foreground "grey55")))
+;;     "Face used to dim parentheses."
+;;     :group 'starter-kit-faces))
 
 ;;; Emacs Lisp
 
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'emacs-lisp-mode-hook 'esk-remove-elc-on-save)
-(add-hook 'emacs-lisp-mode-hook 'turn-on-company)
 
 (defun esk-remove-elc-on-save ()
   "If you're saving an elisp file, likely the .elc is no longer valid."
@@ -31,6 +30,8 @@
             (lambda ()
               (if (file-exists-p (concat buffer-file-name "c"))
                   (delete-file (concat buffer-file-name "c"))))))
+
+(define-key emacs-lisp-mode-map (kbd "M-.") 'find-function-at-point)
 
 ;;; Clojure
 
@@ -43,11 +44,10 @@
   (interactive (list
                 (ido-read-directory-name
                  "Project root: "
-                 (locate-dominating-file default-directory "pom.xml"))))
+                 (locate-dominating-file default-directory "src"))))
+  (require 'swank-clojure)
   (when (get-buffer "*inferior-lisp*")
     (kill-buffer "*inferior-lisp*"))
-  (defvar swank-clojure-extra-vm-args nil)
-  (defvar slime-lisp-implementations nil)
   (add-to-list 'swank-clojure-extra-vm-args
                (format "-Dclojure.compile.path=%s"
                        (expand-file-name "target/classes/" path)))

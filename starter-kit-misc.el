@@ -2,12 +2,8 @@
 ;;
 ;; Part of the Emacs Starter Kit
 
-;; Avoid error: "Variable binding depth exceeds max-specpdl-size"
-(setq max-specpdl-size 32000)
-
 (when window-system
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
-  (turn-off-tool-bar)
   (scroll-bar-mode (quote right))
   (tooltip-mode -1)
   (turn-off-tool-bar)
@@ -31,8 +27,6 @@
       color-theme-is-global t
       delete-by-moving-to-trash t
       shift-select-mode nil
-      column-number-mode 1
-      make-backup-files nil
       truncate-partial-width-windows nil
       uniquify-buffer-name-style 'forward
       whitespace-style '(trailing lines space-before-tab
@@ -49,27 +43,20 @@
 ;; Enable syntax highlighting for older Emacsen that have it off
 (global-font-lock-mode t)
 
-;; You really don't need this; trust me.
-;; jart: the menu bar really helps in GTK mode ._.
-(unless window-system
-  (menu-bar-mode -1))
-
 ;; Save a list of recent files visited.
 (recentf-mode 1)
 
 ;; Highlight matching parentheses when the point is on them.
 (show-paren-mode 1)
 
-;; Overwrite highlighted text if you start typing
-(delete-selection-mode t)
-
 ;; ido-mode is like magic pixie dust!
-(ido-mode t)
-(setq ido-enable-prefix nil
-      ido-enable-flex-matching t
-      ido-create-new-buffer 'always
-      ido-use-filename-at-point t
-      ido-max-prospects 10)
+(when (> emacs-major-version 21)
+  (ido-mode t)
+  (setq ido-enable-prefix nil
+        ido-enable-flex-matching t
+        ido-create-new-buffer 'always
+        ido-use-filename-at-point 'guess
+        ido-max-prospects 10))
 
 (set-default 'indent-tabs-mode nil)
 (set-default 'indicate-empty-lines t)
@@ -83,14 +70,6 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (random t) ;; Seed the random-number generator
-
-;; ReST files from bitbucket in particular have the header
-;; ".. -*-restructuredtext-*-" which emacs isn't going to understand
-;; without this alias
-(defalias 'restructuredtext-mode 'rst-mode)
-
-;; ReST
-(add-hook 'rst-adjust-hook 'rst-toc-update)
 
 ;; Hippie expand: at times perhaps too hip
 (delete 'try-expand-line hippie-expand-try-functions-list)
@@ -115,9 +94,6 @@
 (add-to-list 'auto-mode-alist '("Rakefile$" . ruby-mode))
 (add-to-list 'auto-mode-alist '("\\.js\\(on\\)?$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.xml$" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.xslt$" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
-(add-to-list 'auto-mode-alist '("\\.rst$" . rst-mode))
 
 ;; Default to unified diffs
 (setq diff-switches "-u")
@@ -134,9 +110,13 @@
      (set-face-foreground 'magit-diff-add "green3")
      (set-face-foreground 'magit-diff-del "red3")))
 
-(eval-after-load 'nxhtml
+(eval-after-load 'mumamo
   '(eval-after-load 'zenburn
      '(set-face-background 'mumamo-background-chunk-submode "gray22")))
+
+;; make emacs use the clipboard
+(setq x-select-enable-clipboard t)
+(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
 (provide 'starter-kit-misc)
 ;;; starter-kit-misc.el ends here

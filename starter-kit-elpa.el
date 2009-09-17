@@ -10,8 +10,8 @@
                                    'findr
                                    'magit
                                    'yasnippet-bundle
-                                   ;; 'nxml
                                    'gist
+                                   'nxml-mode
                                    'paredit)
   "Libraries that should be installed by default.")
 

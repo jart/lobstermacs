@@ -5,21 +5,6 @@
 ;; You know, like Readline.
 (global-set-key (kbd "C-M-h") 'backward-kill-word)
 
-;; If we're typing on a region and press backspace, the region should die.
-(global-set-key (kbd "C-d") 'delete-char-dwim)
-(global-set-key (kbd "<DEL>") 'delete-backward-char-dwim)
-
-;; Additional Paredit bindings
-(eval-after-load 'paredit
-  '(progn
-     (define-key paredit-mode-map (kbd "C-d") 'paredit-forward-delete)
-     (define-key paredit-mode-map (kbd "<DEL>") 'paredit-backward-delete)
-     (define-key paredit-mode-map (kbd ")")   'paredit-close-parenthesis-safe)
-     (define-key paredit-mode-map (kbd "M-)") 'paredit-close-parenthesis-and-newline-safe)
-     (define-key paredit-mode-map (kbd "M-s") 'paredit-forward-slurp-sexp)
-     (define-key paredit-mode-map (kbd "M-v") 'paredit-forward-barf-sexp)
-     (define-key paredit-mode-map (kbd "C-M-h") 'paredit-backward-kill-word)))
-
 ;; Align your code in a pretty way.
 (global-set-key (kbd "C-x \\") 'align-regexp)
 
@@ -30,7 +15,7 @@
 (global-set-key (kbd "C-c n") 'cleanup-buffer)
 
 ;; Turn on the menu bar for exploring new modes
-(global-set-key [f1] 'menu-bar-mode)
+(global-set-key (kbd "C-<f10>") 'menu-bar-mode)
 
 ;; Font size
 (define-key global-map (kbd "C-+") 'text-scale-increase)
@@ -49,7 +34,6 @@
 (global-set-key (kbd "C-x M-f") 'ido-find-file-other-window)
 (global-set-key (kbd "C-x C-M-f") 'find-file-in-project)
 (global-set-key (kbd "C-x f") 'recentf-ido-find-file)
-(global-set-key (kbd "C-x C-p") 'find-file-at-point)
 (global-set-key (kbd "C-c y") 'bury-buffer)
 (global-set-key (kbd "C-c r") 'revert-buffer)
 (global-set-key (kbd "M-`") 'file-cache-minibuffer-complete)
@@ -84,13 +68,6 @@
 ;; Should be able to eval-and-replace anywhere.
 (global-set-key (kbd "C-c e") 'eval-and-replace)
 
-;; These key-bindings make it very easy to navigate through grep
-;; results, compile errors, etc.
-(global-set-key (kbd "C-x C-n") 'next-error)
-(global-set-key (kbd "C-x C-p") 'previous-error)
-(global-set-key [f11] 'next-error)
-(global-set-key [f12] 'previous-error)
-
 ;; Applications
 
 (global-set-key (kbd "C-c j") (lambda () (interactive) (switch-or-start 'jabber-connect "*-jabber-*")))
@@ -115,6 +92,10 @@
   (lambda () (interactive)
     (let ((case-fold-search isearch-case-fold-search))
       (occur (if isearch-regexp isearch-string (regexp-quote isearch-string))))))
+
+;; Org
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
 
 (provide 'starter-kit-bindings)
 ;;; starter-kit-bindings.el ends here

@@ -9,6 +9,12 @@
 ;; and brighter; it simply makes everything else vanish."
 ;; -Neal Stephenson, "In the Beginning was the Command Line"
 
+;; Turn off mouse interface early in startup to avoid momentary display
+;; You really don't need these; trust me.
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
 ;; Load path etc.
 
 (setq dotfiles-dir (file-name-directory
@@ -36,10 +42,6 @@
 ;; backport some functionality to Emacs 22 if needed
 (require 'dominating-file)
 
-;; this must be loaded before ELPA since it bundles its own
-;; out-of-date js stuff. TODO: fix it to use ELPA dependencies
-(load "elpa-to-submit/nxhtml/autostart")
-
 ;; Load up ELPA, the package manager
 
 (require 'package)
@@ -55,17 +57,22 @@
 (require 'starter-kit-defuns)
 (require 'starter-kit-bindings)
 (require 'starter-kit-misc)
-(require 'starter-kit-system)
 (require 'starter-kit-registers)
 (require 'starter-kit-eshell)
 (require 'starter-kit-lisp)
 (require 'starter-kit-perl)
 (require 'starter-kit-ruby)
 (require 'starter-kit-js)
-(require 'starter-kit-rst)
-(require 'starter-kit-c)
-(require 'starter-kit-python)
-(require 'starter-kit-erlang)
+
+;; lobstermacs stuff
+(require 'lobstermacs-defuns)
+(require 'lobstermacs-system)
+(require 'lobstermacs-c)
+(require 'lobstermacs-rst)
+(require 'lobstermacs-lisp)
+(require 'lobstermacs-python)
+(require 'lobstermacs-erlang)
+(require 'lobstermacs-misc)
 
 (regen-autoloads)
 

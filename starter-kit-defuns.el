@@ -86,11 +86,11 @@ Symbols matching the text at point are put first in the completion list."
 (defun turn-on-whitespace ()
   (whitespace-mode t))
 
+(defun turn-on-paredit ()
+  (paredit-mode t))
+
 (defun turn-off-tool-bar ()
   (tool-bar-mode -1))
-
-(defun turn-on-company ()
-  (company-mode t))
 
 (add-hook 'coding-hook 'local-column-number-mode)
 (add-hook 'coding-hook 'local-comment-auto-fill)
@@ -202,132 +202,22 @@ Symbols matching the text at point are put first in the completion list."
 
 (defun esk-paredit-nonlisp ()
   "Turn on paredit mode for non-lisps."
-  (set (make-local-variable 'paredit-space-for-delimiter-predicate)
-       (lambda (endp delimiter)
-         (equal (char-syntax (char-before)) ?\")))
+  (set (make-local-variable 'paredit-space-delimiter-chars)
+       (list ?\"))
   (paredit-mode 1))
 
-(defun lines (&rest lines)
-  (mapconcat 'identity lines "\n"))
-(defun padded-lines (&rest lines)
-  (concat "\n\n" (mapconcat 'identity lines "\n") "\n\n"))
-
-(defun lob/view-media-file (filename &optional force-browser)
-  "Tries to figure out the best possible way to view a media file
-like PDF, DVI, JPG, PNG, etc.  doc-view is the awesomest, then
-we'll try evince, xpdf, and if all else fails we'll just throw it in the "
-  (interactive "fFile? ")
-  ;; Example:
-  ;;   (lob/view-media-file "/home/jart/Documents/Markdown_Cheat_Sheet.pdf")
-  (cond
-   ((and (not force-browser)
-         (fboundp 'image-mode)
-         (memq (intern (downcase (file-name-extension filename)))
-               '(jpg jpeg png gif tif tiff svg svgz)))
-    (find-file filename))
-   ((and (not force-browser)
-         (fboundp 'doc-view-mode)
-         (memq (intern (downcase (file-name-extension filename)))
-               '(pdf dvi epdf epdf ps eps)))
-    (find-file filename))
-   ((and (not force-browser)
-         (memq (intern (downcase (file-name-extension filename)))
-               '(pdf dvi))
-         (executable-find "evince"))
-    (shell-command (concat "evince " (expand-file-name filename))))
-   ((and (not force-browser)
-         (memq (intern (downcase (file-name-extension filename)))
-               '(pdf dvi))
-         (executable-find "xpdf"))
-    (shell-command (concat "xpdf " (expand-file-name filename))))
-   (t (browse-url (concat "file://" (expand-file-name filename))))))
-
-(defun lob/regex-match (regexp string &optional number)
-  "Easier regular expression matching"
-  ;; Example:
-  ;;   (lob/regex-match "\\(hel\\)\\(lo\\)" "hello" 2)
-  ;;       => "lo"
-  ;;   (lob/regex-match "ID:\t\\(\\w+\\)\n" "Distributor ID:	Ubuntu\n" 1)
-  ;;       => "Ubuntu"
-  (if (string-match regexp string)
-      (match-string (or number 0) string)))
-
-(defmacro lob/nevar-fail (primary failover)
-  "Runs primary code.  If primary code fails, then executes
-  failover code."
-  `(condition-case exc
-       ,primary
-     ('error
-      (message (format "Caught exception: [%s]" exc))
-      ,failover)))
-
-;; (defmacro lob/safen-command (command on-fail)
-;;   "Declare a defun named 'command-safe' that will perform
-;;   'on-fail' if something bad happens."
-;;   `(defun ,(intern (concat (symbol-name command) "-safe")) ()
-;;      (lob/nevar-fail (,command) ,on-fail)))
-
-;; (defmacro lob/safen-command (command on-fail)
-;;   "Declare a defun named 'command-safe' that will perform
-;;   'on-fail' if something bad happens."
-;;   `(defun ,(make-symbol (concat (symbol-name command) "-safe")) ()
-;;      (interactive)
-;;      (condition-case exc
-;;          (apply ,command)
-;;        ('error
-;;         (message (format "Caught exception: [%s]" exc)))
-;;        ,on-fail)))
-
-;; (call-interactively 'paredit-close-parenthesis)
-;; (lob/safen-command paredit-close-parenthesis (insert ")"))
-;; (lob/safen-command paredit-close-parenthesis-and-newline (insert ")"))
-;; (macroexpand-all '(lob/safen-command paredit-close-parenthesis (insert ")")))
-;; (paredit-close-parenthesis-safe)
-
-(defun paredit-close-parenthesis-safe ()
-  "How do you expect me to rebalance my parens if you won't let
-  me type omg!"
+(defun toggle-fullscreen ()
   (interactive)
-  (lob/nevar-fail (paredit-close-parenthesis)
-                  (insert ")")))
-
-(defun paredit-close-parenthesis-and-newline-safe ()
-  "How do you expect me to rebalance my parens if you won't let
-  me type omg!"
-  (interactive)
-  (nevar-fail (paredit-close-parenthesis-and-newline)
-              (insert ")")))
+  ;; TODO: this only works for X. patches welcome for other OSes.
+  (x-send-client-message nil 0 nil "_NET_WM_STATE" 32
+                         '(2 "_NET_WM_STATE_MAXIMIZED_VERT" 0))
+  (x-send-client-message nil 0 nil "_NET_WM_STATE" 32
+                         '(2 "_NET_WM_STATE_MAXIMIZED_HORZ" 0)))
 
 ;; A monkeypatch to cause annotate to ignore whitespace
 (defun vc-git-annotate-command (file buf &optional rev)
   (let ((name (file-relative-name file)))
     (vc-git-command buf 0 name "blame" "-w" rev)))
-
-;; credit: chris capel's emacs file
-(defun close-or-bury-window ()
-  "Closes the open window or buries it if it's the only
-open window.  Example:
-
-    (progn
-      (erlang-shell)
-      (close-or-bury-window))
-"
-  (interactive)
-  (if (= (count-windows) 1)
-      (bury-buffer)
-          (delete-window)))
-
-;; credit: chris capel's emacs file
-(defun delete-char-dwim ()
-  (interactive)
-  (if (ensure-mark)
-      (delete-active-region)
-    (delete-char 1)))
-(defun delete-backward-char-dwim ()
-  (interactive)
-  (if (ensure-mark)
-      (delete-active-region)
-    (delete-backward-char 1)))
 
 (provide 'starter-kit-defuns)
 ;;; starter-kit-defuns.el ends here
