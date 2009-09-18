@@ -3,7 +3,7 @@
 
 (global-set-key (kbd "C-u") ctl-x-map)
 (global-set-key (kbd "C-x C-v") vc-prefix-map)
-(global-set-key (kbd "C-h") 'delete-backward-char-dwim)
+(global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "M-h") 'backward-kill-word)
 
 (eval-after-load 'paredit
