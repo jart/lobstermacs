@@ -72,9 +72,9 @@
   '(define-key paredit-mode-map (kbd ";") 'self-insert-command))
 
 (dolist (x '(scheme emacs-lisp lisp clojure))
-  (font-lock-add-keywords
-   (intern (concat (symbol-name x) "-mode"))
-   '(("(\\|)" . 'esk-paren-face)))
+;;   (font-lock-add-keywords
+;;    (intern (concat (symbol-name x) "-mode"))
+;;    '(("(\\|)" . 'esk-paren-face)))
   (add-hook
    (intern (concat (symbol-name x) "-mode-hook"))
    (lambda ()
