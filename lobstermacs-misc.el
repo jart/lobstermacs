@@ -4,8 +4,15 @@
 
 ;; Lots here stolen from topfunky
 
-(server-start)
 (prefer-coding-system 'utf-8)
+
+;; start emacs server, but not if some other emacs instance already
+;; has a server
+(if (fboundp 'server-start)
+    (progn
+      (require 'server) ;; server-running-p is not autoloaded
+      (if (not (server-running-p))
+          (server-start))))
 
 ;; Avoid error: "Variable binding depth exceeds max-specpdl-size"
 (setq max-specpdl-size 32000
