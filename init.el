@@ -54,6 +54,11 @@
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
 (autoload 'company-mode "company" nil t)
 
+;; latest version
+(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/newsticker-1.99"))
+(autoload 'newsticker-start "newsticker" "Emacs Newsticker" t)
+(autoload 'newsticker-show-news "newsticker" "Emacs Newsticker" t)
+
 (require 'starter-kit-defuns)
 (require 'starter-kit-bindings)
 (require 'starter-kit-misc)
