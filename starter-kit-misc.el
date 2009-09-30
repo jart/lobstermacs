@@ -112,7 +112,7 @@
 
 (eval-after-load 'mumamo
   '(eval-after-load 'zenburn
-     '(set-face-background 'mumamo-background-chunk-submode "gray22")))
+     '(ignore-errors (set-face-background 'mumamo-background-chunk-submode "gray22"))))
 
 ;; make emacs use the clipboard if available
 (if (fboundp 'x-cut-buffer-or-selection-value)
