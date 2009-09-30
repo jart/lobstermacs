@@ -67,6 +67,18 @@ buffer-file-name
   (move-beginning-of-line nil)
   (insert ";; a new comment appears!\n"))
 
+;; output data to a helpful buffer
+(defun output-to-buffer (data &optional buffer-name)
+  (let ((bufname (or buffer-name "*variable-output*")))
+    (get-buffer-create bufname)
+    (pop-to-buffer bufname))
+  (end-of-buffer)
+  (recenter)
+  (save-excursion
+    (insert data)))
+
+(output-to-buffer (concat "\nYour load path:\n\n"
+                          (mapconcat 'identity load-path "\n")))
 
 ;; the fine line: variables/atoms, code/lists
 system-name
@@ -152,11 +164,20 @@ nil
 (condition-case ex
   ('error (message (format "omg: [%s]" ex))))
 
+;; while loop
 (setq i 0)
 (while (< i 10)
   (insert "oh snap ")
   (setq i (+ i 1)))
 
+;; foreach loop
+(mapcar '(lambda (x) (concat "hi: " x)) (list "omg" "lol"))
+(mapcar '(lambda (x) (concat "hi: " x)) (list "omg" "lol"))
+(mapcar 'message load-path)
+
+(message "Hello")
+
+;; for loop
 (progn
   (let ((misery "I have haxored into your computer")
         (count  (length misery))
@@ -266,7 +287,7 @@ nil
 (nth 2 (list 6 7 8))
 ;; is element in list?
 (memq 'there (list 'hi 'there))
-(memq 'dog (list 'hi 'there)))
+(memq 'dog (list 'hi 'there))
 (memq system-type '(ms-dos windows-nt))
 (memq system-type '(ms-dos windows-nt))
 ;; head of list

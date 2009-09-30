@@ -32,6 +32,48 @@ ToDo
 
 ToDo
 
+## Using Emacs from the Command Line
+
+Running in terminal mode:
+
+    # mnemonic for -nw: "no window"
+    emacs -nw
+
+Emacs takes a while to load.  To quickly edit a file from the command
+line, you can start emacs in the background and use `emacsclient` to
+quickly edit a file:
+
+    emacs &
+    emacsclient -nw some_file.txt
+    emacsclient -nw some_file.txt --alternate-editor=nano
+
+Running lisp code from the command line:
+
+    emacsclient -e '(+ 2 2)'
+    emacsclient -e <code_file.el
+
+## Using Emacs for System Administration
+
+Getting started:
+
+    jart@compy:~$ ssh myserver
+    jart@myserver:~$ sudo apt-get install emacs-snapshot-nox emacs-snapshot-el
+    jart@myserver:~$ git clone git://github.com/jart/emacs-starter-kit.git .emacs.d
+    jart@myserver:~$ emacs
+
+Important Shortcuts:
+
+* `F3`: Re-open current file with root permissions using sudo.
+* `M-x sudo-edit`: Open a new file with root permissions.
+
+### BIND DNS Zone Files
+
+When editing DNS zone files, `zone-mode` saves you time by setting the
+zone serial number to the current date each time you save your file.
+This mode is automatically loaded when editing files with naming
+schemes like: `something.com.db`, `bind/db.something` or
+`named/db.something`.
+
 ## Lisp
 
 ToDo
