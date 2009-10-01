@@ -22,6 +22,9 @@
 ;; Overwrite highlighted text if you start typing
 (delete-selection-mode t)
 
+;; what the heck is `default-push`?
+(setq hg-outgoing-repository "default")
+
 ;; auto modes for certain extensions
 (add-to-list 'auto-mode-alist '("\\.xslt$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
