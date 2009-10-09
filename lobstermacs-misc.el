@@ -2,8 +2,6 @@
 ;;
 ;; Part of Lobstermacs.
 
-;; Lots here stolen from topfunky
-
 (prefer-coding-system 'utf-8)
 
 ;; start emacs server, but not if some other emacs instance already
