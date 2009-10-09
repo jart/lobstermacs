@@ -29,5 +29,12 @@
 ;;
 (setq lob/is-colorful (>= (display-color-cells) 256))
 
+(if (and (not window-system)
+         (not lob/is-colorful))
+    (message (concat "\n"
+                     "*** NOTICE: If you want pretty colors use: "
+                     "'export TERM=xterm-256color' before running me!"
+                     "\n")))
+
 (provide 'lobstermacs-system)
 ;;; lobstermacs-misc.el ends here

@@ -281,7 +281,13 @@ is the term to describe real windows)
 
 Your customizations generally get saved to your `custom.el` file.
 
-* `M-x customize-faces`: The master list.
+* `M-x customize-face`: A long list of colors/fonts you can customize
+  throughout Emacs.  After pressing "Save for future sessions" check
+  out your `custom.el` file to see what it did.
+
+* `M-x list-colors-display`: Shows you a list of all neat colorful
+  list of all the different text foreground/background colors you can
+  use.
 
 ## Using Emacs from the Command Line
 
