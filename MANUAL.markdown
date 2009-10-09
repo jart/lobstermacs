@@ -110,6 +110,11 @@ you want the non-GUI version for a dedicated server, use
     $ git clone git://github.com/jart/emacs-starter-kit.git
     $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
 
+Run Lobstermacs in a terminal:
+
+    $ export TERM=xterm-256color
+    $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
+
 ## Basic Editing
 
 The best way to learn basic editing using the keyboard is to go
@@ -334,7 +339,7 @@ inside parentheses.
 * `C-c C-s`: Slurp next term and put it inside my s-expr
 * `C-c C-b`: Barf last term in current s-expr out of the club
 * `C-c C-r`: Raise me out of the s-expr I'm trapped inside
-* `C-c C-s`: Split apart an s-expr at cursor
+* `C-c C-l`: Split apart an s-expr at cursor
 * `C-c C-j`: Join two s-exprs at left and right of cursor together
 
 #### Advanced

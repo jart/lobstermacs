@@ -82,7 +82,8 @@
 
 (regen-autoloads)
 
-(when window-system
+;; enable zenburn theme if we have 256+ colors
+(when lob/is-colorful
   (color-theme-zenburn))
 
 (load custom-file 'noerror)

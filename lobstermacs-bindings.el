@@ -22,7 +22,7 @@
      (define-key paredit-mode-map (kbd "C-c C-s") 'paredit-forward-slurp-sexp)
      (define-key paredit-mode-map (kbd "C-c C-b") 'paredit-forward-barf-sexp)
      (define-key paredit-mode-map (kbd "C-c C-r") 'paredit-raise-sexp)
-     (define-key paredit-mode-map (kbd "C-c C-s") 'paredit-split-sexp)
+     (define-key paredit-mode-map (kbd "C-c C-l") 'paredit-split-sexp)
      (define-key paredit-mode-map (kbd "C-c C-j") 'paredit-join-sexps)
      (define-key paredit-mode-map (kbd "C-M-h") 'paredit-backward-kill-word)))
 

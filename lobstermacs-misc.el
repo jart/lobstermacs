@@ -6,19 +6,24 @@
 
 ;; lets you use the mouse in terminal mode.  seems to be a bug using
 ;; this on read-only buffers.  also highlighting doesn't take effect
-;; until you let go of the mouse :\
+;; until you let go of the mouse :\  ALSO this highlighting doesn't
+;; seem to work when editing lisp files
 (when (not window-system)
   (xterm-mouse-mode t))
 
 ;; Line numbers are cool but you can always have too much of a good
 ;; thing.  Disable `linum-on` so it doesn't apply to popup buffers
-;; starting with '*' like `*Ido Completions*` and `*Help*`
-(if (fboundp 'global-linum-mode)
-    (global-linum-mode 1))
+;; starting with '*' like `*Ido Completions*` and `*Help*`.  Disabled
+;; when running from terminal, looks kinda bad
 (defun linum-on ()
     (unless (or (minibufferp)
                 (string-match "^\*" (buffer-name (current-buffer))))
       (linum-mode 1)))
+(if (and (fboundp 'global-linum-mode)
+         (not window-system))
+    (custom-set-faces
+     '(linum ((t (:foreground "brightblack")))))
+    (global-linum-mode 1))
 
 ;; tiny scroll bars in minibuffer is silly
 (set-window-scroll-bars (minibuffer-window) nil)

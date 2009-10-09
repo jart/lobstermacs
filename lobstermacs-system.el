@@ -22,5 +22,12 @@
 (setq lob/is-ubuntu-intrepid (and lob/is-ubuntu (string= lob/linux-distro-codename "intrepid")))
 (setq lob/is-ubuntu-hardy (and lob/is-ubuntu (string= lob/linux-distro-codename "hardy")))
 
+;; means terminal or emacs gui supports at least 256 colors
+;; in gnome terminal i can run:
+;;
+;;   TERM=xterm-256color emacs
+;;
+(setq lob/is-colorful (>= (display-color-cells) 256))
+
 (provide 'lobstermacs-system)
 ;;; lobstermacs-misc.el ends here
