@@ -12,12 +12,11 @@
 ;; Turn off mouse interface early in startup to avoid momentary display
 ;; You really don't need these; trust me.
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (unless window-system
-  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1)))
+  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1)))
 
 ;; Load path etc.
-
 (setq dotfiles-dir (file-name-directory
                     (or (buffer-file-name) load-file-name)))
 
@@ -28,6 +27,14 @@
 (setq autoload-file (concat dotfiles-dir "loaddefs.el"))
 (setq package-user-dir (concat dotfiles-dir "elpa"))
 (setq custom-file (concat dotfiles-dir "custom.el"))
+
+;; load these earlier
+(require 'lobstermacs-defuns)
+(require 'lobstermacs-system)
+;; enable zenburn theme if we have 256+ colors
+(when lob/is-colorful
+  (require 'zenburn)
+  (color-theme-zenburn))
 
 ;; These should be loaded on startup rather than autoloaded on demand
 ;; since they are likely to be used in every session
@@ -55,11 +62,6 @@
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
 (autoload 'company-mode "company" nil t)
 
-;; latest version
-(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/newsticker-1.99"))
-(autoload 'newsticker-start "newsticker" "Emacs Newsticker" t)
-(autoload 'newsticker-show-news "newsticker" "Emacs Newsticker" t)
-
 (require 'starter-kit-defuns)
 (require 'starter-kit-bindings)
 (require 'starter-kit-misc)
@@ -71,8 +73,6 @@
 (require 'starter-kit-js)
 
 ;; lobstermacs stuff
-(require 'lobstermacs-defuns)
-(require 'lobstermacs-system)
 (require 'lobstermacs-c)
 (require 'lobstermacs-rst)
 (require 'lobstermacs-lisp)
@@ -82,10 +82,6 @@
 (require 'lobstermacs-misc)
 
 (regen-autoloads)
-
-;; enable zenburn theme if we have 256+ colors
-(when lob/is-colorful
-  (color-theme-zenburn))
 
 (load custom-file 'noerror)
 
