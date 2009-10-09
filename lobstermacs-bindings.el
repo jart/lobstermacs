@@ -2,6 +2,33 @@
 ;;
 ;; Part of Lobstermacs.
 
+;; an oldy but a goody.  this makes the cursor stay in the same page
+;; on the screen when you use `C-v` and `M-v` so you don't have to
+;; keep re-centering with `C-l`
+(require 'pager)
+(global-set-key (kbd "C-v") 'pager-page-down)
+(global-set-key (kbd "M-v") 'pager-page-up)
+
+;; make emacs slightly less astonishing for windows users without
+;; provoking the wrath of emacs aficionados.  Cua-Lite is configured
+;; here to only really kick in if you use the arrow keys, page
+;; up/down, etc.
+;;
+;; You can now highlight with the shift and arrow keys like everyone
+;; else in the world.  Now I just need to figure out how to make
+;; `C-c`, `C-x` and `C-v` behave the Windows way when a selection was
+;; created using the mouse or arrow keys.
+(require 'cua-lite)
+(setq cua-lite-default-keybindings 1
+      cua-lite-mode-line-string ""
+      cua-lite-use-backward-delete-word nil
+      cua-lite-use-simplified-paragraph-movement t
+      cua-lite-what-is-alt-f4 nil
+      cua-lite-what-is-control-w nil
+      cua-lite-display-status-in-mode-line nil
+      cua-lite-use-hscroll-mode nil)
+(cua-lite 1)
+
 ;; auto modes for certain extensions
 (add-to-list 'auto-mode-alist '("\\.xslt$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))

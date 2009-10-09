@@ -207,7 +207,28 @@ it back with `C-y`.
 * `M-?` or `C-<enter>`: Auto-complete symbol (smart, introspects code)
 * `C-;`: Comment highlighted region [2]
 
-### Cursor Movement (Advanced If You're Lazy)
+### Copy/Pasting
+
+Emacs is like, *really old* so instead of a clip-board you get a "kill
+ring."  Kill=Copy, Yank=Paste, Region=Highlighted Text.
+
+You can highlight text with shift + arrow keys if you like.
+
+* `C-y` or `Shift-Insert`: Yank (pastes last thing killed)
+* `C-y M-y M-y M-y ...`: Yank, cycling through previous kills
+* `C-<space>`: Start highlighting text (mark region)
+* `C-w`: Cut region to clipboard
+* `M-w`: Copy region to clipboard
+* `C-g`: Cancel highlighting text
+
+Tip: Many common features are coded to operate on highlighted regions.
+
+Tip: It helps to use other shortcuts like Search (`C-s`) once you're
+started highlighting.
+
+### Advanced Cursor Movement
+
+How to code like a hacker:
 
 * `C-l`: Re-center screen (press multiple times for different alignments)
 
@@ -228,24 +249,8 @@ it back with `C-y`.
 * `C-a`: Go to beginning of line (Think first letter in alphabet)
 * `C-e`: Go to *End* of line
 * `C-v`: Page up
-* `M-v`: Page down
-
-### Copy/Pasting (Advanced)
-
-AKA Killing/Yanking
-
-You can highlight text with the keyboard (regions.)  Many shortcuts
-detect regions.  If you highlight text and use replace string, it will
-only work inside your region.
-
-Tip: It helps to use other shortcuts like Search (`C-s`) once you're
-started highlighting.
-
-* `C-y`: Paste (Yank)
-* `C-y M-y M-y M-y ...`: Paste something previously copied
-* `C-<space>`: Start highlighting text (mark region)
-* `C-w`: Cut region to clipboard
-* `M-w`: Copy region to clipboard
+* `M->`: Go to end of buffer
+* `M-<`: Go to beginning of buffer
 
 ### Macros (Advanced)
 
