@@ -126,7 +126,6 @@ open window.  Example:
   (interactive)
   (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
 
-
 (defun lob/linum-format-with-space (line)
   "This is here because in terminal mode the fringe goes away,
 the line numbers touch your code, it's really ugly.  You would
@@ -144,6 +143,22 @@ But the numbers won't right align so do this:
                       (count-lines (point-min)
                                    (point-max))))))
       (concat "%" (number-to-string w) "d ")) line) 'face 'linum))
+
+;; IDO M-x is cool :D
+(setq ido-execute-command-cache nil)
+(defun ido-execute-command ()
+  (interactive)
+  (call-interactively
+   (intern
+    (ido-completing-read
+     "M-x "
+     (progn
+       (unless ido-execute-command-cache
+         (mapatoms (lambda (s)
+                     (when (commandp s)
+                       (setq ido-execute-command-cache
+                             (cons (format "%S" s) ido-execute-command-cache))))))
+       ido-execute-command-cache)))))
 
 (provide 'lobstermacs-defuns)
 ;;; lobstermacs-defuns.el ends here

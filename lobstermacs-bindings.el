@@ -71,5 +71,9 @@
 (global-set-key [f11] 'next-error)
 (global-set-key [f12] 'previous-error)
 
+;; IDO execute is cool
+(global-set-key (kbd "M-x") 'ido-execute-command)
+(global-set-key (kbd "C-x C-m") 'ido-execute-command)
+
 (provide 'lobstermacs-bindings)
 ;;; lobstermacs-bindings.el ends here
