@@ -4,6 +4,9 @@
 
 (prefer-coding-system 'utf-8)
 
+;; tiny scroll bars in minibuffer is silly
+(set-window-scroll-bars (minibuffer-window) nil)
+
 ;; start emacs server, but not if some other emacs instance already
 ;; has a server
 (if (fboundp 'server-start)
