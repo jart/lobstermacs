@@ -367,6 +367,7 @@ static char *gnus-pointer[] = {
 
      `(border ((t (:background ,zenburn-bg))))
      '(fringe ((t (:inherit zenburn-highlight-subtle))))
+     `(linum ((t (:foreground "#696969" :background ,zenburn-bg))))
      '(header-line ((t (:inherit zenburn-highlight-damp
                         :box (:color "#2e3330" :line-width 2)))))
      '(mode-line ((t (:foreground "#acbc90" :background "#1e2320"

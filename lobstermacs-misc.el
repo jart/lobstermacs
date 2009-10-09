@@ -2,13 +2,23 @@
 ;;
 ;; Part of Lobstermacs.
 
+(prefer-coding-system 'utf-8)
+
 ;; lets you use the mouse in terminal mode.  seems to be a bug using
 ;; this on read-only buffers.  also highlighting doesn't take effect
 ;; until you let go of the mouse :\
 (when (not window-system)
   (xterm-mouse-mode t))
 
-(prefer-coding-system 'utf-8)
+;; Line numbers are cool but you can always have too much of a good
+;; thing.  Disable `linum-on` so it doesn't apply to popup buffers
+;; starting with '*' like `*Ido Completions*` and `*Help*`
+(if (fboundp 'global-linum-mode)
+    (global-linum-mode 1))
+(defun linum-on ()
+    (unless (or (minibufferp)
+                (string-match "^\*" (buffer-name (current-buffer))))
+      (linum-mode 1)))
 
 ;; tiny scroll bars in minibuffer is silly
 (set-window-scroll-bars (minibuffer-window) nil)
