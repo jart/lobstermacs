@@ -2,6 +2,12 @@
 ;;
 ;; Part of Lobstermacs.
 
+;; lets you use the mouse in terminal mode.  seems to be a bug using
+;; this on read-only buffers.  also highlighting doesn't take effect
+;; until you let go of the mouse :\
+(when (not window-system)
+  (xterm-mouse-mode t))
+
 (prefer-coding-system 'utf-8)
 
 ;; tiny scroll bars in minibuffer is silly
