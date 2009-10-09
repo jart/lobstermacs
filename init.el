@@ -77,6 +77,7 @@
 (require 'lobstermacs-lisp)
 (require 'lobstermacs-python)
 (require 'lobstermacs-erlang)
+(require 'lobstermacs-bindings)
 (require 'lobstermacs-misc)
 
 (regen-autoloads)

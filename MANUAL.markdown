@@ -125,15 +125,18 @@ all terminals and throughout Mac OS X (by default.)
 
 ### Essential
 
+Note: A "buffer" is an open file.  Most Emacs users keep hundreds open
+at a time.
+
 * `C-g`: Panic button (makes whatever you did stop happening)
 * `C-x C-c`: Quit
 * `M-z` or `C-?`: Undo!
 * `C-x 1`: Make split windows go away
-* `C-x C-f`: Open file (creating a new buffer)
+* `C-x C-f`: Open file (Tip: Try `//`, `C-s` and `C-r` in IDO's find file mode)
 * `C-x f`: Open recent file
 * `M-s` or `C-x C-s`: Save current buffer
 * `C-x k`: Close buffer
-* `C-x C-b`: Switch between buffers (as in open files)
+* `C-x C-b`: Switch between buffers (Tip: `C-s` and `C-r` cycle through your available buffers)
 * `M-x`: Execute extended command
 * `M-!`: Execute system/shell command
 
@@ -155,6 +158,10 @@ all terminals and throughout Mac OS X (by default.)
   editing.
 
 ### Searching
+
+Once you start searching, you can press `C-s` and `C-r` to jump
+between results, and `C-g` will cancel and bring you back where you
+were.
 
 * `C-s`: Search forward (Uses regular expressions)
 * `C-r`: Reverse search (Uses regular expressions)
@@ -263,6 +270,14 @@ is the term to describe real windows)
 [1] Lobstermacs only
 [2] Intended more for programmers
 
+## Customizing
+
+### Colors
+
+Your customizations generally get saved to your `custom.el` file.
+
+* `M-x customize-faces`: The master list.
+
 ## Using Emacs from the Command Line
 
 Running in terminal mode:
@@ -298,6 +313,9 @@ schemes like: `something.com.db`, `bind/db.something` or
 * `C-x C-e`: Execute s-expression before cursor or region
 * `C-:`: Ask me to type a s-expression in minibuffer to execute
 
+Tip: Use EDebug to diagnose Lisp problems.  I find `M-x edebug-defun`
+is very useful!
+
 ### Paredit: Dealing With Parentheses (S-Expressions)
 
 Paredit takes a little time to get used to but is very much worth
@@ -313,10 +331,11 @@ inside parentheses.
 #### Important Shortcuts
 
 * `C-M-f` and `C-M-b`: Hop around your jungle of s-exprs (or `C-F` and `C-B`)
-* `M-s`: Slurp next term and put it inside my s-expr
-* `M-v`: Vomit last term in current s-expr
-* `M-r`: Bust me out of the s-expr I'm wrapped inside
-* `M-S`, `M-J`: Split/Join an s-expr
+* `C-c C-s`: Slurp next term and put it inside my s-expr
+* `C-c C-b`: Barf last term in current s-expr out of the club
+* `C-c C-r`: Raise me out of the s-expr I'm trapped inside
+* `C-c C-s`: Split apart an s-expr at cursor
+* `C-c C-j`: Join two s-exprs at left and right of cursor together
 
 #### Advanced
 

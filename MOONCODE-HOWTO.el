@@ -195,6 +195,7 @@ nil
 ;; this uses regular expressions so be careful
 (string-match "o$" "hello")
 (string-match "ll$" "hello")
+(string-match "CODE" (buffer-name (current-buffer)))
 (replace-regexp-in-string " " "-" "is this the place i used to call fatherland")
 (split-string "war,is,peace" ",")
 (downcase "OMG what you know about Emacs dawg?")

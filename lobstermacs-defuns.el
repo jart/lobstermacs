@@ -93,8 +93,8 @@ we'll try evince, xpdf, and if all else fails we'll just throw it in the "
   "How do you expect me to rebalance my parens if you won't let
   me type omg!"
   (interactive)
-  (nevar-fail (paredit-close-parenthesis-and-newline)
-              (insert ")")))
+  (lob/nevar-fail (paredit-close-parenthesis-and-newline)
+                  (insert ")")))
 
 ;; credit: chris capel's emacs file
 (defun close-or-bury-window ()
@@ -121,6 +121,10 @@ open window.  Example:
   (if mark-active
       (delete-active-region)
     (delete-backward-char 1)))
+
+(defun sudo-edit-me ()
+  (interactive)
+  (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
 
 (provide 'lobstermacs-defuns)
 ;;; lobstermacs-defuns.el ends here
