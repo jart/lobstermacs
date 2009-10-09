@@ -13,17 +13,20 @@
 
 ;; Line numbers are cool but you can always have too much of a good
 ;; thing.  Disable `linum-on` so it doesn't apply to popup buffers
-;; starting with '*' like `*Ido Completions*` and `*Help*`.  Disabled
-;; when running from terminal, looks kinda bad
+;; starting with '*' like `*Ido Completions*` and `*Help*`.  We're not
+;; going to bother with this on 4-bit terminals.
+;;
+;; BUG: flaky with company completion popups
+(when (and (fboundp 'global-linum-mode)
+           lob/is-colorful)
+  (global-linum-mode 1)
+  ;; in terminal there's no gutter, so give a little space
+  (if (not window-system)
+      (setq linum-format 'lob/linum-format-with-space)))
 (defun linum-on ()
-    (unless (or (minibufferp)
-                (string-match "^\*" (buffer-name (current-buffer))))
-      (linum-mode 1)))
-(if (and (fboundp 'global-linum-mode)
-         (not window-system))
-    (custom-set-faces
-     '(linum ((t (:foreground "brightblack")))))
-    (global-linum-mode 1))
+  (unless (or (minibufferp)
+              (string-match "^\*" (buffer-name (current-buffer))))
+    (linum-mode 1)))
 
 ;; tiny scroll bars in minibuffer is silly
 (set-window-scroll-bars (minibuffer-window) nil)
