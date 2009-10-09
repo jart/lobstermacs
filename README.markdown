@@ -8,28 +8,9 @@ working environment for anyone using Emacs for dynamic languages. The
 main advantage of the Starter Kit is that it provides better default
 settings and bundles many useful libraries.
 
-The latest version is at <http://github.com/jart/emacs-starter-kit/>
+The latest version is at <http://github.com/jart/lobstermacs/>
 
-The latest "official" version is at <http://github.com/technomancy/emacs-starter-kit/>
-
-## Notes Regarding This Fork
-
-(jart 2009/08) I created this fork of emacs-starter-kit to write
-documentation and offer better "out of the box" support for the
-following pieces of software:
-
-- Python
-- Mercurial
-- Erlang
-
-## Learning
-
-This won't teach you Emacs, but it'll make it easier to get
-comfortable. To access the tutorial, press control-h followed by t.
-
-You may also find the [PeepCode Meet Emacs
-screencast](http://peepcode.com/products/meet-emacs) helpful. The
-[Emacs Wiki](http://emacswiki.org) is also very handy.
+The latest upstream version is at <http://github.com/technomancy/emacs-starter-kit/>
 
 ### Tips
 
@@ -73,20 +54,6 @@ single instance using the starter kit, try the following invocation:
 Note that having a ~/.emacs file might override the starter kit
 loading, so if you've having trouble loading it, make sure that file
 is not present.
-
-### Quick Start Ubuntu
-
-This will get you set up with a nice happy GUI version of emacs:
-
-    $ sudo apt-get install git-core emacs-snapshot emacs-snapshot-el ispell
-    $ git clone git://github.com/jart/emacs-starter-kit.git
-    $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
-
-If you like to write code in Erlang:
-
-    $ sudo apt-get install erlang erlang-dev erlang-manpages build-essential
-    $ cd emacs-starter-kit/vendor/distel
-    $ make install
 
 ## Structure
 
