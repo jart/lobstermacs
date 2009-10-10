@@ -23,6 +23,8 @@
 (add-to-list 'load-path dotfiles-dir)
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/jabber"))
+(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml"))
+(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml/util"))
 
 (setq autoload-file (concat dotfiles-dir "loaddefs.el"))
 (setq package-user-dir (concat dotfiles-dir "elpa"))
@@ -75,6 +77,7 @@
 (require 'starter-kit-js)
 
 ;; lobstermacs stuff
+(require 'ourcomments-util)
 (require 'lobstermacs-ido)
 (require 'lobstermacs-c)
 (require 'lobstermacs-rst)

@@ -4,8 +4,13 @@
 
 (prefer-coding-system 'utf-8)
 
-;; This might annoy some people
-(setq require-final-newline t)
+(setq max-specpdl-size 32000 ;; Avoid error: "Variable binding depth exceeds max-specpdl-size"
+      column-number-mode 1
+      make-backup-files nil
+      ourcomments-ido-ctrl-tab t
+      ourcomments-M-x-menu-mode t
+      require-final-newline t
+      hg-outgoing-repository "default")
 
 ;; lets you use the mouse in terminal mode.  seems to be a bug using
 ;; this on read-only buffers.  also highlighting doesn't take effect
@@ -42,16 +47,8 @@
       (if (not (server-running-p))
           (server-start))))
 
-;; Avoid error: "Variable binding depth exceeds max-specpdl-size"
-(setq max-specpdl-size 32000
-      column-number-mode 1
-      make-backup-files nil)
-
 ;; Overwrite highlighted text if you start typing
 (delete-selection-mode t)
-
-;; what the heck is `default-push`?
-(setq hg-outgoing-repository "default")
 
 ;; ReST files from bitbucket in particular have the header
 ;; ".. -*-restructuredtext-*-" which emacs isn't going to understand

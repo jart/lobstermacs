@@ -79,6 +79,19 @@
 (global-set-key (kbd "M-x") 'ido-execute-command)
 (global-set-key (kbd "C-x C-m") 'ido-execute-command)
 
+(defun ourcomments-ido-switch-buffer-or-next-entry ()
+  (interactive)
+  (if (active-minibuffer-window)
+      (ido-next-match)
+    (ido-switch-buffer)))
+
+;; You can now switch buffers with IDO using `C-Tab` and `C-S-Tab`
+(global-set-key [(control tab)]       'ourcomments-ido-switch-buffer-or-next-entry)
+(global-set-key [(control shift tab)] 'ido-prev-match)
+(global-set-key (kbd "C-S-<iso-lefttab>") 'ido-prev-match)
+;(define-key ido-buffer-completion-map (kbd "C-S-<iso-lefttab>") 'ido-prev-match)
+;(define-key ido-buffer-completion-map [(control shift tab)] 'ido-prev-match)
+
 ;; opposite of `M-q`
 (global-set-key (kbd "M-Q") 'unfill-paragraph)
 
