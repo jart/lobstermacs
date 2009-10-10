@@ -194,7 +194,7 @@ Any shortcuts that deletes more than one character ALSO copies the
 text you just deleted (to the "kill ring.")  You can yank (or paste)
 it back with `C-y`.
 
-* `M-z` or `C-?`: Undo!
+* `C-z` or `M-z` or `C-?`: Undo! (`C-z` disabled in terminal mode)
 * `C-<Backspace>`: Delete word backwards
 * `C-M-h`: Delete word backwards
 * `C-d`: Delete character forwards
@@ -252,10 +252,11 @@ How to code like a hacker:
 * `M->`: Go to end of buffer
 * `M-<`: Go to beginning of buffer
 
-### Macros (Advanced)
+* `C-o`: Create new line without indentation.  This is very useful in
+  cases where you need a blank line but pressing `<enter>` would do
+  something undesirable.  (Like with auto-fill and auto-indent)
 
-* `C-o`: Create new line without indentation (Very useful for creating
-  blank lines in code when auto-indent is enabled)
+### Macros (Advanced)
 
 Macros are very useful for automating basic editing tasks, and they're
 usually simpler than writing a regular expression.
@@ -369,11 +370,19 @@ inside parentheses.
 
 ## Python
 
-ToDo
+Ubuntu users starting off with Python should install the following
+packages to get started:
+
+    sudo apt-get install python python-setuptools python-tz
+    sudo easy_install django # 9.04 ships with 1.0.. 1.1 is so worth it!
+    sudo easy_install py     # my personal favorite unit testing framework
 
 ## Ruby
 
-ToDo
+Ubuntu users starting off with Ruby and/or Rails should install the
+following packages:
+
+    sudo apt-get install ri ruby irb rails mongrel rake rdoc rubygems
 
 ## Erlang
 

@@ -66,6 +66,10 @@
 (global-set-key (kbd "M-s") 'save-buffer)
 (global-set-key (kbd "M-z") 'undo)
 
+;; being able to minimize emacs isn't very helpful, especially if it
+;; makes life harder for windows ppl
+(if window-system (global-set-key (kbd "C-z") 'undo))
+
 ;; function keyz
 (global-set-key [f3] 'sudo-edit-me)
 (global-set-key [f11] 'next-error)
