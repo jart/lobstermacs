@@ -219,44 +219,59 @@ ring."  Kill=Copy, Yank=Paste, Region=Highlighted Text.
 
 You can highlight text with shift + arrow keys if you like.
 
-* `C-y` or `Shift-Insert`: Yank (pastes last thing killed)
+* `C-y` or `Shift-Insert` or `Middle-Click`: Yank (Pastes last thing killed)
 * `C-y M-y M-y M-y ...`: Yank, cycling through previous kills
 * `C-<space>`: Start highlighting text (mark region)
 * `C-w`: Cut region to clipboard
 * `M-w`: Copy region to clipboard
+* `C-x h`: Highlight entire buffer (Select all)
 * `C-g`: Cancel highlighting text
-
+  
 Tip: Many common features are coded to operate on highlighted regions.
 
 Tip: It helps to use other shortcuts like Search (`C-s`) once you're
 started highlighting.
 
-### Advanced Cursor Movement
+### Cursor Movement
 
-How to code like a hacker:
+How to code like a hacker.  You are recommended to avoid the arrow
+keys and do things the Emacs way for sake of efficiency, but the
+choice is yours!
 
 * `C-l`: Re-center screen (press multiple times for different alignments)
 
-* `C-f`: *Forward* one character
-* `C-b`: *Backward* one character
-* `M-f`: *Forward* one word
-* `M-b`: *Backward* one word
-* `C-M-f`: Next *term* [1] [2]
-* `C-M-b`: Previous *term* [1] [2]
+* `C-f` or `<right>`: *Forward* one character
+* `C-b` or `<left>`: *Backward* one character
+* `M-f` or `<C-right>`: *Forward* one word
+* `M-b` or `<C-left>`: *Backward* one word
+* `C-M-f`: Next *term* (May conflict with OS or Term)
+* `C-M-b`: Previous *term* [1] [2] (May conflict with OS or Term)
 
-* `C-n`: *Next* line
-* `C-p`: *Previous* line
-* `M-n`: Next *blank* line [1]
-* `M-p`: Previous *blank* line [1]
-* `C-M-n`: Next *top-level term* [1] [2]
-* `C-M-p`: Previous *top-level term* [1] [2]
+* `C-n` or `<down>`: *Next* line
+* `C-p` or `<up>`: *Previous* line
+* `M-n` or `C-<down>`: Next *blank* line (think jump to next paragraph) [1]
+* `M-p` or `C-<up>`: Previous *blank* line [1]
+* `C-M-n` or `C-{`: Next *top-level term* [1] [2]
+* `C-M-p` or `C-}`: Previous *top-level term* [1] [2]
 
 * `C-a`: Go to beginning of line (Think first letter in alphabet)
 * `C-e`: Go to *End* of line
-* `C-v`: Page up
-* `M->`: Go to end of buffer
-* `M-<`: Go to beginning of buffer
+* `C-v` or `<PgUp>`: Page up
+* `M-v` or `<PgDown>`: Page down
+* `M->` or `C-<home>`: Go to end of buffer
+* `M-<` or `C-<end>`: Go to beginning of buffer 
+* `C-<PgUp>`: Move cursor to top of screen without scrolling
+* `C-<PgDown>`: Move cursor to bottom of screen without scrolling
 
+### Programming Shortcuts
+
+* `C-x C-i`: Browse through list of functions/classes (IDO style!) so
+  you can jump to their definition.
+* `M-/`: Auto-complete symbol based on text in all buffers (works
+  universally; doesn't user code-intelligence)
+* `M-?` or `C-<enter>`: Auto-complete symbol (smart, introspects code)
+* `M-.`: Jump to definition of symbol under cursor.
+* `C-;`: Comment highlighted region
 * `C-o`: Create new line without indentation.  This is very useful in
   cases where you need a blank line but pressing `<enter>` would do
   something undesirable.  (Like with auto-fill and auto-indent)

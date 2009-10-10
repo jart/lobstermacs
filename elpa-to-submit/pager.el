@@ -81,6 +81,7 @@ keep the `pager-temporary-goal-column'")
 
 ;; ----------------------------------------------------------------------
 
+;;;###autoload
 (defun pager-page-down ()
   "Like scroll-up, but moves a fixed amount of lines (fixed relative the
 `window-height') so that pager-page-up moves back to the same line."
@@ -88,7 +89,8 @@ keep the `pager-temporary-goal-column'")
   (if (not (pos-visible-in-window-p (point-max)))
       (pager-scroll-screen (- (1- (window-height))
 			      next-screen-context-lines))))
-    
+
+;;;###autoload
 (defun pager-page-up ()
   "Like scroll-down, but moves a fixed amount of lines (fixed relative the
 `window-height') so that pager-page-down moves back to the same line."
@@ -99,6 +101,7 @@ keep the `pager-temporary-goal-column'")
 
 ;; ------------------------------
 
+;;;###autoload
 (defun pager-scroll-screen (lines)
   "Scroll screen LINES, but keep the cursors position on screen."
   (if (not (memq last-command pager-keep-column-commands))
@@ -113,6 +116,7 @@ keep the `pager-temporary-goal-column'")
 
 ;; ----------------------------------------------------------------------
 
+;;;###autoload
 (defun pager-row-up ()
   "Move point to previous line while scrolling screen down one line.
 The effect is that the cursor stays in the same position on the screen."
@@ -125,6 +129,7 @@ The effect is that the cursor stays in the same position on the screen."
   (move-to-column pager-temporary-goal-column)
   )
 
+;;;###autoload
 (defun pager-row-down ()
   "Move point to next line while scrolling screen up one line.
 The effect is that the cursor stays in the same position on the screen."

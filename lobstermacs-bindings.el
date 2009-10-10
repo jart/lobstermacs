@@ -5,7 +5,6 @@
 ;; an oldy but a goody.  this makes the cursor stay in the same page
 ;; on the screen when you use `C-v` and `M-v` so you don't have to
 ;; keep re-centering with `C-l`
-(require 'pager)
 (global-set-key (kbd "C-v") 'pager-page-down)
 (global-set-key (kbd "M-v") 'pager-page-up)
 
@@ -18,7 +17,6 @@
 ;; else in the world.  Now I just need to figure out how to make
 ;; `C-c`, `C-x` and `C-v` behave the Windows way when a selection was
 ;; created using the mouse or arrow keys.
-(require 'cua-lite)
 (setq cua-lite-default-keybindings 1
       cua-lite-mode-line-string ""
       cua-lite-use-backward-delete-word nil
@@ -27,6 +25,7 @@
       cua-lite-what-is-control-w nil
       cua-lite-display-status-in-mode-line nil
       cua-lite-use-hscroll-mode nil)
+(require 'cua-lite)
 (cua-lite 1)
 
 ;; auto modes for certain extensions
