@@ -52,6 +52,10 @@ learning curve is worth it is for you to decide.
   work as you'd expect between applications.  Right clicking is
   favored over middle clicking.
 
+* Standard Emacs completion (dabbrev-expand: `M-/`) has been improved
+  significantly for fast and easy completion of file-names, symbols,
+  dictionary words and more.
+
 * Code intelligence, completion, definition jumping and browsing work
   out of the box for Lisp, Ruby, Python, Erlang and C/C++.  Thanks to
   the "company" library, you can even get context-sensitive drop-down
@@ -92,8 +96,7 @@ learning curve is worth it is for you to decide.
 * Simplified PDF/browser preview support for Restructured Text and
   Markdown.  You can render documents using HTML, LaTeX, man, and
   more.
-(ispell-insert-word new-word)
-(ispell-pdict-save)
+
 * Python and Lisp will transform 'lambda' into a pretty symbol.
 
 * Lisp s-expressions can be edited more easily thanks to paredit.
@@ -180,6 +183,8 @@ at a time.
 * `F1`: Search Google
 * `F2`: Open man page
 * `F3`: Re-open current buffer with sudo permissions (or `M-x sudo-edit`)
+* `F4`: Toggle directory browser tray on side using sr-speedbar.
+  Supports revision control and stuff.
 * `F9` or `C-x m`: Open up a shell or command prompt (or switch to
   active one.  `C-x M` creates additional shells.
 * `F10`: Compile project
@@ -293,9 +298,10 @@ choice is yours!
 
 * `C-x C-i`: Browse through list of functions/classes (IDO style!) so
   you can jump to their definition.
-* `M-/`: Auto-complete symbol based on text in all buffers (works
-  universally; doesn't user code-intelligence)
-* `M-?` or `C-<enter>`: Auto-complete symbol (smart, introspects code)
+* `M-/`: Auto-completes a partially typed word based on other words in
+  your buffer, file-names, function/class symbols for your programming
+  project, as well as words from the dictionary.  Press multiple times
+  to cycle through possible completions.
 * `M-.`: Jump to definition of symbol under cursor.
 * `C-;`: Comment highlighted region
 * `C-o`: Create new line without indentation.  This is very useful in
@@ -398,7 +404,7 @@ etc.  You can press `(` over a highlighted region.  Destructive
 commands like delete, `C-k`, etc. are overridden to act "smarter"
 inside parentheses.
 
-#### Important Shortcuts
+Important Shortcuts:
 
 * `C-M-f` and `C-M-b`: Hop around your jungle of s-exprs (or `C-F` and `C-B`)
 * `C-c C-s`: Slurp next term and put it inside my s-expr
@@ -407,7 +413,7 @@ inside parentheses.
 * `C-c C-l`: Split apart an s-expr or string at cursor
 * `C-c C-j`: Join two s-exprs or strings at left and right of cursor
 
-#### Advanced
+Advanced:
 
 * `C-)`, `C-(`: If your s-expr needs more friends (slurping)
 * `C-}`, `C-{`: To kick stuff out of your s-expr (barfing)
@@ -521,7 +527,7 @@ started:
 
 * `C-x g`: Open up Git status buffer
 
-#### Status Window Shortcuts
+Status Window Shortcuts:
 
 * `g`: Refresh the Git status buffer with the latest information
 * `c`: Start a commit
@@ -530,7 +536,7 @@ started:
 * `k`: Discard changes made to a file (like `svn revert`)
 * `i`: Add file to your `.gitignore` file
 
-#### Staging Files and Hunks
+Staging Files and Hunks:
 
 * `<tab>`: Toggles expansion of hunks (see what changed in a file, and
   cherry-pick only specific hunks that you want to commit)

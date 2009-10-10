@@ -75,6 +75,7 @@
 (require 'starter-kit-js)
 
 ;; lobstermacs stuff
+(require 'lobstermacs-ido)
 (require 'lobstermacs-c)
 (require 'lobstermacs-rst)
 (require 'lobstermacs-lisp)

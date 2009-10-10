@@ -149,34 +149,6 @@ But the numbers won't right align so do this:
                                    (point-max))))))
       (concat "%" (number-to-string w) "d ")) line) 'face 'linum))
 
-;; IDO M-x is cool :D
-(setq ido-execute-command-cache nil)
-(defun ido-execute-command ()
-  (interactive)
-  (call-interactively
-   (intern
-    (ido-completing-read
-     "M-x "
-     (progn
-       (unless ido-execute-command-cache
-         (mapatoms (lambda (s)
-                     (when (commandp s)
-                       (setq ido-execute-command-cache
-                             (cons (format "%S" s) ido-execute-command-cache))))))
-       ido-execute-command-cache)))))
-
-;; This seems to make other stuff use ido like `C-h f`, `C-h v`, etc.
-;; Stolen from 'InteractivelyDoThings' on EmacsWiki
-(defadvice completing-read
-  (around foo activate)
-  (if (boundp 'ido-cur-list)
-      ad-do-it
-    (setq ad-return-value
-          (ido-completing-read
-           prompt
-           (all-completions "" collection predicate)
-           nil require-match initial-input hist def))))
-
 (defun unfill-paragraph ()
   "The opposite of fill-paragraph. Takes a multi-line paragraph
 and makes it into a single line of text.  Thanks: Stefan Monnier
