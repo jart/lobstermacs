@@ -480,6 +480,47 @@ Important Shortcuts:
   bar of `=` or `-` characters is the correct length.  Press multiple
   times to cycle through different types of section headers.
 
+## Revision Control
+
+Revision control is a *invaluable tool* if you're a programmer.
+Lobstermacs has excellent VCS support that you're going to love:
+
+### Git using Magit
+
+When working on GitHub projects, or hacking the Linux kernel,
+Lobstermacs offers amazing Git support using "Magit."  The best thing
+about Magit is that it turns Git's concept of a "Staging Area" from an
+annoyance to an incredible strength!
+
+Note: If you have never used Git before, pick a folder with lots of
+code and run `git init`, `git add .` then `git commit -a -m 'Initial
+Checkin'`.  Now change a bunch of files and you're ready to get
+started:
+
+* `C-x g`: Open up Git status buffer
+
+#### Status Window Shortcuts
+
+* `g`: Refresh the Git status buffer with the latest information
+* `c`: Start a commit
+* `P`: Push your latest commits to a server like GitHub
+* `F`: Pull new commits other people have made from the server
+* `k`: Discard changes made to a file (like `svn revert`)
+* `i`: Add file to your `.gitignore` file
+
+#### Staging Files and Hunks
+
+* `<tab>`: Toggles expansion of hunks (see what changed in a file, and
+  cherry-pick only specific hunks that you want to commit)
+* `n` and `p`: Jump between hunks
+* `s`: Stage file or hunk to be committed
+* `u`: Stage file or hunk to be committed
+* `<enter>`: Jump to the source code for this file or hunk
+
+See the menu-bar named 'Magit' which appears when you open the status
+window for more information.  If you don't have a menu bar, type `C-h
+m` for more information.
+
 ## About
 
     Lobstermacs
