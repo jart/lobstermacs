@@ -3,7 +3,12 @@
 
 Lobstermacs: Emacs For the 21st Century
 
-<http://github.com/jart/lobstermacs/>
+* Maintainer: J.A. Roberts Tunney <jtunney@lobstertech.com>
+* Website: <http://github.com/jart/lobstermacs/>
+* Copying: Licensed under the GNU GPL v3 or later
+* Credits: This is an upstream compatible "friendly fork" of all
+  terrific work done by everyone on GitHub with
+  [emacs-starter-kit][http://github.com/technomancy/emacs-starter-kit].
 
 ## Synopsis
 
@@ -38,26 +43,37 @@ learning curve is worth it is for you to decide.
 
 ## Why On Earth Would I Want To Use Your Goofy Flavor of Emacs?
 
+* IDO is used extensively throughout Lobstermacs, which is quite
+  possibly (IMHO) one of the greatest IDE user-interface innovations
+  ever.  Opening files, switching between hundreds of open files,
+  executing commands, browsing through functions/classes.
+
 * Antiquated GUI features are disabled.  Copy and pasting will also
   work as you'd expect between applications.  Right clicking is
   favored over middle clicking.
 
-* Switching between buffers and opening files is much more
-  user-friendly and insanely efficient thanks to IDO.
+* Code intelligence, completion, definition jumping and browsing work
+  out of the box for Lisp, Ruby, Python, Erlang and C/C++.  Thanks to
+  the "company" library, you can even get context-sensitive drop-down
+  menus showing you available completions when typing, just like in
+  Visual Studio.
 
-* Code completion and definition jumping work out of the box for Lisp,
-  Ruby, Python and Erlang.
+* If you use a TAGS file, Lobstermacs is good at figuring out where
+  its located, and can regenerate it automatically.  Lobstermacs will
+  also do its best to hunt down the source code to libraries you use
+  and generate TAGS for them in the background.  Lobstermacs also
+  isolates tag files.  This means if you're editing C code and Python
+  code at the same time, your C tags won't show up in your Python
+  code!
 
 * Works great on Linux/MacOSX/Windows as well as the terminal.
   Top-notch support is offered for Ubuntu users.
 
 * You can press `F3` to re-open a file with sudo permissions.
 
-* The shell command feature (`M-!`) has tab completion and the up/down
-  keys will let you browse through your command history.
-
-* Simplified PDF/browser preview support for Restructured Text and
-  Markdown.
+* The shell command feature (`M-!`) has tab completion.  The up/down
+  as well as `C-n`/`C-p` will let you cycle through your command
+  history.
 
 * Uses extensive heuristics to automatically determine the location of
   the project you're currently editing, how it should be
@@ -73,30 +89,42 @@ learning curve is worth it is for you to decide.
 
 * Excellent support for Python projects that are using virtualenv.
 
+* Simplified PDF/browser preview support for Restructured Text and
+  Markdown.  You can render documents using HTML, LaTeX, man, and
+  more.
+(ispell-insert-word new-word)
+(ispell-pdict-save)
 * Python and Lisp will transform 'lambda' into a pretty symbol.
 
 * Lisp s-expressions can be edited more easily thanks to paredit.
+  Finally, lispers can tame those zillion parentheses with ease.
 
 * Ediff doesn't put that annoying little frame in the top right corner
   of your screen anymore.
 
+* YASnippet works out of the box for more than a dozen languages.  If
+  you're a fan of TextMate, you should feel right at home with
+  Lobstermacs <3
+
 ## Reporting Bugs
 
-Lobstermacs is a small project so all suggestions and bug reports are
-welcome; no matter how trivial they may be.  *Please, please, please,*
-if you find **ANYTHING** annoying, difficult, broken, or have a
-difference in opinion, I urge you to complain!  You can use the
-following:
+Similar to Ubuntu, Lobstermacs has a very liberal philosophy when it
+comes to reporting bugs.  I personally feel that if an intelligent
+person who's new to Lobstermacs can't figure out how to do something,
+please report it!
 
-1. Issue tracker: <http://github.com/jart/lobstermacs/issues>
+If you have any pet-peeves about emacs, find something difficult,
+broken, or have a difference in opinion, let me know.  Even if you're
+able to solve the problem on your own, please tell me what you did so
+others won't face the same problem.
 
-2. Emacs me directly: <jtunney@lobstertech.com>
+You can report an issue to the [Lobstermacs Issue
+Tracker]<http://github.com/jart/lobstermacs/issues>, or contact me
+directly:
 
-3. Chat with me on Google Talk for support: <jtunney@gmail.com>
-
-Even if you get some sort of crash and are experienced enough to
-figure it out what went wrong, please report it so it doesn't happen
-to anyone else!
+* Email: <jtunney@lobstertech.com>
+* SIP: <sip:jtunney@lobstertech.com>
+* XMPP: <xmpp:jtunney@gmail.com>
 
 ## Installation
 
@@ -125,10 +153,8 @@ pressing `C-h t`.
 
 ## Universal Shortcuts
 
-These shortcuts apply to all modes.  Many are Lobstermacs specific and
-have been tuned to work consistently across modes.  Many of these
-shortcuts, particularly the navigational ones, are supported on almost
-all terminals and throughout Mac OS X (by default.)
+These keyboard shortcuts have been tuned to work consistently across a
+variety of editing modes.
 
 ### Essential
 
@@ -143,8 +169,10 @@ at a time.
 * `C-x f`: Open recent file
 * `M-s` or `C-x C-s`: Save current buffer
 * `C-x k`: Close buffer
-* `C-x C-b`: Switch between buffers (Tip: `C-s` and `C-r` cycle through your available buffers)
-* `M-x`: Execute extended command
+* `C-x C-b`: Switch between buffers IDO style (Tip: `C-s` and `C-r`
+  cycle through your available buffers)
+* `C-<middle-click>`: Shows pop-up menu of open buffers, grouped by language mode
+* `M-x` or `C-x C-m`: Execute command manually (IDO style!)
 * `M-!`: Execute system/shell command
 
 ### Function Keys
@@ -152,7 +180,8 @@ at a time.
 * `F1`: Search Google
 * `F2`: Open man page
 * `F3`: Re-open current buffer with sudo permissions (or `M-x sudo-edit`)
-* `F9`: Open a command prompt
+* `F9` or `C-x m`: Open up a shell or command prompt (or switch to
+  active one.  `C-x M` creates additional shells.
 * `F10`: Compile project
 * `F11` or `C-x C-n`: Jump to next compilation error
 * `F12` or `C-x C-p`: Jump to previous compilation error
@@ -193,6 +222,7 @@ were.
 * `C-M-t` or `C-x t`: Transpose lines
 * `C-M-\`: Magic indent highlighted region.  Try highlighting an
   entire function in your source code and using this, it's smart :)
+  Linux users Be careful not to accidentally press `C-M-<backspace>`!
 * `M-q`: Fill paragraph under cursor.  This wraps lines at column 70
   or so to give you neat little blocks of text.
 * `M-Q`: Un-fill paragraph under cursor.  (Reverses `M-q`)
@@ -207,12 +237,6 @@ it back with `C-y`.
 * `C-d`: Delete character forwards
 * `M-d`: Delete word forward
 * `C-k`: Delete (Kill) current line
-
-### Code Intelligence
-
-* `M-/`: Expand symbol based on text around it (dumb, works universally)
-* `M-?` or `C-<enter>`: Auto-complete symbol (smart, introspects code)
-* `C-;`: Comment highlighted region [2]
 
 ### Copy/Pasting
 
@@ -278,6 +302,10 @@ choice is yours!
   cases where you need a blank line but pressing `<enter>` would do
   something undesirable.  (Like with auto-fill and auto-indent)
 
+### Programming Tools
+
+* `M-x delete-trailing-whitespace`: Does what it says on whole buffer
+
 ### Macros (Advanced)
 
 Macros are very useful for automating basic editing tasks, and they're
@@ -305,9 +333,12 @@ is the term to describe real windows)
 
 ## Customizing
 
-### Colors
+Once you save your customizations, they will be written to
+`custom.el`.
 
-Your customizations generally get saved to your `custom.el` file.
+* `M-x customize-apropos`: Useful for searching 
+
+### Colors
 
 * `M-x customize-face`: A long list of colors/fonts you can customize
   throughout Emacs.  After pressing "Save for future sessions" check
@@ -380,15 +411,6 @@ inside parentheses.
 
 * `C-)`, `C-(`: If your s-expr needs more friends (slurping)
 * `C-}`, `C-{`: To kick stuff out of your s-expr (barfing)
-
-#### Customize
-
-    (eval-after-load 'paredit
-      '(progn
-         (define-key paredit-mode-map (kbd ")")   'paredit-close-parenthesis)
-         (define-key paredit-mode-map (kbd "M-)") 'paredit-close-parenthesis-and-newline)
-         (define-key paredit-mode-map (kbd "C-h") 'paredit-backward-delete)
-         (define-key paredit-mode-map (kbd "M-h") 'paredit-backward-kill-word)))
 
 ## Python
 
@@ -490,7 +512,7 @@ Lobstermacs has excellent VCS support that you're going to love:
 When working on GitHub projects, or hacking the Linux kernel,
 Lobstermacs offers amazing Git support using "Magit."  The best thing
 about Magit is that it turns Git's concept of a "Staging Area" from an
-annoyance to an incredible strength!
+annoyance to an indispensable tool to avoid making humongous commits.
 
 Note: If you have never used Git before, pick a folder with lots of
 code and run `git init`, `git add .` then `git commit -a -m 'Initial
@@ -520,11 +542,3 @@ started:
 See the menu-bar named 'Magit' which appears when you open the status
 window for more information.  If you don't have a menu bar, type `C-h
 m` for more information.
-
-## About
-
-    Lobstermacs
-    Based upon the Emacs Starter Kit Project
-    Licensed under the GPL v3 or later
-
-    J.A. Roberts Tunney <jtunney@lobstertech.com>
