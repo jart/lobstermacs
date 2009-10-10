@@ -8,9 +8,6 @@
   (turn-off-tool-bar)
   (blink-cursor-mode -1))
 
-;; you might want this
-;; (setq require-final-newline t)
-
 (add-hook 'before-make-frame-hook 'turn-off-tool-bar)
 
 (mouse-wheel-mode t)

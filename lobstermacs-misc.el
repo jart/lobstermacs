@@ -4,6 +4,9 @@
 
 (prefer-coding-system 'utf-8)
 
+;; This might annoy some people
+(setq require-final-newline t)
+
 ;; add ispell support to hippie-expand so i don't have to work as hard
 ;; to be pretentious when typing big complicated words...  so cool!
 (add-to-list 'hippie-expand-try-functions-list 'lob/try-complete-ispell)
