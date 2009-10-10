@@ -2,6 +2,11 @@
 ;;
 ;; Part of Lobstermacs
 
+(defun lob/warn (msg)
+  "ToDo: Have LobsterMacs warnings go in special buffer to avoid
+unhelpful noise in *Messages*"
+  (message (concat "\n*** WARNING: " msg "\n")))
+
 (defun turn-on-company ()
   (company-mode t))
 
@@ -167,6 +172,39 @@ and makes it into a single line of text.  Thanks: Stefan Monnier
   (interactive)
   (let ((fill-column (point-max)))
     (fill-paragraph nil)))
+
+(defun lob/is-text-mode ()
+  "Is current buffer text-mode, or derived from text-mode?  I was
+going to use this a way to selectively enable
+`lob/try-complete-ispell` but adding it to the end of the
+hippie-expand list seems to work wonders."
+  (or (string= "text-mode" (symbol-name major-mode))
+      (string= "text-mode" (symbol-name (derived-mode-class major-mode)))))
+
+(autoload 'lookup-words "ispell" "Lookup word for dictionary completions." nil)
+(defun lob/try-complete-ispell (old)
+  "Making hippie-expand a little better for text-mode and stuff.
+I based this code off `try-complete-lisp-symbol` and
+`ispell-complete-word`"
+  (if (not old)
+      (progn
+	(he-init-string (he-lisp-symbol-beg) (point))
+	(if (not (he-string-member he-search-string he-tried-table))
+	    (setq he-tried-table (cons he-search-string he-tried-table)))
+	(setq he-expand-list
+	      (and (not (equal he-search-string ""))
+                   (lookup-words he-search-string ispell-complete-word-dict)))))
+  (while (and he-expand-list
+	      (he-string-member (car he-expand-list) he-tried-table))
+    (setq he-expand-list (cdr he-expand-list)))
+  (if (null he-expand-list)
+      (progn
+	(if old (he-reset-string))
+	())
+      (progn
+	(he-substitute-string (car he-expand-list))
+	(setq he-expand-list (cdr he-expand-list))
+	t)))
 
 (provide 'lobstermacs-defuns)
 ;;; lobstermacs-defuns.el ends here

@@ -31,10 +31,25 @@
 
 (if (and (not window-system)
          (not lob/is-colorful))
-    (message (concat "\n"
-                     "*** NOTICE: If you want pretty colors use: "
-                     "'export TERM=xterm-256color' before running me!"
-                     "\n")))
+    (lob/warn (concat "If you want pretty terminal colors use: "
+                      "'export TERM=xterm-256color' before running me!")))
+
+;; spelling is fun
+(if (fboundp 'ispell)
+    (require 'ispell))
+(setq lob/have-cmd-ispell (not (null (executable-find "ispell"))))
+(setq lob/have-dictionary-file (and (fboundp 'ispell) (file-exists-p ispell-alternate-dictionary)))
+(setq lob/have-ispell (and (fboundp 'ispell)
+                           (or lob/have-cmd-ispell lob/have-dictionary-file)))
+(if (not lob/have-ispell)
+    ;; they NOTHING, no ispell, no dictionary file for grepping :(
+    (lob/warn "ispell could not be found on your system!  "
+              "Spell checking and completion will not work :( "
+              "Please run: sudo apt-get install ispell")
+  ;; they have a dictionary file, but not the efficient ispell program
+  (if (not lob/have-cmd-ispell)
+      (lob/warn "For more efficient spell checking and completion, "
+                "please install ispell: sudo apt-get install ispell")))
 
 (provide 'lobstermacs-system)
 ;;; lobstermacs-misc.el ends here
