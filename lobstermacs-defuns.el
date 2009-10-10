@@ -165,6 +165,18 @@ But the numbers won't right align so do this:
                              (cons (format "%S" s) ido-execute-command-cache))))))
        ido-execute-command-cache)))))
 
+;; This seems to make other stuff use ido like `C-h f`, `C-h v`, etc.
+;; Stolen from 'InteractivelyDoThings' on EmacsWiki
+(defadvice completing-read
+  (around foo activate)
+  (if (boundp 'ido-cur-list)
+      ad-do-it
+    (setq ad-return-value
+          (ido-completing-read
+           prompt
+           (all-completions "" collection predicate)
+           nil require-match initial-input hist def))))
+
 (defun unfill-paragraph ()
   "The opposite of fill-paragraph. Takes a multi-line paragraph
 and makes it into a single line of text.  Thanks: Stefan Monnier
