@@ -27,6 +27,7 @@
       delete-by-moving-to-trash t
       shift-select-mode nil
       truncate-partial-width-windows nil
+      delete-by-moving-to-trash nil
       uniquify-buffer-name-style 'forward
       whitespace-style '(trailing lines space-before-tab
                                   indentation space-after-tab)
@@ -35,6 +36,16 @@
       oddmuse-directory (concat dotfiles-dir "oddmuse")
       xterm-mouse-mode t
       save-place-file (concat dotfiles-dir "places"))
+
+;; Set this to whatever browser you use
+;; (setq browse-url-browser-function 'browse-url-firefox)
+;; (setq browse-url-browser-function 'browse-default-macosx-browser)
+;; (setq browse-url-browser-function 'browse-default-windows-browser)
+;; (setq browse-url-browser-function 'browse-default-kde)
+;; (setq browse-url-browser-function 'browse-default-epiphany)
+;; (setq browse-url-browser-function 'browse-default-w3m)
+;; (setq browse-url-browser-function 'browse-url-generic
+;;       browse-url-generic-program "~/src/conkeror/conkeror")
 
 ;; Transparently open compressed files
 (auto-compression-mode t)
@@ -111,7 +122,17 @@
 
 (eval-after-load 'mumamo
   '(eval-after-load 'zenburn
-     '(ignore-errors (set-face-background 'mumamo-background-chunk-submode "gray22"))))
+     '(ignore-errors (set-face-background
+                      'mumamo-background-chunk-submode "gray22"))))
+
+;; Platform-specific stuff
+(when (eq system-type 'darwin)
+  ;; Work around a bug on OS X where system-name is FQDN
+  (setq system-name (car (split-string system-name "\\.")))
+  ;; Work around a bug where environment variables aren't set correctly
+  (require 'osx-plist)
+  (when (file-exists-p "~/.MacOSX/environment.plist")
+    (osx-plist-update-environment)))
 
 ;; make emacs use the clipboard if available
 (if (fboundp 'x-cut-buffer-or-selection-value)
