@@ -28,7 +28,13 @@
 (setq package-user-dir (concat dotfiles-dir "elpa"))
 (setq custom-file (concat dotfiles-dir "custom.el"))
 
-;; load these earlier
+;; until they fix the elpa package thing
+(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
+(autoload 'company-mode "company" nil t)
+
+;; Load these earlier, they contain important system checks and gui
+;; changes
+
 (require 'lobstermacs-defuns)
 (require 'lobstermacs-system)
 ;; enable zenburn theme if we have 256+ colors
@@ -57,10 +63,6 @@
 (require 'starter-kit-elpa)
 
 ;; Load up starter kit customizations
-
-;; until they fix the elpa package thing
-(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
-(autoload 'company-mode "company" nil t)
 
 (require 'starter-kit-defuns)
 (require 'starter-kit-bindings)

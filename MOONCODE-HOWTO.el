@@ -39,7 +39,8 @@
 '(hello there (+ 2 2))
 (list 'hello 'there)
 (list 'hello 'there (+ 2 2))
-(sort (list 3 4 1 5 2))
+(sort (list 3 4 1 5 2) '<)
+(sort (list "there" "hi") 'string-lessp)
 
 '(+ 2 2 2)
 (eval '(+ 2 2 2))
@@ -79,6 +80,16 @@ buffer-file-name
 
 (output-to-buffer (concat "\nYour load path:\n\n"
                           (mapconcat 'identity load-path "\n")))
+
+
+;; detecting what mode you're in
+major-mode
+mode-name
+minor-mode-alist
+(equal "emacs-lisp-mode" (symbol-name major-mode))
+;; sometimes modes like 'rst-mode' are derived from 'text-mode'
+(derived-mode-class major-mode)
+
 
 ;; the fine line: variables/atoms, code/lists
 system-name
@@ -126,6 +137,8 @@ nil
 (or t t nil)
 (zerop 0) ; Return t if number is zero.
 (string= "what a pain" "what a pain")
+(string-lessp "hi" "there")
+(string-lessp "there" "hi")
 (eq 2 2)
 (= 2 2)
 (/= 2 3)
@@ -273,6 +286,7 @@ nil
 
 
 ;; running shell commands
+(executable-find "ispell")
 (shell-command-to-string "ls")
 (shell-command "ls")
 (progn (shell-command "ls -al" "*ls-results-buf*")

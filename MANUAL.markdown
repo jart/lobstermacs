@@ -404,8 +404,8 @@ inside parentheses.
 * `C-c C-s`: Slurp next term and put it inside my s-expr
 * `C-c C-b`: Barf last term in current s-expr out of the club
 * `C-c C-r`: Raise me out of the s-expr I'm trapped inside
-* `C-c C-l`: Split apart an s-expr at cursor
-* `C-c C-j`: Join two s-exprs at left and right of cursor together
+* `C-c C-l`: Split apart an s-expr or string at cursor
+* `C-c C-j`: Join two s-exprs or strings at left and right of cursor
 
 #### Advanced
 
