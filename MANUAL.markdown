@@ -107,13 +107,15 @@ you want the non-GUI version for a dedicated server, use
 `emacs-snapshot-nox`)
 
     $ sudo apt-get install git-core emacs-snapshot emacs-snapshot-el ispell
-    $ git clone git://github.com/jart/emacs-starter-kit.git
-    $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
+    $ git clone git://github.com/jart/lobstermacs.git
+    $ emacs-snapshot --debug-init -q -l lobstermacs/init.el
 
-Run Lobstermacs in a terminal:
+Run Lobstermacs in a terminal.  (If you are using a terminal, I
+*strongly* recommend trying out GNU Screen.  See
+`lobstermacs/contrib/.screen` for helpful information.)
 
     $ export TERM=xterm-256color
-    $ emacs-snapshot --debug-init -q -l emacs-starter-kit/init.el
+    $ emacs-snapshot --debug-init -q -l lobstermacs/init.el
 
 ## Basic Editing
 

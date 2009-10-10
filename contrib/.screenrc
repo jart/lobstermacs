@@ -1,0 +1,106 @@
+
+########################
+## jart's .screenrc file
+
+# screen is one of the best tools you can possibly use on Linux,
+# especially if you SSH into lots of servers.  It lets you have lots
+# of bash shells open simultaneously within the same terminal,
+# creating a little tab at the bottom of the screen for each one.
+# Most importantly if your SSH connection drops, you can log back in
+# an hour later and your screen session will be waiting for you, 100%
+# in-tact :)
+
+# This screenrc has been tested extensively with gnome-terminal and
+# Mac OS X's terminal.  I'm sure it works great in Putty too.
+
+##################
+## GETTING STARTED
+
+# cp lobstermacs/contrib/.screenrc ~/.screenrc
+# screen -DR
+
+########################
+## WHAT YOU NEED TO KNOW
+
+# While inside GNU screen, backtic '`' is intercepted by screen so you
+# can tell it to do things.  If you want to type this character
+# normally, press it twice.  See `man screen` for more information.
+
+# ` n: Go to Next window
+# ` p: Go to Previous screen
+# ` k: Kill current window
+# ` A: Change title of current screen
+# ` d: Detach screen and go back to normal terminal (you can reattach
+       again later using screen -DR)
+# ` [: Freezes screen so you can use the arrow keys to scroll around
+       and look for information.  Press '?' to start searching
+       backward and `/` to search forward (vi shortcuts)  You can also
+       use the scroll wheel.  Press <enter> a bunch of times to leave
+       this mode.
+
+###############
+## XTERM TWEAKS
+
+# These are very important if you want emacs keyboard shortcuts to
+# behave normally
+
+#xterm understands both im/ic and doesn't have a status line.
+#Note: Do not specify im and ic in the real termcap/info file as
+#some programs (e.g. vi) will not work anymore.
+termcap  xterm hs@:cs=\E[%i%d;%dr:im=\E[4h:ei=\E[4l
+terminfo xterm hs@:cs=\E[%i%p1%d;%p2%dr:im=\E[4h:ei=\E[4l
+#80/132 column switching must be enabled for ^AW to work
+#change init sequence to not switch width
+termcapinfo  xterm Z0=\E[?3h:Z1=\E[?3l:is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l
+#defscrollback 5000
+# Make the output buffer large for (fast) xterms.
+termcapinfo xterm* OL=10000
+# tell screen that xterm can switch to dark background and has function
+# keys.
+termcapinfo xterm 'VR=\E[?5h:VN=\E[?5l'
+termcapinfo xterm 'k1=\E[11~:k2=\E[12~:k3=\E[13~:k4=\E[14~'
+termcapinfo xterm 'kh=\E[1~:kI=\E[2~:kD=\E[3~:kH=\E[4~:kP=\E[H:kN=\E[6~'
+# special xterm hardstatus: use the window title.
+termcapinfo xterm 'hs:ts=\E]2;:fs=\007:ds=\E]0;screen\007'
+# our xterm has colors! (rxvt, too)
+termcap  xterm 'AF=\E[3%dm:AB=\E[4%dm'
+terminfo xterm 'AF=\E[3%p1%dm:AB=\E[4%p1%dm'
+#terminfo xterm 'vb=\E[?5h$<200/>\E[?5l'
+termcapinfo xterm 'vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l'
+# emulate part of the 'K' charset
+termcapinfo   xterm 'XC=K%,%\E(B,[\304,\\\\\326,]\334,{\344,|\366,}\374,~\337'
+
+########################
+## GENERAL CONFIGURATION
+
+# if you wanted to make `C-x` the escape command, you would use `^x^x`
+escape ``
+autodetach on
+vbell on
+vbell_msg "~~OH SNAP~~"
+startup_message off
+shelltitle "$|bash"
+bind ^w windowlist -m
+bind ^n next
+bind ^h prev
+bind ^t focus
+bind ^r title
+bind ^m colon
+bind = resize =
+bind + resize +3
+bind - resize -3
+hardstatus alwayslastline "%{= KW}%-w%{= wk}%50>%n %t%{-}%+w%< %=[%H | %l | %D %C %a]"
+
+#########################
+## TERMINAL CONFIGURATION
+
+# create three tabs for terminals
+screen 0
+screen 1
+screen 2
+
+select 0
+
+## You can automatically load certain programs when screen starts:
+#screen 10 bitchx irc.freenode.net
+#title irc
