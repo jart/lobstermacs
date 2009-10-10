@@ -189,6 +189,11 @@ were.
 * `C-t`: Transpose characters
 * `M-t`: Transpose words
 * `C-M-t` or `C-x t`: Transpose lines
+* `C-M-\`: Magic indent highlighted region.  Try highlighting an
+  entire function in your source code and using this, it's smart :)
+* `M-q`: Fill paragraph under cursor.  This wraps lines at column 70
+  or so to give you neat little blocks of text.
+* `M-Q`: Un-fill paragraph under cursor.  (Reverses `M-q`)
 
 Any shortcuts that deletes more than one character ALSO copies the
 text you just deleted (to the "kill ring.")  You can yank (or paste)

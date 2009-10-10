@@ -79,5 +79,8 @@
 (global-set-key (kbd "M-x") 'ido-execute-command)
 (global-set-key (kbd "C-x C-m") 'ido-execute-command)
 
+;; opposite of `M-q`
+(global-set-key (kbd "M-Q") 'unfill-paragraph)
+
 (provide 'lobstermacs-bindings)
 ;;; lobstermacs-bindings.el ends here

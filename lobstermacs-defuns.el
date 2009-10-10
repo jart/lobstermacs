@@ -160,5 +160,13 @@ But the numbers won't right align so do this:
                              (cons (format "%S" s) ido-execute-command-cache))))))
        ido-execute-command-cache)))))
 
+(defun unfill-paragraph ()
+  "The opposite of fill-paragraph. Takes a multi-line paragraph
+and makes it into a single line of text.  Thanks: Stefan Monnier
+<foo at acm.org>"
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
 (provide 'lobstermacs-defuns)
 ;;; lobstermacs-defuns.el ends here
