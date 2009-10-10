@@ -7,10 +7,6 @@
 ;; This might annoy some people
 (setq require-final-newline t)
 
-;; add ispell support to hippie-expand so i don't have to work as hard
-;; to be pretentious when typing big complicated words...  so cool!
-(add-to-list 'hippie-expand-try-functions-list 'lob/try-complete-ispell)
-
 ;; lets you use the mouse in terminal mode.  seems to be a bug using
 ;; this on read-only buffers.  also highlighting doesn't take effect
 ;; until you let go of the mouse :\  ALSO this highlighting doesn't

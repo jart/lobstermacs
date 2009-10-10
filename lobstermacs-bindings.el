@@ -71,6 +71,7 @@
 
 ;; function keyz
 (global-set-key [f3] 'sudo-edit-me)
+(global-set-key [f4] 'sr-speedbar-toggle) ;; We need to do something about those icons....
 (global-set-key [f11] 'next-error)
 (global-set-key [f12] 'previous-error)
 
