@@ -165,16 +165,24 @@ hippie-expand list seems to work wonders."
   (or (string= "text-mode" (symbol-name major-mode))
       (string= "text-mode" (symbol-name (derived-mode-class major-mode)))))
 
+(defun lob/is-editing-english ()
+  "Returns true if \\[lob/is-text-mode] or \\[fundamental-mode],
+otherwise detects if cursor is inside a comment by checking
+\\[face-at-point] to see if it matches \\[font-lock-comment-face]
+or \\[font-lock-doc-face]"
+  (or (lob/is-text-mode)
+      (string= "fundamental-mode" (symbol-name major-mode))
+      (string= "font-lock-comment-face" (symbol-name (face-at-point)))
+      (string= "font-lock-doc-face" (symbol-name (face-at-point)))))
+
 (autoload 'lookup-words "ispell" "Lookup word for dictionary completions." nil)
 
 (defun lob/try-complete-ispell (old)
   "Making hippie-expand a little better for text-mode and stuff.
 I based this code off `try-complete-lisp-symbol` and
 `ispell-complete-word`"
-  (if (not (lob/is-text-mode))
-      nil
-    (progn
-      (if (not old)
+  (when (lob/is-editing-english)
+    (if (not old)
           (progn
             (he-init-string (he-lisp-symbol-beg) (point))
             (if (not (he-string-member he-search-string he-tried-table))
@@ -192,7 +200,7 @@ I based this code off `try-complete-lisp-symbol` and
         (progn
           (he-substitute-string (car he-expand-list))
           (setq he-expand-list (cdr he-expand-list))
-          t)))))
+          t))))
 
 (provide 'lobstermacs-defuns)
 ;;; lobstermacs-defuns.el ends here
