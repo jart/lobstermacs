@@ -127,9 +127,12 @@
   ;; Work around a bug on OS X where system-name is FQDN
   (setq system-name (car (split-string system-name "\\.")))
   ;; Work around a bug where environment variables aren't set correctly
-  (require 'osx-plist)
-  (when (file-exists-p "~/.MacOSX/environment.plist")
-    (osx-plist-update-environment)))
+
+  ;; todo: seems to crash on binary plist files
+  ;;  (require 'osx-plist)
+  ;;  (when (file-exists-p "~/.MacOSX/environment.plist")
+  ;;    (osx-plist-update-environment))
+)
 
 ;; make emacs use the clipboard if available
 (if (fboundp 'x-cut-buffer-or-selection-value)
