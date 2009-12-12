@@ -2,8 +2,8 @@
 ;;
 ;; Author: Lennart Borgman (lennart O borgman A gmail O com)
 ;; Created: Sat Apr 21 2007
-(defconst nxhtml-menu:version "1.93") ;;Version:
-;; Last-Updated: 2009-05-29 Fri
+;; Moved version to autostart.el.
+;; Last-Updated: 2009-11-18 Wed
 ;; URL:
 ;; Keywords:
 ;; Compatibility:
@@ -15,9 +15,10 @@
   ;; `cus-face', `cus-load', `cus-start', `dired', `easymenu',
   ;; `ediff', `ediff-diff', `ediff-help', `ediff-init', `ediff-merg',
   ;; `ediff-mult', `ediff-util', `ediff-wind', `ffip', `flymake',
-  ;; `flymake-js', `flymake-php', `flyspell', `fold-dwim', `gimp',
-  ;; `grep', `help-mode', `hideshow', `html-imenu', `html-quote',
-  ;; `html-site', `html-upl', `ido', `ietf-drums', `imenu', `ispell',
+  ;; `flymake-js', `flymake-php', `flyspell', `fold-dwim', `foldit',
+  ;; `fupd', `gimpedit', `grep', `help-mode', `hideshow',
+  ;; `html-imenu', `html-pagetoc', `html-quote', `html-site',
+  ;; `html-toc', `html-upl', `ido', `ietf-drums', `imenu', `ispell',
   ;; `loadhist', `mail-parse', `mail-prsvr', `mailcap', `mlinks',
   ;; `mm-util', `mumamo', `nxhtml-mode', `nxml-enc', `nxml-glyph',
   ;; `nxml-mode', `nxml-ns', `nxml-outln', `nxml-parse', `nxml-rap',
@@ -27,11 +28,11 @@
   ;; `rng-uri', `rng-util', `rng-valid', `rngalt', `rx',
   ;; `setup-helper', `sgml-mode', `tidy-xhtml', `time-date', `timer',
   ;; `timezone', `tls', `tool-bar', `tree-widget', `typesetter',
-  ;; `udev', `udev-cedet', `udev-ecb', `udev-rinari', `url',
-  ;; `url-auth', `url-c', `url-cookie', `url-expand', `url-gw',
-  ;; `url-history', `url-http', `url-methods', `url-parse',
-  ;; `url-privacy', `url-proxy', `url-util', `url-vars', `view',
-  ;; `w32-reg-iface', `w32-regdat', `wid-edit', `xmltok'.
+  ;; `udev', `udev-ecb', `udev-rinari', `url', `url-auth', `url-c',
+  ;; `url-cookie', `url-expand', `url-gw', `url-history', `url-http',
+  ;; `url-methods', `url-parse', `url-privacy', `url-proxy',
+  ;; `url-util', `url-vars', `view', `w32-reg-iface', `w32-regdat',
+  ;; `wid-edit', `xhtml-help', `xml', `xmltok'.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -68,15 +69,15 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'cus-edit))
 (eval-when-compile (require 'dired))
-(eval-when-compile (require 'gimp))
+(eval-when-compile (require 'gimpedit))
 (eval-when-compile (require 'html-site))
 (eval-when-compile (when (fboundp 'nxml-mode) (require 'nxhtml-mode)))
 (eval-when-compile (require 'css-color))
 (eval-when-compile (require 'flymake))
-(eval-when-compile (require 'flymake-php))
+;;(eval-when-compile (require 'flymake-php))
 (eval-when-compile (require 'flymake-js))
 (eval-when-compile (require 'udev-ecb))
-(eval-when-compile (require 'udev-cedet))
+;;(eval-when-compile (require 'udev-cedet))
 (eval-when-compile (require 'udev-rinari))
 
 (defun nxhtml-nxhtml-in-buffer ()
@@ -148,13 +149,13 @@
       buffer-file-name))
 
 (defun nxhtml-gimp-can-edit ()
-  (gimp-can-edit (nxhtml-menu-image-file)))
+  (gimpedit-can-edit (nxhtml-menu-image-file)))
 
 ;;;###autoload
 (defun nxhtml-edit-with-gimp ()
   "Edit with GIMP buffer or file at point."
   (interactive)
-  (gimp-edit-file (nxhtml-menu-image-file)))
+  (gimpedit-edit-file (nxhtml-menu-image-file)))
 
 ;;;###autoload
 (defun nxhtml-browse-file (file)
@@ -177,8 +178,8 @@
     ;; Fix-me: Workaround for Emacs bug on w32
     ;; http://emacsbugs.donarmstrong.com/cgi-bin/bugreport.cgi?bug=4015
     (if (eq system-type 'windows-nt)
-        (w32-shell-execute "open" file nil 1)
-      (browse-url-of-file file))
+        (w32-shell-execute nil (concat "file:///" file-to-browse) nil 1)
+      (browse-url-of-file file-to-browse))
     ))
 
 ;;;###autoload
@@ -262,6 +263,8 @@
       (define-key help-map [nxhtml-help-separator2] (list 'menu-item "--"))
       (define-key help-map [nxhtml-byte-compile-nxhtml]
         (list 'menu-item "Byte Compile nXhtml" 'nxhtmlmaint-start-byte-compilation))
+      (define-key help-map [nxhtml-web-download]
+        (list 'menu-item "Update nXhtml (from devel sources)" 'nxhtml-download))
       (define-key help-map [nxhtml-features-check]
         (list 'menu-item "Check Optional Features" 'nxhtml-features-check))
       (define-key help-map [nxhtml-customize]
@@ -288,7 +291,7 @@
     (let ((tools-map (make-sparse-keymap)))
       (define-key map [nxhtml-tools-map]
         (list 'menu-item "Tools" tools-map
-              :visible `(not (derived-mode-p 'dired-mode))
+              ;;:visible `(not (derived-mode-p 'dired-mode))
               ))
       (define-key tools-map [nxhtml-last-resort]
         (list 'menu-item "Last Resort" 'n-back-game))
@@ -301,11 +304,61 @@
       (define-key tools-map [nxhtml-viper-tut]
         (list 'menu-item "Viper try-out tutorial"
               'viper-tutorial))
+      (define-key tools-map [rebind-keys]
+        (list 'menu-item "Rebind Some Keys" 'rebind-keys-mode
+              :button '(:toggle . (and (boundp 'rebind-keys-mode)
+                                       rebind-keys-mode))))
       (define-key tools-map [nxhtml-menu-to-m-x]
         (list 'menu-item "Add Menu Commands to M-x history"
               'ourcomments-M-x-menu-mode
               :button '(:toggle . (and (boundp 'ourcomments-M-x-menu-mode)
                                        ourcomments-M-x-menu-mode))))
+
+      (define-key tools-map [nxhtml-folding-separator]
+        (list 'menu-item "--" nil))
+      (let ((folding-map (make-sparse-keymap)))
+        (define-key tools-map [nxhtml-folding-map]
+          (list 'menu-item "Folding" folding-map))
+        (define-key folding-map [nxhtml-fold-unhide-all]
+          (list 'menu-item "Unhide Everything"
+                'fold-dwim-unhide-hs-and-outline))
+        (define-key folding-map [nxhtml-fold-dwim]
+          (list 'menu-item "Maybe DWIM Folding"
+                'fold-dwim-toggle))
+        (define-key folding-map [nxhtml-separator2] (list 'menu-item "--" nil))
+        (define-key folding-map [nxhtml-hs]
+          (list 'menu-item "Turn On Hide/Show and Hide"
+                'fold-dwim-turn-on-hs-and-hide))
+        (define-key folding-map [nxhtml-outline]
+          (list 'menu-item "Turn On Outline and Hide All"
+                'fold-dwim-turn-on-outline-and-hide-all))
+        (define-key folding-map [nxhtml-separator1] (list 'menu-item "--" nil))
+        (define-key folding-map [nxhtml-foldit-mode]
+          (list 'menu-item "Folding Markers in Buffer"
+                'foldit-mode
+                :button '(:toggle . (and (boundp 'foldit-mode)
+                                         foldit-mode))))
+        (define-key folding-map [nxhtml-foldit-global-mode]
+          (list 'menu-item "Folding Markers Everywhere"
+                'foldit-global-mode
+                :button '(:toggle . (and (boundp 'foldit-global-mode)
+                                         foldit-global-mode))))
+        )
+
+      ;;(define-key tools-map [nxhtml-frame-win-separator] (list 'menu-item "--" nil))
+      (let ((frame-map (make-sparse-keymap)))
+        (define-key tools-map [nxhtml-frame-map]
+          (list 'menu-item "Windows and Frames" frame-map))
+        (define-key frame-map [nxhtml-winsav-mode]
+          (list 'menu-item "Save/restore Frames and Windows"
+                'winsav-save-mode
+                :button '(:toggle . (and (boundp 'winsav-save-mode)
+                                         winsav-save-mode))))
+        (define-key frame-map [nxhtml-resize-windows]
+          (list 'menu-item "Resize Windows"
+                'resize-windows)))
+
+
       (define-key tools-map [nxhtml-next-last-resort-separator]
         (list 'menu-item "--" nil))
       (let ((fill-map (make-sparse-keymap)))
@@ -372,27 +425,27 @@
         )
 
 
-      (let ((cedet-map (make-sparse-keymap)))
-        (define-key tools-map [nxhtml-cedet-map]
-          (list 'menu-item "CEDET" cedet-map))
-        (define-key cedet-map [nxhtml-custom-cedet]
-          (list 'menu-item "Customize CEDET dev startup from nXhtml"
-                'udev-cedet-customize-startup))
-        (define-key cedet-map [nxhtml-cedet-utest]
-          (list 'menu-item "Run CEDET unit tests"
-                'udev-cedet-utest))
-        (define-key cedet-map [nxhtml-update-cedet]
-          (list 'menu-item "Fetch/update and install CEDET dev sources"
-                'udev-cedet-update))
-        (define-key cedet-map [nxhtml-cedet-home-separator]
-          (list 'menu-item "--" nil))
-        (define-key cedet-map [nxhtml-rinari-homepage]
-          (list 'menu-item "CEDET Home Page"
-                (lambda ()
-                  "Open CEDET home page in your web browser."
-                  (interactive)
-                  (browse-url "http://cedet.sourceforge.net/"))))
-        )
+      ;; (let ((cedet-map (make-sparse-keymap)))
+      ;;   (define-key tools-map [nxhtml-cedet-map]
+      ;;     (list 'menu-item "CEDET" cedet-map))
+      ;;   (define-key cedet-map [nxhtml-custom-cedet]
+      ;;     (list 'menu-item "Customize CEDET dev startup from nXhtml"
+      ;;           'udev-cedet-customize-startup))
+      ;;   (define-key cedet-map [nxhtml-cedet-utest]
+      ;;     (list 'menu-item "Run CEDET unit tests"
+      ;;           'udev-cedet-utest))
+      ;;   (define-key cedet-map [nxhtml-update-cedet]
+      ;;     (list 'menu-item "Fetch/update and install CEDET dev sources"
+      ;;           'udev-cedet-update))
+      ;;   (define-key cedet-map [nxhtml-cedet-home-separator]
+      ;;     (list 'menu-item "--" nil))
+      ;;   (define-key cedet-map [nxhtml-rinari-homepage]
+      ;;     (list 'menu-item "CEDET Home Page"
+      ;;           (lambda ()
+      ;;             "Open CEDET home page in your web browser."
+      ;;             (interactive)
+      ;;             (browse-url "http://cedet.sourceforge.net/"))))
+      ;;   )
 
 
       (let ((rinari-map (make-sparse-keymap)))
@@ -464,20 +517,6 @@
                   (browse-url "http://hyperstruct.net/projects/mozlab"))))
         )
 
-      (define-key tools-map [nxhtml-frame-win-separator]
-        (list 'menu-item "--" nil))
-      (let ((frame-map (make-sparse-keymap)))
-        (define-key tools-map [nxhtml-frame-map]
-          (list 'menu-item "Windows and Frames" frame-map))
-        (define-key frame-map [nxhtml-winsav-mode]
-          (list 'menu-item "Save/restore Frames and Windows"
-                'winsav-save-mode
-                :button '(:toggle . (and (boundp 'winsav-save-mode)
-                                         winsav-save-mode))))
-        (define-key frame-map [nxhtml-resize-windows]
-          (list 'menu-item "Resize Windows"
-                'resize-windows)))
-
       (define-key tools-map [nxhtml-majpri-separator]
         (list 'menu-item "--" nil))
       (define-key tools-map [nxhtml-as-external]
@@ -514,6 +553,10 @@
                             (tidy-build-menu)
                             (or (derived-mode-p 'html-mode)
                                 (nxhtml-nxhtml-in-buffer)))))
+      (define-key tools-map [zencoding]
+        (list 'menu-item "Zen coding for HTML/CSS" 'zencoding-mode
+              :button '(:toggle . (and (boundp 'zencoding-mode)
+                                       zencoding-mode))))
       (define-key tools-map [nxhtml-flymake]
         (list 'menu-item "Flymake Mode" 'flymake-mode
               :button '(:toggle . (and (boundp 'flymake-mode)
@@ -535,7 +578,7 @@
           (list 'menu-item "--"))
         (define-key flyspell-map [nxhtml-flyspell]
           (list 'menu-item "Flyspell Mode" 'flyspell-mode
-                :button '(:toggle . (and (boundp flyspell-mode)
+                :button '(:toggle . (and (boundp 'flyspell-mode)
                                          flyspell-mode))))
         )
       (define-key tools-map [nxhtml-flyspell-separator]
@@ -854,8 +897,9 @@
       (define-key map [nxhtml-chunk-map]
         (list 'menu-item "Chunks" chunk-map
               :visible `(not (derived-mode-p 'dired-mode))
-              :enable '(and (boundp 'mumamo-multi-major-mode)
-                            mumamo-multi-major-mode)))
+              ;; :enable '(and (boundp 'mumamo-multi-major-mode)
+              ;;               mumamo-multi-major-mode)
+              ))
       (define-key chunk-map [nxhtml-customize-mumamo]
         (list 'menu-item "Customize MuMaMo"
               (lambda () (interactive) (customize-group-other-window 'mumamo))))
@@ -873,13 +917,28 @@
         (list 'menu-item "--" nil))
       (let ((region-map (make-sparse-keymap)))
         (define-key chunk-map [nxhtml-region-map]
-          (list 'menu-item "Make Chunks from Visible Region" region-map))
+          (list 'menu-item "Temprary Region Chunks" region-map))
         (define-key region-map [mumamo-clear-all-regions]
           (list 'menu-item "Clear Region Chunks"
                 'mumamo-clear-all-regions
-                :enable '(fboundp 'mumamo-clear-all-regions)))
+                :enable '(and (boundp 'mumamo-multi-major-mode)
+                              mumamo-multi-major-mode
+                              (fboundp 'mumamo-clear-all-regions))))
+        (define-key region-map [mumamo-clear-region]
+          (list 'menu-item "Clear Region Chunk at Point"
+                'mumamo-clear-region
+                :enable '(fboundp 'mumamo-clear-region)))
+        (define-key region-map [nxhtml-region-separator2]
+          (list 'menu-item "--" nil))
+        (define-key region-map [mumamo-region-major]
+          (list 'menu-item "Set Region Chunk Major Mode"
+                'mumamo-region-set-major
+                :enable '(fboundp 'mumamo-region-set-major)))
+        (define-key region-map [mumamo-add-region-from-string]
+          (list 'menu-item "Add Region Chunk from String"
+                'mumamo-add-region-from-string))
         (define-key region-map [mumamo-add-region]
-          (list 'menu-item "Add Region Chunk"
+          (list 'menu-item "Add Region Chunk from Selection"
                 'mumamo-add-region)))
       (define-key chunk-map [nxhtml-region-separator]
         (list 'menu-item "--" nil))
@@ -1027,6 +1086,11 @@
                 (lambda () (interactive) (customize-set-variable 'popcmp-completion-style 'anything))
                 :enable `(fboundp 'anything)
                 :button `(:radio . (eq popcmp-completion-style 'anything))))
+        (define-key style-map [popcmp-company-completion]
+          (list 'menu-item "Company Mode Style Completion"
+                (lambda () (interactive) (customize-set-variable 'popcmp-completion-style 'company-mode))
+                :enable `(fboundp 'company-mode)
+                :button `(:radio . (eq popcmp-completion-style 'company-mode))))
         (define-key style-map [popcmp-emacs-completion]
           (list 'menu-item "Emacs Default Style Completion"
                 (lambda () (interactive) (customize-set-variable 'popcmp-completion-style 'emacs-default))
@@ -1035,11 +1099,6 @@
           (list 'menu-item "Popup Style Completion"
                 (lambda () (interactive) (customize-set-variable 'popcmp-completion-style 'popcmp-popup))
                 :button `(:radio . (eq popcmp-completion-style 'popcmp-popup))))
-        (define-key style-map [popcmp-company-completion]
-          (list 'menu-item "Company Mode Style Completion"
-                (lambda () (interactive) (customize-set-variable 'popcmp-completion-style 'company-mode))
-                :enable `(fboundp 'company-mode)
-                :button `(:radio . (eq popcmp-completion-style 'company-mode))))
         )
       (define-key cmpl-map [nxhtml-cmpl-separator]
         (list 'menu-item "--" nil
@@ -1074,6 +1133,7 @@
       (list 'menu-item "nXhtml" nxhtml-minor-mode-menu-map))
     map))
 
+;;;###autoload
 (define-minor-mode nxhtml-minor-mode
   "Minor mode to turn on some key and menu bindings.
 See `nxhtml-mode' for more information."
@@ -1093,6 +1153,7 @@ See `nxhtml-mode' for more information."
     css-mode
     javascript-mode
     java-mode ;; jsp
+    groovy-mode ;; gsp
     image-mode
     ;;
     dired-mode

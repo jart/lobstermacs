@@ -1,7 +1,7 @@
 
 # Lobstermacs Manual
 
-Lobstermacs: Emacs For the 21st Century
+Lobstermacs: A Happier Version of Emacs
 
 * Maintainer: J.A. Roberts Tunney <jtunney@lobstertech.com>
 * Website: <http://github.com/jart/lobstermacs/>
@@ -14,73 +14,46 @@ Lobstermacs: Emacs For the 21st Century
 
 Lobstermacs is distribution of emacs, much in the way that Ubuntu is a
 distribution of Linux.  It's a collection of Emacs' best third party
-extensions, fine-tuned for consistency and simplicity with helpful
-documentation.
-
-## Rationale
-
-Emacs is an excellent editor, but rather "vanilla" out-of-the-box.
-It's been around for decades, has thousands of configuration options,
-modes and third-party libraries.  Documentation and on-line resources
-are written in a language few programmers understand, and are
-oftentimes incredibly buggy or outdated.
-
-Lobstermacs offers a simpler alternative.  It works out of the box
-with *all batteries included*, hand-selecting the best features the
-Emacs community has to offer, making them simpler to use, and offering
-concise documentation to get you started.
-
-I created Lobstermacs because I noticed that most of my friends who
-used Emacs didn't have the time and patience to deal with its quirks,
-and became so discouraged by Emacs' complexity that they never
-bothered to learn all of its coolest features.
-
-Lobstermacs is not a watered-down or intended for newbies, but rather
-to promote efficiency for professional engineers without compromising
-sanity.  Compared to software like Dreamweaver and Visual Basic,
-Lobstermacs still has a strong learning curve.  Whether or not the
-learning curve is worth it is for you to decide.
+extensions, fine-tuned to be simpler and less annoying combined with
+helpful documentation.
 
 ## Why On Earth Would I Want To Use Your Goofy Flavor of Emacs?
 
-* IDO is used extensively throughout Lobstermacs, which is quite
-  possibly (IMHO) one of the greatest IDE user-interface innovations
-  ever.  Opening files, switching between hundreds of open files,
-  executing commands, browsing through functions/classes.
+* Works great on Linux/Macintosh/Windows as well as the terminal.
+  Ubuntu is the platform the developers choose.
 
-* Antiquated GUI features are disabled.  Copy and pasting will also
-  work as you'd expect between applications.  Right clicking is
-  favored over middle clicking.
-
-* Standard Emacs completion (dabbrev-expand: `M-/`) has been improved
-  significantly for fast and easy completion of file-names, symbols,
-  dictionary words and more.
+* ido support (best feature ever omg) Opening files, switching between
+  hundreds of open files, browsing through functions/classes
+  definitions, etc. is much more efficient and user-friendly than the
+  default behavior.
 
 * Code intelligence, completion, definition jumping and browsing work
-  out of the box for Lisp, Ruby, Python, Erlang and C/C++.  Thanks to
-  the "company" library, you can even get context-sensitive drop-down
-  menus showing you available completions when typing, just like in
-  Visual Studio.
+  out of the box for Lisp, Ruby, Python, Erlang and C/C++.  We try to
+  use company-mode drop-down completion boxes whenever possible.
 
-* If you use a TAGS file, Lobstermacs is good at figuring out where
-  its located, and can regenerate it automatically.  Lobstermacs will
-  also do its best to hunt down the source code to libraries you use
-  and generate TAGS for them in the background.  Lobstermacs also
-  isolates tag files.  This means if you're editing C code and Python
-  code at the same time, your C tags won't show up in your Python
-  code!
+* nXhtml support is built in.  This means you can edit a PHP file with
+  inlined HTML (if you really wanted to lol) as well as many types of
+  HTML templating languages like Smarty, Django, etc. without
+  sacrificing XHTML validation/awareness.
 
-* Works great on Linux/MacOSX/Windows as well as the terminal.
-  Top-notch support is offered for Ubuntu users.
+* magit support for *fantastic* Git support.
 
-* You can press `F3` to re-open a file with sudo permissions.
+* paredit support which makes editing Lisp languages less painful.
 
 * The shell command feature (`M-!`) has tab completion.  The up/down
   as well as `C-n`/`C-p` will let you cycle through your command
   history.
 
-* Uses extensive heuristics to automatically determine the location of
-  the project you're currently editing, how it should be
+* You can press `F3` to re-open a file with sudo permissions.
+
+* Python and Lisp will transform 'lambda' into a pretty symbol.
+
+* Lobstermacs' key-bindings have been tuned to be more accessible to
+  Windows/Mac users without compromising the standard bindings. (Work
+  In Progress)
+
+* Uses crazy heuristics to automatically determine the location of the
+  project you're currently editing, how it should be
   compiled/executed, etc.
 
 * Recursive grep is now more user-friendly.  Searches current folder
@@ -88,19 +61,11 @@ learning curve is worth it is for you to decide.
   certain types of "evil" files like `.svn` folders as well as what's
   in your `.hgignore` or `.gitignore` (if present.)
 
-* Top-notch git version control support thanks to magit.  Also
-  supports Mercurial, Subversion, CVS, and more.
-
 * Excellent support for Python projects that are using virtualenv.
 
 * Simplified PDF/browser preview support for Restructured Text and
   Markdown.  You can render documents using HTML, LaTeX, man, and
   more.
-
-* Python and Lisp will transform 'lambda' into a pretty symbol.
-
-* Lisp s-expressions can be edited more easily thanks to paredit.
-  Finally, lispers can tame those zillion parentheses with ease.
 
 * Ediff doesn't put that annoying little frame in the top right corner
   of your screen anymore.
@@ -110,16 +75,6 @@ learning curve is worth it is for you to decide.
   Lobstermacs <3
 
 ## Reporting Bugs
-
-Similar to Ubuntu, Lobstermacs has a very liberal philosophy when it
-comes to reporting bugs.  I personally feel that if an intelligent
-person who's new to Lobstermacs can't figure out how to do something,
-please report it!
-
-If you have any pet-peeves about emacs, find something difficult,
-broken, or have a difference in opinion, let me know.  Even if you're
-able to solve the problem on your own, please tell me what you did so
-others won't face the same problem.
 
 You can report an issue to the [Lobstermacs Issue
 Tracker]<http://github.com/jart/lobstermacs/issues>, or contact me
@@ -225,9 +180,6 @@ were.
 * `C-t`: Transpose characters
 * `M-t`: Transpose words
 * `C-M-t` or `C-x t`: Transpose lines
-* `C-M-\`: Magic indent highlighted region.  Try highlighting an
-  entire function in your source code and using this, it's smart :)
-  Linux users Be careful not to accidentally press `C-M-<backspace>`!
 * `M-q`: Fill paragraph under cursor.  This wraps lines at column 70
   or so to give you neat little blocks of text.
 * `M-Q`: Un-fill paragraph under cursor.  (Reverses `M-q`)
@@ -296,14 +248,23 @@ choice is yours!
 
 ### Programming Shortcuts
 
-* `C-x C-i`: Browse through list of functions/classes (IDO style!) so
-  you can jump to their definition.
+* `<Tab>`: Fix indentation for current line
+
+* `Highlight + <Tab>`: Fix indentation on multiple lines
+
+* `C-x C-i`: IDO-style browsing of functions/class definitions in
+  current buffer and (ToDo) other currently open files written in the
+  same programming language.  Does not require a TAGS file.
+
 * `M-/`: Auto-completes a partially typed word based on other words in
   your buffer, file-names, function/class symbols for your programming
   project, as well as words from the dictionary.  Press multiple times
   to cycle through possible completions.
+
 * `M-.`: Jump to definition of symbol under cursor.
+
 * `C-;`: Comment highlighted region
+
 * `C-o`: Create new line without indentation.  This is very useful in
   cases where you need a blank line but pressing `<enter>` would do
   something undesirable.  (Like with auto-fill and auto-indent)
@@ -336,6 +297,15 @@ is the term to describe real windows)
 
 [1] Lobstermacs only
 [2] Intended more for programmers
+
+### Narrowing (Advanced)
+
+This is a goofy feature.
+
+C-u n d         narrow to function
+C-u n n         narrow to region
+C-u n p         narrow to page
+C-u n w         widen
 
 ## Customizing
 
@@ -548,3 +518,5 @@ Staging Files and Hunks:
 See the menu-bar named 'Magit' which appears when you open the status
 window for more information.  If you don't have a menu bar, type `C-h
 m` for more information.
+
+For more information: <http://zagadka.vm.bytemark.co.uk/magit/magit.html>

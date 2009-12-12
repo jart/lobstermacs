@@ -4,23 +4,24 @@
 ;; Maintainer:
 ;; Created: Fri Mar 09 2007
 (defconst mumamo:version "0.91") ;;Version:
-;; Last-Updated: 2009-05-28 Thu
+;; Last-Updated: 2009-10-19 Mon
 ;; URL: http://OurComments.org/Emacs/Emacs.html
 ;; Keywords:
 ;; Compatibility:
 ;;
 ;; Features that might be required by this library:
 ;;
-  ;; `appmenu', `apropos', `backquote', `button', `bytecomp', `cl',
-  ;; `comint', `compile', `easymenu', `flyspell', `grep', `ido',
-  ;; `ispell', `mail-prsvr', `mlinks', `mm-util', `nxml-enc',
-  ;; `nxml-glyph', `nxml-mode', `nxml-ns', `nxml-outln',
-  ;; `nxml-parse', `nxml-rap', `nxml-util', `ourcomments-util',
-  ;; `recentf', `ring', `rng-dt', `rng-loc', `rng-match',
-  ;; `rng-parse', `rng-pttrn', `rng-uri', `rng-util', `rng-valid',
-  ;; `rx', `sgml-mode', `timer', `tool-bar', `tree-widget',
-  ;; `url-expand', `url-methods', `url-parse', `url-util',
-  ;; `url-vars', `wid-edit', `xmltok'.
+;; `appmenu', `apropos', `backquote', `button', `bytecomp', `cl',
+;; `comint', `compile', `easymenu', `flyspell', `grep', `ido',
+;; `ispell', `mail-prsvr', `mlinks', `mm-util', `nxml-enc',
+;; `nxml-glyph', `nxml-mode', `nxml-ns', `nxml-outln',
+;; `nxml-parse', `nxml-rap', `nxml-util', `ourcomments-util',
+;; `recentf', `ring', `rng-dt', `rng-loc', `rng-match',
+;; `rng-parse', `rng-pttrn', `rng-uri', `rng-util', `rng-valid',
+;; `rx', `sgml-mode', `timer', `tool-bar', `tree-widget',
+;; `url-expand', `url-methods', `url-parse', `url-util',
+;; `url-vars', `wid-edit', `xmltok'.
+;;
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -254,6 +255,7 @@
 ;;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'desktop))
 (eval-when-compile (require 'flyspell))
 (eval-when-compile (require 'mlinks))
 (eval-when-compile (require 'nxml-mode nil t))
@@ -268,6 +270,14 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Debugging etc
+
+(defsubst mumamo-while (limit counter where)
+  (let ((count (symbol-value counter)))
+    (if (= count limit)
+        (progn
+          (msgtrc "Reached (while limit=%s, where=%s)" limit where)
+          nil)
+      (set counter (1+ count)))))
 
 ;; (defun dbg-smarty-err ()
 ;; ;;   (insert "}{")
@@ -352,7 +362,7 @@ FORMAT-STRING and ARGS have the same meaning as for the function
   ;;(list 'apply (list 'quote 'msgtrc) format-string (append '(list) args))
   ;;(list 'apply (list 'quote 'message) format-string (append '(list) args))
   ;;(list 'progn 'apply (list 'quote 'message) format-string (append '(list) args) nil)
-  ;;(list 'apply (list 'quote 'message) format-string (append '(list) args))
+  ;;(list 'apply (list 'quote 'message) format-string (append '(list) args)) ;; <--
   ;;(list 'apply (list 'quote 'message) (list 'concat "%s: " format-string)
   ;;   (list 'get-internal-run-time) (append '(list) args))
   )
@@ -382,7 +392,7 @@ errors.")
   "Set to t to stop fontification on errors.")
 
 (defun mumamo-message-with-face (msg face)
-  "Put MSG with face FACE in *Message* buffer."
+  "Put MSG with face FACE in *Messages* buffer."
   (let ((start (+ (with-current-buffer msgtrc-buffer
                     (point-max))
                   1))
@@ -403,7 +413,7 @@ errors.")
   "Tell the user there is a long error message."
   (save-match-data ;; runs in timer
     (mumamo-message-with-face
-     "MuMaMo error, please look in the *Message* buffer"
+     "MuMaMo error, please look in the *Messages* buffer"
      'highlight)))
 
 ;; This code can't be used now because `debugger' is currently not
@@ -442,7 +452,7 @@ errors.")
 
 ;;(mumamo-display-error 'test-lwarn-type "testing 1=%s, 2=%s" "one" 'two)
 (defun mumamo-display-error (lwarn-type format-string &rest args)
-  "Display a message plus traceback in the *Message* buffer.
+  "Display a message plus traceback in the *Messages* buffer.
 Use this for errors that happen during fontification or when
 running a timer.
 
@@ -450,15 +460,15 @@ LWARN-TYPE is used as the type argument to `lwarn' if warnings
 are displayed.  FORMAT-STRING and ARGS are used as the
 corresponding arguments to `message' and `lwarn'.
 
-All the output from this function in the *Message* buffer is
+All the output from this function in the *Messages* buffer is
 displayed with the highlight face.  After the message printed by
 `message' is traceback from where this function was called.
 Note: There is no error generated, just a traceback that is put
-in *Message* as above.
+in *Messages* as above.
 
 Display an error message using `message' and colorize it using
 the `highlight' face to make it more prominent.  Add a backtrace
-colored with the `highlight' face to the buffer *Message*.  Then
+colored with the `highlight' face to the buffer *Messages*.  Then
 display the error message once again after this so that the user
 can see it.
 
@@ -599,6 +609,7 @@ text buttons."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Custom group
 
+;;;###autoload
 (defgroup mumamo nil
   "Customization group for multiple major modes in a buffer."
   :group 'editing
@@ -652,10 +663,10 @@ Note: When `linum-mode' is on the right margin is always used
   (mumamo-update-this-buffer-margin-use)
   (if mumamo-margin-info-mode
       (progn
-        (add-hook 'window-configuration-change-hook 'mumamo-update-this-buffer-margin-use nil t)
+        ;;(add-hook 'window-configuration-change-hook 'mumamo-update-this-buffer-margin-use nil t)
         (add-hook 'linum-mode-hook 'mumamo-update-this-buffer-margin-use nil t)
         )
-    (remove-hook 'window-configuration-change-hook 'mumamo-update-this-buffer-margin-use t)
+    ;;(remove-hook 'window-configuration-change-hook 'mumamo-update-this-buffer-margin-use t)
     (remove-hook 'linum-mode-hook 'mumamo-update-this-buffer-margin-use t)
     ))
 (put 'mumamo-margin-info-mode 'permanent-local t)
@@ -684,18 +695,6 @@ Note: When `linum-mode' is on the right margin is always used
 (defun mumamo-update-all-buffers-margin-use ()
   (dolist (buf (buffer-list))
     (mumamo-update-buffer-margin-use buf)))
-
-(defun mumamo-update-buffer-margin-use (buffer)
-  ;;(msgtrc "update-buffer-margin-use %s" buffer)
-  (when (fboundp 'mumamo-update-chunks-margin-display)
-    (with-current-buffer buffer
-      (when mumamo-multi-major-mode
-        ;; Note: window update must be before buffer update because it
-        ;; uses old-margin from the call to function margin-used.
-        (dolist (win (get-buffer-window-list buffer))
-          (mumamo-set-window-margins-used win))
-        (mumamo-update-chunks-margin-display buffer)
-        ))))
 
 ;; (setq mumamo-chunk-coloring 4)
 (defcustom mumamo-chunk-coloring 0
@@ -775,7 +774,7 @@ interfere with syntax highlighting."
     (((class color) (min-colors 88) (background light))
      ;;:background "lightgoldenrod2")
      :background "#f7d1f4")
-     ;;:background "green")
+    ;;:background "green")
     (((class color) (min-colors 16) (background dark))
      :background "blue3")
     (((class color) (min-colors 16) (background light))
@@ -928,9 +927,11 @@ The values in the list should be symbols. Each symbol should either be
   :group 'mumamo)
 
 (defcustom mumamo-submode-indent-offset 2
-  "Indentation of submode relative main major mode.
-If this is nil then no special indent is made when entering a
-submode.
+  "Indentation of submode relative outer major mode.
+If this is nil then indentation first non-empty line in a
+subchunk will \(normally) be 0.  See however
+`mumamo-indent-line-function-1' for special handling of first
+line in subsequent subchunks.
 
 See also `mumamo-submode-indent-offset-0'."
   :type '(choice integer
@@ -939,26 +940,50 @@ See also `mumamo-submode-indent-offset-0'."
 
 (defcustom mumamo-submode-indent-offset-0 0
   "Indentation of submode at column 0.
-This value overrides `mumamo-submode-indent-offset' when the main
-major mode above has indentation 0."
+This value overrides `mumamo-submode-indent-offset' when the
+outer major mode above has indentation 0."
   :type '(choice integer
                  (const :tag "No special"))
   :group 'mumamo-indentation)
 
-(defcustom mumamo-major-mode-indent-specials
+(defcustom mumamo-indent-major-to-use
+  '(
+    ;;(nxhtml-mode html-mode)
+    (html-mode nxhtml-mode)
+    )
+  "Major mode to use for indentation.
+This is normally the major mode specified for the chunk. Here you
+can make exceptions."
+  :type '(repeat
+          (list (symbol :tag "Major mode symbol specified")
+                (command :tag "Major mode to use")))
+  :group 'mumamo-indentation)
+
+;;(mumamo-indent-get-major-to-use 'nxhtml-mode)
+;;(mumamo-indent-get-major-to-use 'html-mode)
+(defun mumamo-indent-get-major-to-use (major)
+  (or (cadr (assq major mumamo-indent-major-to-use))
+      major))
+
+(defcustom mumamo-indent-widen-per-major
   '(
     (php-mode (use-widen))
-    (nxhtml-mode ((use-widen (html-mumamo-mode nxhtml-mumamo-mode))))
-    (html-mode ((use-widen (html-mumamo-mode nxhtml-mumamo-mode))))
+    (nxhtml-mode (use-widen (html-mumamo-mode nxhtml-mumamo-mode)))
+    (html-mode (use-widen (html-mumamo-mode nxhtml-mumamo-mode)))
     )
-  "Major mode specials to use during indentation."
+  "Wether do widen buffer during indentation.
+If not then the buffer is narrowed to the current chunk when
+indenting a line in a chunk."
   :type '(repeat
           (list (symbol :tag "Major mode symbol")
                 (set
-                 (const :tag "Widen buffer during indentation" use-widen))))
+                 (const :tag "Widen buffer during indentation" use-widen)
+                 (repeat (command :tag "Widen if multi major is any of those"))
+                 )))
   :group 'mumamo-indentation)
 
 
+;;;###autoload
 (defgroup mumamo-hi-lock-faces nil
   "Faces for hi-lock that are visible in mumamo multiple modes.
 This is a workaround for the problem that text properties are
@@ -1054,6 +1079,8 @@ somewhat visible."
     (java-mode
      jde-mode
      java-mode)
+    (groovy-mode
+     groovy-mode)
     ;; For Emacs 22 that do not have nxml by default
     ;; Fix me: fallback when autoload fails!
     (nxhtml-mode
@@ -1101,6 +1128,7 @@ Lookup in this list is done by `mumamo-major-mode-from-modespec'."
   "This function is added to `fontification-functions' by mumamo.
 START is a parameter given to functions in that hook."
   (mumamo-msgfntfy "mumamo-jit-lock-function %s, ff=%s, just-changed=%s" start (get-text-property start 'fontified) mumamo-just-changed-major)
+  ;;(msgtrc "jit-lock-function %s, ff=%s, just-changed=%s" start (get-text-property start 'fontified) mumamo-just-changed-major)
   ;;(msgtrc "mumamo-jit-lock-function enter: font-lock-keywords-only def=%s" (default-value 'font-lock-keywords-only))
   (if mumamo-just-changed-major
       (setq mumamo-just-changed-major nil))
@@ -1263,11 +1291,11 @@ Preserves the `buffer-modified-p' state of the current buffer."
   (assert (overlayp chunk) t)
   (when pos (assert (or (markerp pos) (integerp pos)) t))
   (let* ((region-info (if (overlayp region-or-chunk)
-                         (cons (overlay-start region-or-chunk)
-                               (overlay-end region-or-chunk))
-                       region-or-chunk))
+                          (cons (overlay-start region-or-chunk)
+                                (overlay-end region-or-chunk))
+                        region-or-chunk))
          (obscured (when pos (list pos region-info))))
-      ;;(msgtrc "put-obscure:region-info=%s, obscured=%s" region-info obscured)
+    ;;(msgtrc "put-obscure:region-info=%s, obscured=%s" region-info obscured)
     (when region-info (assert (consp region-info) t))
     (assert (not (overlayp region-info)) t)
     (overlay-put chunk 'obscured obscured)
@@ -1276,6 +1304,8 @@ Preserves the `buffer-modified-p' state of the current buffer."
     ))
 
 (defun mumamo-get-region-from (point)
+  "Return mumamo region values for POINT."
+  ;; Note: `mumamo-get-region-from-1' is defined in mumamo-regions.el
   (when (fboundp 'mumamo-get-region-from-1)
     (mumamo-get-region-from-1 point)))
 
@@ -1294,21 +1324,19 @@ is available.  In this case the return value is undefined.
 
 Otherwise END must be a position in the buffer.  Return the
 mumamo chunk containing the position.  If `mumamo-last-chunk'
-ends before END then create chunks upto END.
-
-If MIN and MAX are non-nil then do not mark for refontification
-in this part of the buffer."
-  (let ((chunk (mumamo-find-chunks-1 end tracer))
-        region-info)
-    (when (and end chunk (featurep 'mumamo-regions))
-      (setq region-info (mumamo-get-region-from end))
-      ;;(msgtrc "find-chunks:region-info=%s" region-info)
-      (if (overlayp region-info)
-          (setq chunk region-info)
-        ;;(overlay-put chunk 'obscured (list end region-info))))
-        (mumamo-put-obscure chunk end region-info)))
-    ;;(msgtrc "find-chunks ret chunk=%s" chunk)
-    chunk))
+ends before END then create chunks upto END."
+  (when mumamo-multi-major-mode
+    (let ((chunk (mumamo-find-chunks-1 end tracer))
+          region-info)
+      (when (and end chunk (featurep 'mumamo-regions))
+        (setq region-info (mumamo-get-region-from end))
+        ;;(msgtrc "find-chunks:region-info=%s" region-info)
+        (if (overlayp region-info)
+            (setq chunk region-info)
+          ;;(overlay-put chunk 'obscured (list end region-info))))
+          (mumamo-put-obscure chunk end region-info)))
+      ;;(msgtrc "find-chunks ret chunk=%s" chunk)
+      chunk)))
 
 (defun mumamo-find-chunks-1 (end tracer) ;; min max)
   ;; Note: This code must probably be reentrant.  The globals changed
@@ -1323,18 +1351,19 @@ in this part of the buffer."
     (widen)
     ;;(msgtrc "find-chunks: mumamo-last-change-pos=%s" mumamo-last-change-pos)
     (let* ((mumamo-find-chunks-1-active t)
+           (here (point))
+           ;; Any changes?
            (change-min (car mumamo-last-change-pos))
            (change-max (cdr mumamo-last-change-pos))
            (chunk-at-change-min (when change-min (mumamo-get-existing-new-chunk-at change-min)))
            (chunk-at-change-min-start (when chunk-at-change-min (overlay-start chunk-at-change-min)))
-           ;; Check if near border
+           ;; Check if change is near border
            (this-syntax-min-max
-            (when chunk-at-change-min-start
+            (when chunk-at-change-min
               (mumamo-update-obscure chunk-at-change-min chunk-at-change-min-start)
               (mumamo-chunk-syntax-min-max chunk-at-change-min nil)))
            (this-syntax-min (car this-syntax-min-max))
            (in-min-border (when this-syntax-min (>= this-syntax-min change-min)))
-           (here (point))
            ;; Fix-me: Use this:
            (first-check-from (if chunk-at-change-min
                                  (if (or in-min-border
@@ -1352,6 +1381,8 @@ in this part of the buffer."
                                  (prog1
                                      (point)
                                    (goto-char here)))))
+           (while-n0 0)
+           (while-n1 0)
            )
       (when (and chunk-at-change-min (= 0 (- (overlay-end chunk-at-change-min)
                                              (overlay-start chunk-at-change-min))))
@@ -1360,17 +1391,23 @@ in this part of the buffer."
       (when mumamo-last-change-pos
         ;; Fix-me:
         (when chunk-at-change-min
+          ;; Fix-me: clearing of cache must be done later.
           (mumamo-clear-chunk-cache chunk-at-change-min)
-          ;; (setq mumamo-last-chunk (overlay-get chunk-at-change-min 'mumamo-prev-chunk))
-          ;; (or (not mumamo-last-chunk)
-          ;;     (overlay-buffer mumamo-last-chunk)
-          ;;     (setq mumamo-last-chunk nil))
-
-          (while (and mumamo-last-chunk
+          ;; Divide the chunk list in a part we know are correct and a tail we want to check.
+          ;;(while (and (> 500 (setq while-n0 (1+ while-n0)))
+          (while (and (mumamo-while 500 'while-n0 "mumamo-last-chunk first-check-from")
+                      mumamo-last-chunk
                       first-check-from
                       (< first-check-from (overlay-end mumamo-last-chunk)))
+            ;; fix-me: looks wrong
+            ;; (let ((old mumamo-old-tail))
+            ;;   (while old
+            ;;     (delete-overlay old)
+            ;;     (setq old (overlay-get old 'mumamo-chunk-next))))
+            (overlay-put mumamo-last-chunk 'mumamo-next-chunk mumamo-old-tail)
             (setq mumamo-old-tail mumamo-last-chunk)
             (overlay-put mumamo-old-tail 'mumamo-is-new nil)
+            ;;(msgtrc "old-tail at nil: %s" mumamo-old-tail)
             (when nil ;; For debugging
               (overlay-put mumamo-old-tail
                            'face
@@ -1378,8 +1415,10 @@ in this part of the buffer."
                                  (format "red%d" (overlay-get mumamo-old-tail 'mumamo-depth)))))
             (setq mumamo-last-chunk
                   (overlay-get mumamo-last-chunk 'mumamo-prev-chunk)))
-          ;; Delete empty chunks at end, will be recreated if really needed
-          (while (and mumamo-last-chunk
+          ;; fix-me: later? Delete empty chunks at end, will be recreated if really needed
+          ;;(while (and (> 500 (setq while-n1 (1+ while-n1)))
+          (while (and (mumamo-while 500 'while-n1 "mumamo-last-chunk del empty chunks")
+                      mumamo-last-chunk
                       ;;(= (point-max) (overlay-end mumamo-last-chunk))
                       (= (overlay-end mumamo-last-chunk) (overlay-start mumamo-last-chunk)))
             ;;(msgtrc "delete-overlay at end")
@@ -1390,12 +1429,6 @@ in this part of the buffer."
         (setq mumamo-last-change-pos nil))
       ;;(msgtrc "find-chunks:at start mumamo-old-tail=%s/%s, mumamo-last-chunk=%s/%s" mumamo-old-tail (mumamo-chunk-major-mode mumamo-old-tail) mumamo-last-chunk (mumamo-chunk-major-mode mumamo-last-chunk))
       (let* ((last-chunk-is-closed (when mumamo-last-chunk (overlay-get mumamo-last-chunk 'mumamo-is-closed)))
-             ;; (ok-pos (if (not mumamo-last-chunk)
-             ;;             0
-             ;;           (if last-chunk-is-closed
-             ;;               (- (overlay-end mumamo-last-chunk) 1)
-             ;;             (- (overlay-end mumamo-last-chunk) 0)
-             ;;             )))
              (ok-pos (or (and mumamo-last-chunk
                               (- (overlay-end mumamo-last-chunk)
                                  (or (and last-chunk-is-closed 1)
@@ -1429,7 +1462,8 @@ in this part of the buffer."
                   ;; chain and mumamo-old-tail the first in the bottom chain.
 
                   ;; Loop forward until end or buffer end ...
-                  (while (and (> 500 (setq while-n3 (1+ while-n3))) ;; fix-me
+                  ;;(while (and (> 500 (setq while-n3 (1+ while-n3))) ;; fix-me
+                  (while (and (mumamo-while 500 'while-n3 "until end")
                               (or (not end)
                                   (<= ok-pos end))
                               (< ok-pos (point-max))
@@ -1440,19 +1474,30 @@ in this part of the buffer."
                     ;; longer than 200 chars. fix-me.
                     (setq narpos (max (- ok-pos 200) 1))
                     (narrow-to-region narpos point-max)
-                    (setq this-new-values (mumamo-find-next-chunk-values
-                                           mumamo-last-chunk
-                                           first-check-from
-                                           ;; If this was after a change
-                                           ;; within one chunk then tell
-                                           ;; that:
-                                           (when (and change-max
-                                                      chunk-at-change-min
-                                                      (overlay-buffer chunk-at-change-min)
-                                                      (< change-max
-                                                         (overlay-end chunk-at-change-min)))
-                                             change-max)
-                                           chunk-at-change-min))
+                    (let ((use-change-max (when (and change-max
+                                                     chunk-at-change-min
+                                                     (overlay-buffer chunk-at-change-min)
+                                                     (< change-max
+                                                        (overlay-end chunk-at-change-min))
+                                                     (or (not mumamo-last-chunk)
+                                                         (> change-max (overlay-end mumamo-last-chunk))))
+                                            change-max))
+                          (use-chunk-at-change-min (when (or (not mumamo-last-chunk)
+                                                             (not (overlay-buffer mumamo-last-chunk))
+                                                             (not chunk-at-change-min)
+                                                             (not (overlay-buffer chunk-at-change-min))
+                                                             (> (overlay-end chunk-at-change-min)
+                                                                (overlay-end mumamo-last-chunk)))
+                                                     chunk-at-change-min
+                                                     )))
+                      (setq this-new-values (mumamo-find-next-chunk-values
+                                             mumamo-last-chunk
+                                             first-check-from
+                                             ;; If this was after a change
+                                             ;; within one chunk then tell
+                                             ;; that:
+                                             use-change-max
+                                             use-chunk-at-change-min)))
                     (if (not this-new-values)
                         (setq ok-pos (point-max))
                       (setq first-check-from nil)
@@ -1477,7 +1522,8 @@ in this part of the buffer."
                         ;; Loop for fit
                         ;;(msgtrc "for fit:old-tail=%s, this-new=%s" mumamo-old-tail this-new-values)
                         (setq while-n2 1)
-                        (while (and (> 500 (setq while-n2 (1+ while-n2)))
+                        ;;(while (and (> 500 (setq while-n2 (1+ while-n2)))
+                        (while (and (mumamo-while 500 'while-n2 "mumamo-old-tail")
                                     (and mumamo-old-tail (< (overlay-start mumamo-old-tail) ok-pos)))
                           (mumamo-mark-for-refontification (overlay-start mumamo-old-tail) (overlay-end mumamo-old-tail))
                           ;;(msgtrc "find-chunks:not eq delete %s" mumamo-old-tail)
@@ -1487,7 +1533,9 @@ in this part of the buffer."
                               (overlay-buffer mumamo-old-tail)
                               (setq mumamo-old-tail nil)))
                         ;; Create chunk and chunk links
+                        ;;(msgtrc "last-chunk before=%s" mumamo-last-chunk)
                         (setq mumamo-last-chunk (mumamo-new-create-chunk this-new-values))
+                        ;;(msgtrc "last-chunk created=%s" mumamo-last-chunk)
                         (setq last-chunk-is-closed (overlay-get mumamo-last-chunk 'mumamo-is-closed))
                         (unless first-change-pos
                           (setq first-change-pos (mumamo-new-chunk-value-min this-new-values)))
@@ -1517,10 +1565,11 @@ in this part of the buffer."
             (setq  mumamo-find-chunk-is-active nil)))
         ;; fix-me: continue here
         (setq mumamo-find-chunks-level (1- mumamo-find-chunks-level))
-        ;; Avoid two empty overlays at the end of the buffer. There
-        ;; can be two empty overlays here if the last overlay content
-        ;; was deleted.
+        ;; Avoid empty overlays at the end of the buffer. Those can
+        ;; come from for example deleting to the end of the buffer.
         (when this-new-chunk
+          ;;(msgtrc "mumamo-find-chunks-1:this-new-chunk, mumamo-old-tail=%s, mumamo-last-chunk=%s" mumamo-old-tail mumamo-last-chunk)
+          ;; Fix-me: can this happen now?
           (setq prev-chunk (overlay-get this-new-chunk 'mumamo-prev-chunk))
           (when (and prev-chunk
                      (overlay-buffer prev-chunk)
@@ -1531,7 +1580,32 @@ in this part of the buffer."
             ;;(msgtrc "find-chunks:deleting this-new-chunk %s" this-new-chunk)
             (delete-overlay this-new-chunk)
             (setq this-new-chunk prev-chunk)
-            ))
+            )
+          (while (and mumamo-old-tail
+                      (overlay-buffer mumamo-old-tail)
+                      (= (overlay-start mumamo-old-tail) (overlay-end mumamo-old-tail)))
+            ;;(msgtrc "mumamo-find-chunks-1:deleting mumamo-old-tail=%s, next=%s" mumamo-old-tail (overlay-get mumamo-old-tail 'mumamo-next-chunk))
+            (assert (not (eq mumamo-old-tail (overlay-get mumamo-old-tail 'mumamo-next-chunk))) t)
+            ;;(msgtrc "here a, mumamo-old-tail=%s" mumamo-old-tail)
+            (setq prev-chunk mumamo-old-tail)
+            ;;(msgtrc "here b, mumamo-old-tail=%s" mumamo-old-tail)
+            (setq mumamo-old-tail (overlay-get mumamo-old-tail 'mumamo-next-chunk))
+            ;;(msgtrc "here c, mumamo-old-tail=%s" mumamo-old-tail)
+            ;;(msgtrc "mumamo-find-chunks-1:after mumamo-old-tail=%s" mumamo-old-tail)
+            (delete-overlay prev-chunk)
+            ;;(msgtrc "mumamo-find-chunks-1:after (delete-overlay prev-chunk), mumamo-old-tail=%s" mumamo-old-tail)
+            )
+          ;;(msgtrc "mumamo-find-chunks-1:after while, mumamo-old-tail=%s" mumamo-old-tail)
+          )
+        ;;(when mumamo-old-tail (message "end=%s old-tail=%s" end mumamo-old-tail))
+        (unless (overlay-get mumamo-last-chunk 'mumamo-is-closed)
+          ;; Check that there are no left-over old chunks
+          (save-restriction
+            (widen)
+            (dolist (o (overlays-in (point-min) (point-max)))
+              (when (and (overlay-get o 'mumamo-depth)
+                         (not (overlay-get o 'mumamo-is-new)))
+                (error "mumamo-find-chunks: left over chunk: %s end=%s" o end)))))
         (when end-param
           ;;(msgtrc "find-chunks:Exit.end-param=%s, this-new-chunk=%s, point-max=%s, last=%s" end-param this-new-chunk (point-max) mumamo-last-chunk)
           (let* ((ret this-new-chunk)
@@ -1574,6 +1648,8 @@ and OLD-LEN see that variable."
   )
 
 (defun mumamo-jit-lock-after-change (min max old-len)
+  ;; Fix-me: Should not this be on
+  ;; jit-lock-after-change-externd-region-functions??
   "Replacement for `jit-lock-after-change'.
 Does the nearly the same thing as that function, but takes
 care of that there might be different major modes at MIN and MAX.
@@ -1709,16 +1785,18 @@ Do not record undo information during evaluation of BODY."
 ;;;###autoload
 (defun mumamo-mark-for-refontification (min max)
   "Mark region between MIN and MAX for refontification."
+  ;;(msgtrc "mark-for-refontification A min,max=%s,%s point-min,max=%s,%s modified=%s" min max (point-min) (point-max) (buffer-modified-p) )
+  ;;(mumamo-backtrace "mark-for-refontification")
   (mumamo-msgfntfy "mumamo-mark-for-refontification A min,max=%s,%s point-min,max=%s,%s modified=%s" min max (point-min) (point-max) (buffer-modified-p) )
   (assert (<= min max))
   (when (< min max)
     (save-restriction
       (widen)
       (mumamo-msgfntfy "mumamo-mark-for-refontification B min,max=%s,%s point-min,max=%s,%s modified=%s" min max (point-min) (point-max) (buffer-modified-p) )
-      ;;(mumamo-save-buffer-state nil
-      (mumamo-with-buffer-prepared-for-jit-lock
-       (put-text-property min max 'fontified nil)
-       ))))
+      ;;(mumamo-with-buffer-prepared-for-jit-lock
+      (mumamo-save-buffer-state nil
+        (put-text-property min max 'fontified nil)
+        ))))
 
 
 ;; Fix me: The functions in this list must be replaced by variables
@@ -1881,7 +1959,7 @@ PS: `font-lock-fontify-syntactically-region' is the main function
 that does syntactic fontification."
   ;;(msgtrc "mumamo-do-fontify enter: font-lock-keywords-only def=%s" (default-value 'font-lock-keywords-only))
   ;;(msgtrc "mumamo-do-fontify <<<<<<< %s %s %s %s %s %s" start end verbose chunk-syntax-min chunk-syntax-max chunk-major)
-  ;;(msgtrc "mumamo-do-fontify <<<<<<< %s %s %s %s %s %s" start end verbose chunk-syntax-min chunk-syntax-max chunk-major)
+  ;;(msgtrc "font-lock-keywords=%S" font-lock-keywords)
   ;;(mumamo-assert-fontified-t start end)
   (mumamo-condition-case err
       (let* ((font-lock-dont-widen t)
@@ -1894,7 +1972,8 @@ that does syntactic fontification."
              (font-lock-beg start)
              (font-lock-end end)
              (while-n1 0))
-        (while (and (> 500 (setq while-n1 (1+ while-n1)))
+        ;;(while (and (> 500 (setq while-n1 (1+ while-n1)))
+        (while (and (mumamo-while 500 'while-n1 "funs")
                     funs)
           (setq funs (if (or (not (funcall (car funs)))
                              (eq funs font-lock-extend-region-functions))
@@ -1918,14 +1997,11 @@ that does syntactic fontification."
                     (narrow-to-region chunk-syntax-min chunk-syntax-max)
                     ;; Now call font-lock-fontify-region again but now
                     ;; with the chunk font lock parameters:
-                    ;;(msgtrc "(font-lock-do-fontify new-start=%s new-end=%s)" new-start new-end)
                     (setq font-lock-syntactically-fontified (1- new-start))
                     (mumamo-msgfntfy "ENTER font-lock-fontify-region %s %s %s" new-start new-end verbose)
-                    ;;(msgtrc "ENTER font-lock-fontify-region %s %s %s" new-start new-end verbose)
-                    ;;(message "mumamo-do-fontify: font-lock-keywords-only =%s in buffer %s, def=%s" font-lock-keywords-only (current-buffer) (default-value 'font-lock-keywords-only))
+                    ;;(msgtrc "mumamo-do-fontify: font-lock-keywords-only =%s in buffer %s, def=%s" font-lock-keywords-only (current-buffer) (default-value 'font-lock-keywords-only))
                     (font-lock-fontify-region new-start new-end verbose)
                     (mumamo-msgfntfy "END font-lock-fontify-region %s %s %s" new-start new-end verbose)
-                    ;;(msgtrc "END font-lock-fontify-region %s %s %s" new-start new-end verbose)
                     )
                   )
               (error
@@ -1964,7 +2040,7 @@ fontification."
   ;; The text property 'fontified is always t here due to the way
   ;; jit-lock works!
 
-  ;;(msgtrc "mumamo-fontify-region-with %s %s %s %s, ff=%s" start end verbose major (get-text-property start 'fontified))
+  ;;(msgtrc "fontify-region-with %s %s %s %s, ff=%s" start end verbose major (get-text-property start 'fontified))
   ;;(mumamo-assert-fontified-t start end)
   ;;(msgtrc "mumamo-fontify-region-with enter: font-lock-keywords-only def=%s" (default-value 'font-lock-keywords-only))
   (mumamo-condition-case err
@@ -1997,8 +2073,9 @@ Set by functions defined by `define-mumamo-multi-major-mode'.")
 
 
 (defun mumamo-backtrace (label)
-  (msgtrc "%s:backtrace in buffer %s\n%s" label (current-buffer) (with-output-to-string (backtrace)))
-  (msgtrc "%s:backtrace in buffer %s END ------------------------------------" label (current-buffer)))
+  (msgtrc "%s:backtrace in START buffer %s <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n%s"
+          label (current-buffer) (with-output-to-string (backtrace)))
+  (msgtrc "%s:backtrace in END   buffer %s >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" label (current-buffer)))
 
 (defun mumamo-unfontify-buffer ()
   "Unfontify buffer.
@@ -2118,6 +2195,9 @@ the major mode for the chunk."
 (defun mumamo-chunk-car (chunk prop)
   (car (overlay-get chunk prop)))
 
+(defun mumamo-chunk-cadr (chunk prop)
+  (cadr (overlay-get chunk prop)))
+
 ;; (let ((l '(1 2))) (setcar (nthcdr 1 l) 10) l)
 ;; setters
 (defsubst mumamo-chunk-value-set-min (chunk-values min)
@@ -2229,7 +2309,7 @@ surrounded by \"...\" since they are fontified a bit special in
 most major modes."
   ;; Fix-me: unfontifying should be done using the correct syntax table etc.
   ;; Fix-me: refontify when new chunk
-  ;;(msgtrc "mumamo-fontify-region-1: font-lock-keywords-only =%s in buffer %s, def=%s" font-lock-keywords-only (current-buffer) (default-value 'font-lock-keywords-only))
+  ;;(msgtrc "fontify-region-1: font-lock-keywords-only =%s in buffer %s, def=%s" font-lock-keywords-only (current-buffer) (default-value 'font-lock-keywords-only))
   (save-match-data
     (let* ((old-point (point))
            (here start)
@@ -2246,7 +2326,8 @@ most major modes."
       (when chunk-at-start-1
         (unless (= start (1- (overlay-end chunk-at-start-1)))
           (setq chunk-at-start-1 nil)))
-      (while (and (> 500 (setq while-n1 (1+ while-n1)))
+      ;;(while (and (> 500 (setq while-n1 (1+ while-n1)))
+      (while (and (mumamo-while 9000 'while-n1 "fontified-t")
                   fontified-t
                   (< here end))
         ;;(msgtrc "mumamo-fontify-region-1 heree 1, here=%s, end=%s" here end)
@@ -2303,7 +2384,7 @@ most major modes."
           ;;  (assert (= (overlay-end prev-chunk) (overlay-start chunk))))
 
           ;; Fontify
-          ;;(message "\nmumamo-fontify-region-1 before chunk=%s" chunk)
+          ;;(msgtrc "\nmumamo-fontify-region-1 before chunk=%s" chunk)
           (mumamo-update-obscure chunk here)
           (let* ((syntax-min-max (mumamo-chunk-syntax-min-max chunk nil))
                  (syntax-min (car syntax-min-max))
@@ -2315,7 +2396,7 @@ most major modes."
                  (border-max (cdr border-min-max))
                  )
             ;;(msgtrc "chunk mumamo-border-face: %s" chunk)
-            ;;(message "mumamo-fontify-region-1, here=%s chunk-min=%s syn-mn/mx=%s/%s" here chunk-min syntax-min syntax-max)
+            (mumamo-msgfntfy "mumamo-fontify-region-1, here=%s chunk-min=%s syn-mn/mx=%s/%s" here chunk-min syntax-min syntax-max)
             (when (<= here syntax-min)
               (mumamo-flush-chunk-syntax chunk chunk-min chunk-max))
             (when (and (<= here syntax-min)
@@ -2331,10 +2412,11 @@ most major modes."
 
           ;;(setq prev-major chunk-major)
           ;;(setq prev-chunk chunk)
-          (setq here max)
-          (setq fontified-t (or mumamo-dbg-pretend-fontified
-                                (get-text-property here 'fontified)))
-          ))
+          (setq here (if (= max here) (1+ max) max))
+          ;;(setq fontified-t (or mumamo-dbg-pretend-fontified (get-text-property (1- here) 'fontified)))
+          )
+        ;;(msgtrc "ft here end=%s %s %s" fontified-t here end)
+        )
       (goto-char old-point)
       ;;(msgtrc "b first-new-ovl=%s last-new-ovl=%s" first-new-ovl last-new-ovl)
       (unless fontified-t
@@ -2357,6 +2439,7 @@ most major modes."
     hi-lock-mode
     hi-lock-file-patterns
     hi-lock-interactive-patterns
+    wrap-to-fill-column-mode
     ))
 
 (defconst mumamo-irrelevant-buffer-local-vars
@@ -2413,8 +2496,6 @@ most major modes."
     ;; More symbols from visual inspection
     before-change-functions
     delayed-mode-hooks
-    imenu-case-fold-search
-    imenu-generic-expression
     isearch-mode
     line-move-ignore-invisible
     local-abbrev-table
@@ -2609,8 +2690,13 @@ The main reasons for doing it this way is:
         (if add-keywords
             (progn
               ;;(msgtrc "fetch:font-lock-add-keywords %S %S %S" (if mode-keywords major nil) keywords how)
-              (font-lock-add-keywords (if mode-keywords major nil) keywords how))
-          (font-lock-remove-keywords (if mode-keywords major nil) keywords))
+              (font-lock-add-keywords (if mode-keywords major nil) keywords how)
+              ;;(font-lock-add-keywords major keywords how)
+              ;;(msgtrc "fetch:font-lock-keywords=%S" font-lock-keywords)
+              )
+          (font-lock-remove-keywords (if mode-keywords major nil) keywords)
+          ;;(font-lock-remove-keywords major keywords)
+          )
         (unless mode-keywords (font-lock-mode -1) (font-lock-mode 1))
         ;;(msgtrc "fetch-major-mode-setup:font-lock-keywords=%S" font-lock-keywords)
         )
@@ -2753,14 +2839,19 @@ The main reasons for doing it this way is:
     ;; Use the new value in current buffer.
     (when  keywords
       ;;(set (make-local-variable func-sym) (symbol-value func-sym))
+      ;;(msgtrc "fetch: major=%s func-def-sym=%s cb=%s fetch-func-definition=%s" major func-def-sym (current-buffer) fetch-func-definition)
+      ;;(msgtrc "fetch: major=%s func-def-sym=%s cb=%s fetch-func-definition" major func-def-sym (current-buffer))
       (set (make-local-variable func-sym) byte-compiled-fun)
-      (set (make-local-variable func-def-sym) fetch-func-definition))
+      (set (make-local-variable func-def-sym) fetch-func-definition)
+      (put func-sym 'permanent-local t)
+      (put func-def-sym 'permanent-local t))
     (assert (functionp (symbol-value func-sym)) t)
     ;; return a list def + fun
     (cons func-sym func-def-sym)))
 
 ;; Fix-me: maybe a hook in font-lock-add-keywords??
 (defun mumamo-ad-font-lock-keywords-helper (major keywords how add-keywords)
+  ;;(msgtrc "ad-font-lock-keywords-helper %s %s %s %s" major keywords how add-keywords)
   (if major
       (mumamo-fetch-major-mode-setup major keywords t t how)
     ;; Fix-me: Can't do that, need a list of all
@@ -2781,6 +2872,7 @@ The main reasons for doing it this way is:
       ;;(font-lock-mode -1) (font-lock-mode 1)
       )))
 
+;; Fix-me: This has stopped working again 2009-11-04, but I do not know when it began...
 (defadvice font-lock-add-keywords (around
                                    mumamo-ad-font-lock-add-keywords
                                    activate
@@ -2873,11 +2965,11 @@ fontification and speeds up fontification significantly."
       (set (make-local-variable fun-var-def-sym) (symbol-value fun-var-def-sym)))
     (caadr (or (assq use-major mumamo-internal-major-modes-alist)
                ))))
-               ;; (assq use-major
-               ;;     (add-to-list 'mumamo-internal-major-modes-alist
-               ;;                  (list use-major
-               ;;                        (mumamo-fetch-major-mode-setup
-               ;;                         use-major nil nil nil))))))))
+;; (assq use-major
+;;     (add-to-list 'mumamo-internal-major-modes-alist
+;;                  (list use-major
+;;                        (mumamo-fetch-major-mode-setup
+;;                         use-major nil nil nil))))))))
 
 (defun mumamo-remove-all-chunk-overlays ()
   "Remove all CHUNK overlays from the current buffer."
@@ -3262,7 +3354,7 @@ Otherwise return nil."
 ;; where they should not be valid borders there.
 (defun mumamo-find-possible-chunk (pos
                                    min max
-                                   bw-exc-start-fun
+                                   bw-exc-start-fun ;; obsolete
                                    bw-exc-end-fun
                                    fw-exc-start-fun
                                    fw-exc-end-fun
@@ -3309,8 +3401,10 @@ Currently only the XML parser in `nxml-mode' is recognized.  In
 this list it should be the symbol `nxml-mode'.
 
 The functions FW-EXC-START-FUN and FW-EXC-END-FUN should search
-for exception start or end, forward resp backward.  Those three
-should return just the start respectively the end of the chunk.
+for exception start or end, forward resp backward. Those two
+takes two parameters, start position POS and max position MAX,
+and should return just the start respectively the end of the
+chunk.
 
 For all three functions the position returned should be nil if
 search fails.
@@ -3543,18 +3637,12 @@ See also `mumamo-quick-static-chunk'."
 
 (defun mumamo-new-create-chunk (new-chunk-values)
   "Create and return a chunk from NEW-CHUNK-VALUES.
-The values for this are stored in the properties
-below:
+When doing this store the functions for creating the next chunk
+after this in the properties below of the now created chunk:
 
-The first two are used when the bottom:
-
-- `mumamo-next-major': is nil or the next chunk's major mode.
-- `mumamo-next-chunk-funs': nil or similar to
-  `mumamo-current-chunk-family'.
-- `mumamo-next-end-fun': function that searches for end of AFTER-CHUNK
-
-- `mumamo-next-border-funs': functions that finds borders
-"
+- 'mumamo-next-major: is nil or the next chunk's major mode.
+- 'mumamo-next-end-fun: function that searches for end of AFTER-CHUNK
+- 'mumamo-next-border-fun: functions that finds borders"
   ;;((1 696 nxhtml-mode nil nil nil nil) (696 nil php-mode nil nil nil nil))
   ;;(current (list curr-min curr-max curr-major curr-border-min curr-border-max curr-parseable curr-fw-exc-fun))
   ;;(next    (list next-min next-max next-major next-border-min next-border-max next-parseable next-fw-exc-fun)))
@@ -3565,8 +3653,8 @@ The first two are used when the bottom:
            (next-major      (nth 0 next-values))
            (next-end-fun    (nth 1 next-values))
            (next-border-fun (nth 2 next-values))
-           (next-chunk-funs (nth 3 next-values))
-           (next-depth-diff (nth 4 next-values))
+           (next-depth-diff (nth 3 next-values))
+           (next-indent     (nth 4 next-values))
            (beg         (nth 0 this-values))
            (end         (nth 1 this-values))
            (maj         (nth 2 this-values))
@@ -3633,7 +3721,6 @@ The first two are used when the bottom:
       (when this-borders-max (setq bmax (- end this-borders-max)))
       ;;(when after-chunk (message "after-chunk.end=%s, beg=%s, end=%s" (overlay-end after-chunk) beg end))
       ;;(message "fw-funs=%s" fw-funs)
-      (unless (or (not next-chunk-funs) (eq 'none next-chunk-funs)) (error "next-chunk-funs not 'none=%s" next-chunk-funs))
       (when this-chunk
         (overlay-put this-chunk 'mumamo-is-new t)
         (overlay-put this-chunk 'face (mumamo-background-color depth))
@@ -3642,12 +3729,12 @@ The first two are used when the bottom:
         (overlay-put this-chunk 'mumamo-next-depth-diff next-depth-diff)
         (assert (symbolp next-major) t)
         (overlay-put this-chunk 'mumamo-next-major next-major)
-        (overlay-put this-chunk 'mumamo-next-chunk-funs next-chunk-funs)
         ;; Values for this chunk
         (overlay-put this-chunk 'mumamo-is-closed is-closed)
         (overlay-put this-chunk 'syntax-min-d bmin)
         (overlay-put this-chunk 'syntax-max-d bmax)
         (overlay-put this-chunk 'mumamo-prev-chunk after-chunk)
+        (overlay-put this-chunk 'mumamo-next-indent next-indent)
         (when after-chunk (overlay-put after-chunk 'mumamo-next-chunk this-chunk))
 
         ;;(msgtrc "\n<<<<<<<<<<<<<<<<< next-depth-diff/depth-diff=%s/%s, maj=%s, after-chunk=%s" next-depth-diff depth-diff maj after-chunk)
@@ -3663,6 +3750,7 @@ The first two are used when the bottom:
          (t (error "next-depth-diff=%s" next-depth-diff)))
         ;;(msgtrc "mumamo-next-end-fun=%S" (overlay-get this-chunk 'mumamo-next-end-fun))
 
+        ;; Fix-me: replace 'mumamo-major-mode with multi major mode to make it more flexible.
         (cond
          ((= 1 depth-diff)
           (mumamo-chunk-push this-chunk 'mumamo-major-mode maj))
@@ -3733,8 +3821,10 @@ The first two are used when the bottom:
   (with-current-buffer buffer
     (save-restriction
       (widen)
-      (let ((chunk (mumamo-find-chunks 1 "margin-disp")))
-        (while chunk
+      (let ((chunk (mumamo-find-chunks 1 "margin-disp"))
+            (while-n0 0))
+        (while (and (mumamo-while 500 'while-n0 "chunk")
+                    chunk)
           (mumamo-update-chunk-margin-display chunk)
           (setq chunk (overlay-get chunk 'mumamo-next-chunk)))))))
 
@@ -3746,24 +3836,66 @@ The first two are used when the bottom:
   (setq mumamo-margin-used
         (if (and (boundp 'linum-mode) linum-mode) 'right-margin (nth 0 mumamo-margin-use))))
 
-(defun mumamo-set-window-margins-used (win)
-  "Set window margin according to `mumamo-margin-use'."
-  ;; Fix-me: old-margin does not work, break it up
-  (let* ((old-margin mumamo-margin-used)
-         (margin    (mumamo-margin-used))
-         (width  (nth 1 mumamo-margin-use))
-         (both-widths (window-margins win))
-         (old-left (eq old-margin 'left-margin))
-         (left (eq margin 'left-margin)))
-    ;; Change only the margin we used!
-    (if (not mumamo-margin-info-mode)
-        (set-window-margins win
-                            (if left nil (car both-widths))
-                            (if (not left) nil (cdr both-widths)))
-      ;;(msgtrc "set-window-margins-used margin-info-mode=t")
-      (case margin
-        ('left-margin  (set-window-margins win width (when old-left (cdr both-widths))))
-        ('right-margin (set-window-margins win (car both-widths) width))))))
+;; (defun mumamo-set-window-margins-used (win)
+;;   "Set window margin according to `mumamo-margin-use'."
+;;   ;; Fix-me: old-margin does not work, break it up
+;;   (let* ((old-margin-used mumamo-margin-used)
+;;          (margin-used  (mumamo-margin-used))
+;;          (width  (nth 1 mumamo-margin-use))
+;;          (both-widths (window-margins win))
+;;          (old-left (eq old-margin-used 'left-margin))
+;;          (left (eq margin 'left-margin)))
+;;     ;; Change only the margin we used!
+;;     (if (not mumamo-margin-info-mode)
+;;         (progn
+;;           (set-window-margins win
+;;                               (if left nil (car both-widths))
+;;                               (if (not left) nil (cdr both-widths)))
+;;           )
+;;       ;;(msgtrc "set-window-margins-used margin-info-mode=t")
+;;       (case margin-used
+;;         ('left-margin  (set-window-margins win width (when old-left (cdr both-widths))))
+;;         ('right-margin (set-window-margins win (car both-widths) width))))))
+
+(defun mumamo-update-buffer-margin-use (buffer)
+  ;;(msgtrc "update-buffer-margin-use %s" buffer)
+  (when (fboundp 'mumamo-update-chunks-margin-display)
+    (with-current-buffer buffer
+      (when mumamo-multi-major-mode
+        (let* ((old-margin-used mumamo-margin-used)
+               (margin-used  (mumamo-margin-used))
+               (old-is-left (eq old-margin-used 'left-margin))
+               (is-left (eq margin-used 'left-margin))
+               (width  (nth 1 mumamo-margin-use))
+               (need-update nil))
+          (if (not mumamo-margin-info-mode)
+              (when old-margin-used
+                (setq need-update t)
+                (setq old-margin-used nil)
+                (if old-is-left
+                    (setq left-margin-width 0)
+                  (setq right-margin-width 0)))
+            (unless (and (eq old-margin-used margin-used)
+                         (= width (if old-is-left left-margin-width right-margin-width)))
+              (setq need-update t)
+              (if is-left
+                  (setq left-margin-width width)
+                (setq right-margin-width width))
+              (unless (eq old-margin-used margin-used)
+                (if old-is-left
+                    (setq left-margin-width 0)
+                  (setq right-margin-width 0)))))
+          (when need-update
+            (mumamo-update-chunks-margin-display buffer)
+            (dolist (win (get-buffer-window-list buffer))
+              (set-window-buffer win buffer)))
+          )
+        ;; Note: window update must be before buffer update because it
+        ;; uses old-margin from the call to function margin-used.
+        ;; (dolist (win (get-buffer-window-list buffer))
+        ;;   (mumamo-set-window-margins-used win))
+        ;; (mumamo-update-chunks-margin-display buffer)
+        ))))
 
 (defun mumamo-new-chunk-value-min (values)
   (let ((this-values (nth 0 values)))
@@ -3780,7 +3912,6 @@ The first two are used when the bottom:
          (chunk-next-major      (overlay-get chunk 'mumamo-next-major))
          (chunk-next-end-fun    (mumamo-chunk-car chunk 'mumamo-next-end-fun))
          (chunk-next-border-fun (mumamo-chunk-car chunk 'mumamo-next-border-fun))
-         (chunk-next-chunk-funs (overlay-get chunk 'mumamo-next-chunk-funs))
          (chunk-next-chunk-diff (overlay-get chunk 'mumamo-next-depth-diff))
          (chunk-beg (overlay-start chunk))
          (chunk-end (overlay-end chunk))
@@ -3798,8 +3929,7 @@ The first two are used when the bottom:
          (values-next-major      (nth 0 next-values))
          (values-next-end-fun    (nth 1 next-values))
          (values-next-border-fun (nth 2 next-values))
-         (values-next-chunk-funs (nth 3 next-values))
-         (values-next-depth-diff (nth 4 next-values))
+         (values-next-depth-diff (nth 3 next-values))
          (values-beg         (nth 0 this-values))
          (values-end         (nth 1 this-values))
          (values-major-mode  (nth 2 this-values))
@@ -3821,8 +3951,6 @@ The first two are used when the bottom:
          ;;(progn (message "eq-c-v: here c, %s /= %s" chunk-next-border-fun values-next-border-fun) t)
          ;;(eq chunk-next-border-fun    values-next-border-fun)
 
-         ;;(progn (message "eq-c-v: here a, %s /= %s" chunk-next-chunk-funs values-next-chunk-funs) t)
-         (equal chunk-next-chunk-funs values-next-chunk-funs)
          (= chunk-next-chunk-diff     values-next-depth-diff)
          (= chunk-beg values-beg)
          ;;(progn (message "eq-c-v: here b") t)
@@ -3861,16 +3989,44 @@ is a chunk family \(ie the third argument to
 You can use the function `mumamo-inherit-sub-chunk-family' to add
 to this list.")
 
+(defvar mumamo-multi-local-sub-chunk-families nil
+  "Multi major mode local chunk dividing rourines for sub chunks.
+Like `mumamo-sub-chunk-families' specific additions for multi
+major modes. The entries have the form
+
+  \((CHUNK-MAJOR . MULTI-MAJOR) CHUNK-FAMILY)
+
+Use the function `mumamo-inherit-sub-chunk-family-locally' to add
+to this list.")
+
 ;;(mumamo-get-sub-chunk-funs 'html-mode)
 (defun mumamo-get-sub-chunk-funs (major)
   "Get chunk family sub chunk with major mode MAJOR."
-  (let ((rec (assoc major mumamo-sub-chunk-families)))
+  (let ((rec (or
+              (assoc (cons major mumamo-multi-major-mode) mumamo-multi-local-sub-chunk-families)
+              (assoc major mumamo-sub-chunk-families))))
     (caddr (cadr rec))))
+
+(defun mumamo-inherit-sub-chunk-family-locally (multi-major multi-using)
+  "Add chunk dividing routines from MULTI-MAJOR locally.
+The dividing routines from multi major mode MULTI-MAJOR can then
+be used in sub chunks in buffers using multi major mode
+MULTI-USING."
+  (let* ((chunk-family (get multi-major 'mumamo-chunk-family))
+         (major      (nth 1 chunk-family)))
+    (let ((major-mode major))
+      (when (derived-mode-p 'nxml-mode)
+        (error "Major mode %s major can't be used in sub chunks" major)))
+    (add-to-list 'mumamo-multi-local-sub-chunk-families
+                 (list (cons major multi-using) chunk-family))))
 
 (defun mumamo-inherit-sub-chunk-family (multi-major)
   "Inherit chunk dividing routines from multi major modes.
 Add chunk family from multi major mode MULTI-MAJOR to
-`mumamo-inherit-chunk-family'."
+`mumamo-sub-chunk-families'.
+
+Sub chunks with major mode the same as MULTI-MAJOR mode will use
+this chunk familyu to find subchunks."
   (let* ((chunk-family (get multi-major 'mumamo-chunk-family))
          (major      (nth 1 chunk-family)))
     (let ((major-mode major))
@@ -3891,15 +4047,10 @@ For the first chunk AFTER-CHUNK is nil.  Then use
 ;; property `mumamo-next-values' in AFTER-CHUNK. The values are a
 ;; list:
 
-;;   \(NEXT-MAJOR END-FUNS NEXT-CHUNK-FUNS)
-
 ;; - NEXT-MAJOR is nil or the next chunk's major mode.
 ;; - END-FUNS is nil or a list (END-FUN BORDER-FUN):
 ;;   - END-FUN searches for end of this chunk
 ;;   - BORDER-FUN finds borders
-;; - NEXT-CHUNK-FUNS is nil or similar to
-;; END-FUNS and NEXT-CHUNK-FUNS are used to search for the end of
-;; the current chunk.
 
 Otherwise use the values cached in AFTER-CHUNK for how to search
 for next chunk.  See `mumamo-new-create-chunk' for more
@@ -3914,6 +4065,7 @@ information.
                                  (eq (overlay-buffer after-chunk)
                                      (current-buffer))))
          (after-chunk-is-closed (when after-chunk-valid (overlay-get after-chunk 'mumamo-is-closed)))
+         ;;(dummy0 (msgtrc "find-next-chunk-values: after-chunk-valid/closed=%s/%s" after-chunk-valid after-chunk-is-closed))
          (use-syntax-min (or (and after-chunk-valid
                                   (+ (overlay-start after-chunk)
                                      (or (overlay-get after-chunk 'syntax-min-d)
@@ -3927,27 +4079,35 @@ information.
                     1)))
          (main-chunk-funs (let ((chunk-info (cdr mumamo-current-chunk-family)))
                             (cadr chunk-info)))
-         (after-next-chunk-funs (when after-chunk-valid (overlay-get after-chunk 'mumamo-next-chunk-funs)))
          ;; Note that "curr-*" values are fetched from "mumamo-next-*" values in after-chunk
          (curr-major (if after-chunk-valid
-                         (or (overlay-get after-chunk 'mumamo-next-major)
-                             ;;(mumamo-main-major-mode))
-                             (let ((after-after-chunk (overlay-get after-chunk 'mumamo-prev-chunk)))
-                               (msgtrc "after-after-chunk...=%s" after-after-chunk)
-                               (unless after-after-chunk (error "after-after-chunk is nil"))
-                               (mumamo-chunk-car after-after-chunk 'mumamo-major-mode)))
+                         (or ;;(progn (msgtrc "At A, after-chunk.next-major=%s" (overlay-get after-chunk 'mumamo-next-major)) nil)
+                          ;; 'mumamo-next-major is used when we are going into a sub chunk.
+                          (overlay-get after-chunk 'mumamo-next-major)
+
+                          ;; We are going out of a sub chunk.
+                          (mumamo-chunk-cadr after-chunk 'mumamo-major-mode)
+
+                          ;;(progn (msgtrc "At B") nil)
+                          ;;(mumamo-main-major-mode))
+
+                          ;; fix-me: Is this some old left-over???
+                          ;; (let ((after-after-chunk (overlay-get after-chunk 'mumamo-prev-chunk)))
+                          ;;   ;;(msgtrc "after-after-chunk...=%s" after-after-chunk)
+                          ;;   (unless after-after-chunk (error "after-after-chunk is nil"))
+                          ;;   ;; Fix-me: use depth diff here (mason example)
+                          ;;   (mumamo-chunk-car after-after-chunk 'mumamo-major-mode))
+                          )
+                       ;;(msgtrc "At C")
                        (mumamo-main-major-mode)))
          (curr-chunk-funs
-          (if (eq curr-major (mumamo-main-major-mode))
+          (if (or (not after-chunk)
+                  (and (= 1 (overlay-get after-chunk 'mumamo-depth))
+                       (= -1 (overlay-get after-chunk 'mumamo-next-depth-diff))))
+              ;;(eq curr-major (mumamo-main-major-mode))
               main-chunk-funs
             ;;(msgtrc "find-next-chunk-values:get-sub-chunk-funs %s" curr-major)
             (mumamo-get-sub-chunk-funs curr-major)))
-          ;; (if (and after-chunk-valid
-          ;;          after-next-chunk-funs)
-          ;;     (if (listp after-next-chunk-funs)
-          ;;         after-next-chunk-funs
-          ;;       nil)
-          ;;   main-chunk-funs))
          (curr-end-fun (when after-chunk-valid
                          (mumamo-chunk-car after-chunk 'mumamo-next-end-fun)))
          ;; Fix-me: there is obviously something wrong below...
@@ -3971,9 +4131,9 @@ information.
          curr-fw-exc-fun
          next-fw-exc-fun
          border-fun
+         indent
          next-major
          curr-end-fun-end
-         (next-chunk-funs 'none)
          next-border-fun
          curr-is-closed
          next-depth-diff
@@ -3999,19 +4159,41 @@ information.
         (let* ((use-max (if after-change-max
                             (+ after-change-max 100)
                           max))
+               (chunk-end (and chunk-at-after-change
+                               (overlay-end chunk-at-after-change)))
                (use-min (max (- pos 2) (point-min)))
                (syntax-min-max (when curr-border-fun (funcall curr-border-fun
                                                               (overlay-end after-chunk)
                                                               nil nil)))
                (syntax-min (or (car syntax-min-max)
                                (when after-chunk (overlay-end after-chunk))
-                               1)))
-          (setq curr-end-fun-end (funcall curr-end-fun use-min use-max))
+                               1))
+               (possible-end-fun-end t))
+          ;; The code below takes care of the case when to subsequent
+          ;; chunks have the same ending delimiter. (Maybe a while
+          ;; loop is bit overkill here.)
+          (while (and possible-end-fun-end
+                      (not curr-end-fun-end)
+                      (< use-min use-max))
+            (setq curr-end-fun-end (funcall curr-end-fun use-min use-max))
+            (if (not curr-end-fun-end)
+                (setq possible-end-fun-end nil)
+              (when (and after-chunk-is-closed
+                         (< curr-end-fun-end (overlay-end after-chunk)))
+                (setq curr-end-fun-end nil)
+                (setq use-min (1+ use-min)))))
+          (unless curr-end-fun-end
+            ;; Use old end if valid
+            (and after-change-max
+                 chunk-end
+                 (= -1 (overlay-get chunk-at-after-change 'mumamo-next-depth-diff))
+                 (< after-change-max chunk-end)
+                 chunk-end))
           ;; Fix-me: Check if old chunk is valid. It is not valid if
           ;; depth-diff = -1 and curr-end-fun-end is not the same as
           ;; before.
 
-          ;;(msgtrc "find-next-chunk-values:Calling (curr-end-fun=%s %s %s), point=%s/%s=>%s" curr-end-fun use-min use-max (point) here curr-end-fun-end)
+          ;;(msgtrc "find-next-chunk-values:Calling (curr-end-fun=%s %s %s), point=%s/%s=>%s, max=%s, caac=%s" curr-end-fun use-min use-max (point) here curr-end-fun-end max chunk-at-after-change)
           ;; Fix-me: this test should also be made for other chunks
           ;; searches, but this catches most problems I think.
           ;;(msgtrc "find-next-chunk-values:here c, curr-min=%s, after-chunk=%s" curr-min after-chunk)
@@ -4041,10 +4223,10 @@ information.
                 )
               (setq curr-end-fun-end nil))
           ;; Use old result if valid
-          (and nil ;(not curr-end-fun-end)
-               chunk-at-after-change
-               (= -1 (overlay-get chunk-at-after-change 'mumamo-next-depth-diff))
-               (setq curr-end-fun-end (overlay-end chunk-at-after-change)))
+          ;; (and nil ;(not curr-end-fun-end)
+          ;;      chunk-at-after-change
+          ;;      (= -1 (overlay-get chunk-at-after-change 'mumamo-next-depth-diff))
+          ;;      (setq curr-end-fun-end (overlay-end chunk-at-after-change)))
           ;;(msgtrc "find-next-chunk-values:curr-end-fun-end after end-in-code=%s" curr-end-fun-end)
           ))
       ;;(msgtrc "find-next-chunk-values:here d, curr-min=%s, after-chunk=%s" curr-min after-chunk)
@@ -4064,6 +4246,7 @@ information.
                  (rparseable  (nth 4 r))
                  (rfw-exc-fun (nth 5 r))
                  (rborder-fun (nth 6 r))
+                 (rindent     (nth 7 r))
                  (rborder-min (when rborder (nth 0 rborder)))
                  (rborder-max (when rborder (nth 1 rborder)))
                  (rmin-found rmin))
@@ -4113,6 +4296,7 @@ information.
                       (setq parseable rparseable)
                       (setq fw-exc-fun rfw-exc-fun)
                       (setq border-fun rborder-fun)
+                      (setq indent rindent)
                       (setq next-major rmajor-sub))
                   (if rmajor-sub
                       (if next-major
@@ -4126,6 +4310,7 @@ information.
                             (setq parseable rparseable)
                             (setq fw-exc-fun rfw-exc-fun)
                             (setq border-fun rborder-fun)
+                            (setq indent rindent)
                             (setq next-major rmajor-sub))
                         (setq next-min rmin)
                         (setq border-min rborder-min)
@@ -4135,6 +4320,7 @@ information.
                         (setq parseable rparseable)
                         (setq fw-exc-fun rfw-exc-fun)
                         (setq border-fun rborder-fun)
+                        (setq indent rindent)
                         (setq next-major rmajor-sub))
                     (unless next-major
                       (when (> next-min rmin)
@@ -4173,14 +4359,16 @@ information.
       (setq curr-parseable parseable)
       (setq curr-border-min border-min)
       (setq curr-border-max border-max)
+      ;;(msgtrc "next-depth-diff: curr-max=%s, curr-end-fun-end=%s" curr-max curr-end-fun-end)
       (setq next-depth-diff (if (and curr-max curr-end-fun-end
                                      (= curr-max curr-end-fun-end))
                                 -1
                               1))
       ;;(msgtrc "find-next-chunk-values:here B, curr-min=%s, after-chunk=%s" curr-min after-chunk)
-      (unless next-major (setq next-chunk-funs nil))
       (when (= -1 next-depth-diff)
-        (setq next-major (mumamo-chunk-car after-chunk 'mumamo-major-mode)))
+        ;;(setq next-major (mumamo-chunk-car after-chunk 'mumamo-major-mode))
+        ;; We will pop it from 'mumamo-major-mode
+        (setq next-major nil))
       (when after-chunk-valid
         ;;(msgtrc "find-next-chunk-values:here C, curr-min=%s, after-chunk=%s" curr-min after-chunk)
         (unless (or (not after-chunk-is-closed)
@@ -4198,7 +4386,7 @@ information.
       (assert (symbolp next-major) t)
       (let ((current (list curr-min curr-max curr-major curr-border-min curr-border-max curr-parseable
                            curr-chunk-funs after-chunk curr-is-closed))
-            (next    (list next-major next-fw-exc-fun next-border-fun next-chunk-funs next-depth-diff)))
+            (next    (list next-major next-fw-exc-fun next-border-fun next-depth-diff indent)))
         ;;(msgtrc "find-next-chunk-values=> current=%s, next=%s" current next)
         (list current next)))))
 
@@ -4426,58 +4614,18 @@ this function will not see it since it is run in a timer.)"
   (add-hook 'post-command-hook 'mumamotemp-post-command nil t)
   (add-hook 'pre-command-hook 'mumamotemp-pre-command nil t))
 
-(defun mumamo-idle-set-major-mode (buffer window)
-  "Set major mode from mumamo chunk when Emacs is idle.
-Do this only if current buffer is BUFFER and then do it in window
-WINDOW.
-
-See the variable `mumamo-set-major-mode-delay' for an
-explanation."
-  (save-match-data ;; runs in idle timer
-    (mumamo-msgfntfy "mumamo-idle-set-major-mode b=%s, window=%s" buffer window)
-    (with-selected-window window
-      ;; According to Stefan Monnier we need to set the buffer too.
-      (with-current-buffer (window-buffer)
-        (when (eq buffer (current-buffer))
-          (mumamo-condition-case err
-              ;;(let* ((ovl (mumamo-get-chunk-at (point)))
-              (let* ((ovl (mumamo-find-chunks (point) "mumamo-idle-set-major-mode"))
-                     (major (mumamo-chunk-major-mode ovl))
-                     (modified (buffer-modified-p)))
-                (unless (eq major major-mode)
-                  ;;(message "mumamo-set-major at A")
-                  (mumamo-set-major major)
-                  ;; Fix-me: This is a bug workaround. Possibly in Emacs.
-                  (when (and (buffer-modified-p)
-                             (not modified))
-                    (set-buffer-modified-p nil))
-                  ;; sync keymap
-                  (when (timerp mumamo-unread-command-events-timer)
-                    (cancel-timer mumamo-unread-command-events-timer))
-                  (when unread-command-events
-                    ;; Save unread keys before calling `top-level' which
-                    ;; will clear them.
-                    (setq mumamo-unread-command-events-timer
-                          (run-with-idle-timer
-                           0 nil
-                           'mumamo-unread-command-events
-                           unread-command-events
-                           major last-command))
-                    (top-level)
-                    )))
-            (error
-             (mumamo-display-error 'mumamo-idle-set-major-mode
-                                   "cb=%s, err=%s" (current-buffer) err))))))))
+(defsubst mumamo-cancel-idle-set-major-mode ()
+  (when (timerp mumamo-idle-set-major-mode-timer)
+    (cancel-timer mumamo-idle-set-major-mode-timer))
+  (setq mumamo-idle-set-major-mode-timer nil))
 
 (defun mumamo-request-idle-set-major-mode ()
   "Setup to change major mode from chunk when Emacs is idle."
-  (when (timerp mumamo-idle-set-major-mode-timer)
-    (cancel-timer mumamo-idle-set-major-mode-timer))
+  (mumamo-cancel-idle-set-major-mode)
   (setq mumamo-idle-set-major-mode-timer
         (run-with-idle-timer
          mumamo-set-major-mode-delay
          nil
-         ;;'mumamo-idle-set-major-mode (mumamo-get-chunk-at (point)))))
          'mumamo-idle-set-major-mode (current-buffer) (selected-window))))
 
 (defvar mumamo-done-first-set-major nil)
@@ -4510,48 +4658,6 @@ explanation."
     )
   )
 
-(defun mumamo-set-major-pre-command ()
-  "Change major mode if necessary before a command.
-When the key sequence that invoked the command is in current
-local map and major mode is not the major mode for the current
-mumamo chunk then set major mode to that for the chunk."
-  ;;(message "enter mumamo-set-major-pre-command")
-  (mumamo-condition-case err
-      ;; First see if we can avoid changing major mode
-      (let ((glob-command) ; (lookup-key global-map (this-command-keys-vector)))
-            )
-        (if (memq this-command mumamo-safe-commands-in-wrong-major)
-            nil ;;(message "safe %s" this-command)
-          (message "not safe %s" this-command)
-          (let* ((ovl (mumamo-find-chunks (point) "mumamo-set-major-pre-command"))
-                 (major (mumamo-chunk-major-mode ovl))
-                 (found-this (lookup-key (current-local-map) (this-command-keys-vector)))
-                 )
-;;;         (message "pre-commend: major=%s, major-mode=%s, lookup M-TAB=%s, binding=%s, found-this=%s"
-;;;                  major major-mode (lookup-key (current-local-map) [(meta tab)])
-;;;                  (key-binding [(meta tab)] t)
-;;;                  found-this)
-            (if (not major)
-                (lwarn '(mumamo-set-major-pre-command) :error "major=%s" major)
-              (when (or (not (eq major-mode major))
-                        (not (mumamo-set-major-check-keymap))
-                        )
-                (setq major-mode nil)
-                (mumamo-set-major major)
-                ;; Unread the last command key sequence
-                (setq unread-command-events
-                      (append (listify-key-sequence (this-command-keys-vector))
-                              unread-command-events))
-                ;; Some commands, like `viper-command-argument' need to
-                ;; know the last command, so tell them.
-                (setq this-command (lambda ()
-                                     (interactive)
-                                     (setq this-command last-command)))
-                )))))
-    (error
-     (mumamo-display-error 'mumamo-set-major-pre-command
-                           "%s" (error-message-string err)))))
-
 (defun mumamo-fetch-local-map (major)
   "Fetch local keymap for major mode MAJOR.
 Do that by turning on the major mode in a new buffer.  Add the
@@ -4580,23 +4686,27 @@ Return the fetched local map."
 (make-variable-buffer-local 'mumamo-post-command-chunk)
 
 (defun mumamo-post-command-get-chunk (pos)
-  (if (and mumamo-post-command-chunk
-           (overlayp mumamo-post-command-chunk)
-           ;;(progn (message "here a=%s" mumamo-post-command-chunk) t)
-           (overlay-buffer mumamo-post-command-chunk)
-           ;;(progn (message "here b=%s" mumamo-post-command-chunk) t)
-           (< pos (overlay-end mumamo-post-command-chunk))
-           ;;(progn (message "here c=%s" mumamo-post-command-chunk) t)
-           (>= pos (overlay-start mumamo-post-command-chunk))
-           ;;(progn (message "here d=%s" mumamo-post-command-chunk) t)
-           (mumamo-chunk-major-mode mumamo-post-command-chunk)
-           ;;(progn (message "here e=%s" mumamo-post-command-chunk) t)
-           )
-      mumamo-post-command-chunk
-    (msgtrc "--------------- new post-command-chunk")
-    (setq mumamo-post-command-chunk
-          (or (mumamo-get-existing-new-chunk-at (point))
-              (mumamo-find-chunks (point) "post-command-get-chunk")))))
+  "Get chunk at POS fast."
+  (let ((have-regions (and (boundp 'mumamo-regions)
+                           mumamo-regions)))
+    (when have-regions (setq mumamo-post-command-chunk nil))
+    (if (and mumamo-post-command-chunk
+             (overlayp mumamo-post-command-chunk)
+             ;;(progn (message "here a=%s" mumamo-post-command-chunk) t)
+             (overlay-buffer mumamo-post-command-chunk)
+             ;;(progn (message "here b=%s" mumamo-post-command-chunk) t)
+             (< pos (overlay-end mumamo-post-command-chunk))
+             ;;(progn (message "here c=%s" mumamo-post-command-chunk) t)
+             (>= pos (overlay-start mumamo-post-command-chunk))
+             ;;(progn (message "here d=%s" mumamo-post-command-chunk) t)
+             (mumamo-chunk-major-mode mumamo-post-command-chunk)
+             ;;(progn (msgtrc "here e=%s" mumamo-post-command-chunk) t)
+             )
+        mumamo-post-command-chunk
+      ;;(msgtrc "--------------- new post-command-chunk")
+      (setq mumamo-post-command-chunk
+            (or (unless have-regions (mumamo-get-existing-new-chunk-at (point)))
+                (mumamo-find-chunks (point) "post-command-get-chunk"))))))
 
 ;; (setq mumamo-set-major-mode-delay 10)
 (defun mumamo-set-major-post-command ()
@@ -4609,43 +4719,106 @@ request a change of major mode when Emacs is idle that long.
 See the variable above for an explanation why a delay might be
 needed \(and is the default)."
   ;;(msgtrc "set-major-post-command here")
-  (let* (;;(ovl (mumamo-get-chunk-at (point)))
-         ;;(ovl (mumamo-find-chunks (point) "mumamo-set-major-post-command"))
-         (in-pre-hook (memq 'mumamo-set-major-pre-command pre-command-hook))
-         ;;(ovl (unless in-pre-hook (mumamo-get-existing-new-chunk-at (point))))
+  (let* ((in-pre-hook (memq 'mumamo-set-major-pre-command pre-command-hook))
          (ovl (unless in-pre-hook (mumamo-post-command-get-chunk (point))))
          (major (when ovl (mumamo-chunk-major-mode ovl)))
-         )
+         (set-it-now (not (or in-pre-hook (eq major major-mode)))))
     ;;(msgtrc "set-major-post-command ovl=%s, in-pre-hook=%s" ovl in-pre-hook)
-    (if (and (not in-pre-hook)
-             (not major))
-        (lwarn '(mumamo-set-major-post-command)
-               :error "major=%s" major)
-      (unless (and mumamo-done-first-set-major
-                   (or (eq major-mode major)
-                       in-pre-hook))
-        ;;(msgtrc "set-major-post-command here done=%s\nsurvive=%s" mumamo-done-first-set-major mumamo-survive)
-        (if mumamo-done-first-set-major
-            (if (<= 0 mumamo-set-major-mode-delay)
-                ;; Window point has been moved to a new chunk with a
-                ;; new major mode.  Major mode will not be changed
-                ;; directly, but in an idle timer.  To avoid that the
-                ;; user get the wrong key bindings for the new chunk
-                ;; fetch the local map directly and apply that.
-                (let* ((map-rec (assoc major mumamo-major-modes-local-maps))
-                       (map (cdr map-rec)))
-                  (unless map
-                    (setq map (mumamo-fetch-local-map major)))
-                  (unless (eq map 'no-local-map)
-                    (use-local-map map))
-                  (add-hook 'pre-command-hook 'mumamo-set-major-pre-command nil t)
-                  ;;(msgtrc "request mumamo-set-major at C")
-                  (mumamo-request-idle-set-major-mode))
-              ;;(msgtrc "mumamo-set-major at C")
-              (mumamo-set-major major)
-              (message "Switched to %s" major-mode))
-          ;;(msgtrc "mumamo-set-major at D")
-          (mumamo-set-major major))))))
+    (if (not set-it-now)
+        (unless (eq major major-mode)
+          (when mumamo-idle-set-major-mode-timer
+            (mumamo-request-idle-set-major-mode)))
+      (if mumamo-done-first-set-major
+          (if (<= 0 mumamo-set-major-mode-delay)
+              ;; Window point has been moved to a new chunk with a new
+              ;; major mode. Major mode will not be changed directly,
+              ;; but in an idle timer or in pre-command-hook. To avoid
+              ;; that the user get the wrong key bindings for the new
+              ;; chunk fetch the local map directly and apply that.
+              (let* ((map-rec (assoc major mumamo-major-modes-local-maps))
+                     (map (cdr map-rec)))
+                (unless map
+                  (setq map (mumamo-fetch-local-map major)))
+                (unless (eq map 'no-local-map)
+                  (use-local-map map))
+                (add-hook 'pre-command-hook 'mumamo-set-major-pre-command nil t)
+                (mumamo-request-idle-set-major-mode))
+            (mumamo-set-major major ovl)
+            (message "Switched to %s" major-mode))
+        (mumamo-set-major major ovl)))))
+
+(defun mumamo-set-major-pre-command ()
+  "Change major mode if necessary before a command.
+When the key sequence that invoked the command is in current
+local map and major mode is not the major mode for the current
+mumamo chunk then set major mode to that for the chunk."
+  (mumamo-condition-case err
+      ;; First see if we can avoid changing major mode
+      (if (memq this-command mumamo-safe-commands-in-wrong-major)
+          (mumamo-request-idle-set-major-mode)
+        (let* ((ovl (mumamo-find-chunks (point) "mumamo-set-major-pre-command"))
+               (major (mumamo-chunk-major-mode ovl)))
+          (if (not major)
+              (lwarn '(mumamo-set-major-pre-command) :error "major=%s" major)
+            (when (or (not (eq major-mode major))
+                      (not (mumamo-set-major-check-keymap)))
+              (setq major-mode nil)
+              (mumamo-set-major major ovl)
+              ;; Unread the last command key sequence
+              (setq unread-command-events
+                    (append (listify-key-sequence (this-command-keys-vector))
+                            unread-command-events))
+              ;; Some commands, like `viper-command-argument' need to
+              ;; know the last command, so tell them.
+              (setq this-command (lambda ()
+                                   (interactive)
+                                   (setq this-command last-command)))))))
+    (error
+     (mumamo-display-error 'mumamo-set-major-pre-command
+                           "%s" (error-message-string err)))))
+
+(defun mumamo-idle-set-major-mode (buffer window)
+  "Set major mode from mumamo chunk when Emacs is idle.
+Do this only if current buffer is BUFFER and then do it in window
+WINDOW.
+
+See the variable `mumamo-set-major-mode-delay' for an
+explanation."
+  (save-match-data ;; runs in idle timer
+    (mumamo-msgfntfy "mumamo-idle-set-major-mode b=%s, window=%s" buffer window)
+    (with-selected-window window
+      ;; According to Stefan Monnier we need to set the buffer too.
+      (with-current-buffer (window-buffer window)
+        (when (eq buffer (current-buffer))
+          (mumamo-condition-case err
+              ;;(let* ((ovl (mumamo-get-chunk-at (point)))
+              (let* ((ovl (mumamo-find-chunks (point) "mumamo-idle-set-major-mode"))
+                     (major (mumamo-chunk-major-mode ovl))
+                     (modified (buffer-modified-p)))
+                (unless (eq major major-mode)
+                  ;;(message "mumamo-set-major at A")
+                  (mumamo-set-major major ovl)
+                  ;; Fix-me: This is a bug workaround. Possibly in Emacs.
+                  (when (and (buffer-modified-p)
+                             (not modified))
+                    (set-buffer-modified-p nil))
+                  ;; sync keymap
+                  (when (timerp mumamo-unread-command-events-timer)
+                    (cancel-timer mumamo-unread-command-events-timer))
+                  (when unread-command-events
+                    ;; Save unread keys before calling `top-level' which
+                    ;; will clear them.
+                    (setq mumamo-unread-command-events-timer
+                          (run-with-idle-timer
+                           0 nil
+                           'mumamo-unread-command-events
+                           unread-command-events
+                           major last-command))
+                    (top-level)
+                    )))
+            (error
+             (mumamo-display-error 'mumamo-idle-set-major-mode
+                                   "cb=%s, err=%s" (current-buffer) err))))))))
 
 (defun mumamo-post-command-1 (&optional no-debug)
   "See `mumamo-post-command'.
@@ -4943,22 +5116,22 @@ function, it is changed to a list of functions."
 (eval-after-load 'vi
   (progn
     (put 'vi-add-to-mode-line 'permanent-local t)
-    ;;Warning (mumamo-survive): Not a local variable: vi-scroll-amount
-    ;;Warning (mumamo-survive): Not a local variable: vi-shift-width
-    ;;Warning (mumamo-survive): Not a local variable: vi-ins-point
-    ;;Warning (mumamo-survive): Not a local variable: vi-ins-length
-    ;;Warning (mumamo-survive): Not a local variable: vi-ins-repetition
-    ;;Warning (mumamo-survive): Not a local variable: vi-ins-overwrt-p
-    ;;Warning (mumamo-survive): Not a local variable: vi-ins-prefix-code
-    ;;Warning (mumamo-survive): Not a local variable: vi-last-change-command
-    ;;Warning (mumamo-survive): Not a local variable: vi-last-shell-command
-    ;;Warning (mumamo-survive): Not a local variable: vi-last-find-char
-    ;;Warning (mumamo-survive): Not a local variable: vi-mark-alist
-    ;;Warning (mumamo-survive): Not a local variable: vi-insert-state
-    ;;Warning (mumamo-survive): Not a local variable: vi-mode-old-local-map
-    ;;Warning (mumamo-survive): Not a local variable: vi-mode-old-mode-name
-    ;;Warning (mumamo-survive): Not a local variable: vi-mode-old-major-mode
-    ;;Warning (mumamo-survive): Not a local variable: vi-mode-old-case-fold
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-scroll-amount
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-shift-width
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-ins-point
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-ins-length
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-ins-repetition
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-ins-overwrt-p
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-ins-prefix-code
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-last-change-command
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-last-shell-command
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-last-find-char
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-mark-alist
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-insert-state
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-mode-old-local-map
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-mode-old-mode-name
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-mode-old-major-mode
+    ;;Warning (mumamo-per-buffer-local-vars): Not a local variable: vi-mode-old-case-fold
     ;;
     ))
 (eval-after-load 'vi
@@ -5065,7 +5238,7 @@ function, it is changed to a list of functions."
 ;; Fix-me: Rails, many problematic things:
 
 ;;; Fix-me: No idea about these, where are they used?? Add them to
-;;; mumamo-survive?:
+;;; mumamo-per-buffer-local-vars?:
 ;; predictive-main-dict
 ;; predictive-prog-mode-main-dict
 ;; predictive-use-auto-learn-cache
@@ -5095,7 +5268,7 @@ function, it is changed to a list of functions."
 
 ;;; Fix-me: This is in the minor mode, what to do? Looks like it
 ;;; should have 'permanent-local t - in this case.  I have added it to
-;;; mumamo-survive for now.
+;;; mumamo-per-buffer-local-vars for now.
 ;; tags-file-name
 
 (eval-after-load 'rails
@@ -5106,9 +5279,11 @@ function, it is changed to a list of functions."
 
 
 
-(defvar mumamo-survive
+(defvar mumamo-per-buffer-local-vars
   '(
     buffer-file-name
+    left-margin-width
+    right-margin-width
     ;; Fix-me: This is to prevent font-lock-mode turning off/on, but
     ;; is it necessary?
     ;;font-lock-mode-major-mode
@@ -5145,15 +5320,10 @@ function, it is changed to a list of functions."
     nxml-prolog-end ;;dnxml-rap.el:92:(make-variable-buffer-local 'nxml-prolog-end)
     nxml-scan-end ;;dnxml-rap.el:107:(make-variable-buffer-local 'nxml-scan-end)
 
-;;;     longlines-mode
-;;;     longlines-wrap-beg
-;;;     longlines-wrap-end
-;;;     longlines-wrap-point
-;;;     longlines-showing
-;;;     longlines-decoded
-    buffer-invisibility-spec
-    header-line-format
+    ;;buffer-invisibility-spec
+    ;;header-line-format
 
+    ;; Fix-me: These must be handled with 'permanent-local since they may be changed:
     line-move-visual ;;simple.el:4537:    (kill-local-variable 'line-move-visual)
     word-wrap ;;simple.el:4538:    (kill-local-variable 'word-wrap)
     truncate-lines ;;simple.el:4539:    (kill-local-variable 'truncate-lines)
@@ -5161,25 +5331,40 @@ function, it is changed to a list of functions."
     fringe-indicator-alist ;;simple.el:4541:    (kill-local-variable 'fringe-indicator-alist)
     visual-line--saved-state ;;simple.el:4544:    (kill-local-variable 'visual-line--saved-state)))
     vis-mode-saved-buffer-invisibility-spec ;;simple.el:6237:    (kill-local-variable 'vis-mode-saved-buffer-invisibility-spec))
+
     )
-  "Local variables to survive the change of major mode.")
+  "Per buffer local variables.
+See also `mumamo-per-main-major-local-vars'.")
 
-(when nil
-  (make-variable-buffer-local 'mumamo-survive-minor-modes)
-  (put 'mumamo-survive-minor-modes 'permanent-local t)
-  (defvar mumamo-survive-minor-modes nil
-    "Hold local minor mode variables specific major modes.
-  Those values are saved when leaving a chunk with a certain
-  major mode and restored when entering a chunk with the same
-  major mode again.
+;; Fix-me: use this, but how exactly? I think the var values must be
+;; picked up at every change from main major mode. And restored after
+;; changing to the new major mode - but maybe a bit differently if
+;; this is the main major mode.
+(defvar mumamo-per-main-major-local-vars
+  '(
+    buffer-invisibility-spec
+    header-line-format
+    )
+  "Per main major local variables.
+Like `mumamo-per-buffer-local-vars', but this is fetched from the
+main major mode.")
 
-  The value of this variable is an associative list where the key
-  is a list with
+;; (when nil
+;;   (make-variable-buffer-local 'mumamo-survive-minor-modes)
+;;   (put 'mumamo-survive-minor-modes 'permanent-local t)
+;;   (defvar mumamo-survive-minor-modes nil
+;;     "Hold local minor mode variables specific major modes.
+;;   Those values are saved when leaving a chunk with a certain
+;;   major mode and restored when entering a chunk with the same
+;;   major mode again.
 
-    \(MAJOR-MODE MINOR-MODE)
+;;   The value of this variable is an associative list where the key
+;;   is a list with
 
-  and the value is a stored value for the minor mode.")
-  )
+;;     \(MAJOR-MODE MINOR-MODE)
+
+;;   and the value is a stored value for the minor mode.")
+;;   )
 
 (defun mumamo-make-variable-buffer-permanent (var)
   "Make buffer local value of VAR survive when moving point to a new chunk.
@@ -5191,10 +5376,9 @@ variables unless they have a non-nil `permanent-local' property
 If you do not want to put a `permanent-local' property on a
 variable you can instead use this function to make variable VAR
 survive chunk switches in all mumamo multi major mode buffers."
-
   ;; If you want it to survive chunk switches only in the current
   ;; buffer then use `mumamo-make-local-permanent' instead."
-  (pushnew var (default-value 'mumamo-survive)))
+  (pushnew var (default-value 'mumamo-per-buffer-local-vars)))
 
 ;; ;; Fix-me: use local value
 ;; ;; Fix-me: delelete local value when exiting mumamo
@@ -5203,9 +5387,9 @@ survive chunk switches in all mumamo multi major mode buffers."
 ;; This is for the current buffer only.
 ;; In most cases you almost certainly want to use
 ;; `mumamo-make-variable-buffer-permanent' instead."
-;;   (pushnew var mumamo-survive))
+;;   (pushnew var mumamo-per-buffer-local-vars))
 
-(defvar mumamo-survive-done-by-me nil
+(defvar mumamo-per-buffer-local-vars-done-by-me nil
   "Variables set by mumamo already.
 Used to avoid unnecessary warnings if setting major mode fails.")
 
@@ -5534,20 +5718,22 @@ by the user.
                              activate
                              compile
                              )
-    (msgtrc "c-after-change: major-mode=%s c-nonsymbol-token-regexp=%s" major-mode c-nonsymbol-token-regexp))
+    ;;(msgtrc "c-after-change: major-mode=%s c-nonsymbol-token-regexp=%s" major-mode c-nonsymbol-token-regexp)
     (when (derived-mode-p 'c-mode)
       ad-do-it))
+  )
 
-(defun mumamo-save-most-buffer-locals (major)
-  "Save some local variables for major mode MAJOR.
+(defun mumamo-save-per-major-local-vars (major)
+  "Save some per major local variables for major mode MAJOR.
 This should be called before switching to a new chunks major
 mode."
-  ;;(message "mumamo-save-most-buffer-locals %s %s" major (current-buffer))
+  ;;(message "mumamo-save-per-major-local-vars %s %s" major (current-buffer))
   (let ((locals (buffer-local-variables)))
     (setq locals (mapcar (lambda (local)
                            (unless
                                (or (memq (car local) mumamo-buffer-locals-dont-set)
-                                   (memq (car local) mumamo-survive)
+                                   (memq (car local) mumamo-per-buffer-local-vars)
+                                   (memq (car local) mumamo-per-main-major-local-vars)
                                    (get (car local) 'permanent-local))
                              local))
                          locals))
@@ -5561,23 +5747,25 @@ mode."
           (cons (cons major-mode locals)
                 mumamo-buffer-locals-per-major))))
 
-;; (benchmark 1000 '(mumamo-save-most-buffer-locals major-mode))
-;; (benchmark 1000 '(mumamo-restore-most-buffer-locals major-mode))
-(defvar mumamo-restore-most-buffer-locals-in-hook-major nil)
-(defun mumamo-restore-most-buffer-locals-in-hook ()
-  "Call `mumamo-restore-most-buffer-locals'.
-Use `mumamo-restore-most-buffer-locals-in-hook-major' as the
-major mode."
-  (mumamo-restore-most-buffer-locals
-   mumamo-restore-most-buffer-locals-in-hook-major)
-  (setq mumamo-restore-most-buffer-locals-in-hook-major nil))
-(put 'mumamo-restore-most-buffer-locals-in-hook 'permanent-local-hook t)
+;; (benchmark 1000 '(mumamo-save-per-major-local-vars major-mode))
+;; (benchmark 1000 '(mumamo-restore-per-major-local-vars major-mode))
+(defvar mumamo-restore-per-major-local-vars-in-hook-major nil)
+(defun mumamo-restore-per-major-local-vars-in-hook ()
+  "Restore some per major mode local variables.
+Call `mumamo-restore-per-major-local-vars'.
+Use `mumamo-restore-per-major-local-vars-in-hook-major' as the
+major mode.
 
-(defun mumamo-restore-most-buffer-locals (major)
-  "Restore some local variables for major mode MAJOR.
+This should be called in the major mode setup hook."
+  (mumamo-restore-per-major-local-vars
+   mumamo-restore-per-major-local-vars-in-hook-major)
+  (setq mumamo-restore-per-major-local-vars-in-hook-major nil))
+(put 'mumamo-restore-per-major-local-vars-in-hook 'permanent-local-hook t)
+
+(defun mumamo-restore-per-major-local-vars (major)
+  "Restore some per major local variables for major mode MAJOR.
 This should be called after switching to a new chunks major
 mode."
-  ;;(message "mumamo-restore-most-buffer-locals %s %s" major (current-buffer))
   (let ((locals (cdr (assq major mumamo-buffer-locals-per-major)))
         var
         perm)
@@ -5620,11 +5808,16 @@ default values."
 (defvar mumamo-set-major-keymap-checked nil)
 (make-variable-buffer-local 'mumamo-set-major-keymap-checked)
 
-(defun mumamo-set-major (major)
+(defvar mumamo-org-startup-done nil)
+(make-variable-buffer-local 'mumamo-org-startup-done)
+(put 'mumamo-org-startup-done 'permanent-local t)
+
+(defun mumamo-set-major (major chunk)
   "Set major mode to MAJOR for mumamo."
   (mumamo-msgfntfy "mumamo-set-major %s, %s" major (current-buffer))
+  (mumamo-cancel-idle-set-major-mode)
+  (remove-hook 'pre-command-hook 'mumamo-set-major-pre-command t)
   ;;(mumamo-backtrace "mumamo-set-major")
-  ;;(message "mumamo-set-major %s, %s" major (current-buffer))
   (remove-hook 'text-mode-hook 'viper-mode) ;; Fix-me: maybe add it back...
   (let ((start-time (get-internal-run-time))
         end-time
@@ -5633,6 +5826,8 @@ default values."
         viper-vi-state-mode-list
         viper-emacs-state-mode-list
         viper-insert-state-mode-list
+        ;; Org-Mode
+        (org-inhibit-startup mumamo-org-startup-done)
         ;; Tell `mumamo-change-major-function':
         (mumamo-set-major-running major)
         ;; Fix-me: Take care of the new values added to these hooks!
@@ -5654,45 +5849,41 @@ default values."
         ;; Viper is used
         (old-cursor-type cursor-type)
         ;; Protect last-command: fix-me: probably remove
-;;;         (old-last-command last-command)
         (last-command last-command)
         ;; Fix-me: remove this
         (old-rng-schema-file (when (boundp 'rng-current-schema-file-name) rng-current-schema-file-name))
-        saved-state
+        ;; Local vars, per buffer and per major mode
+        per-buffer-local-vars-state
+        per-main-major-local-vars-state
         )
     ;; We are not changing mode from font-lock's point of view, so do
     ;; not tell font-lock (let binding these hooks is probably not a
     ;; good choice since they may contain other stuff too):
     (setq mumamo-removed-from-hook nil)
     (mumamo-remove-from-hook 'change-major-mode-hook mumamo-change-major-mode-no-nos)
-    ;;(message "change-major-mode-hook=%s" change-major-mode-hook)
-    ;;(message "change-major-mode-hook glob=%s" (default-value 'change-major-mode-hook))
-;;;     (remove-hook 'change-major-mode-hook 'font-lock-change-mode t)
-;;;     (remove-hook 'change-major-mode-hook 'longlines-mode-off t)
-;;;     (remove-hook 'change-major-mode-hook 'global-font-lock-mode-cmhh)
-;;;     ;; Added somewhere at the beginning of April to nxml:
-;;;     (remove-hook 'change-major-mode-hook 'nxml-cleanup t)
-;;;     ;; We are not changing mode from hs-minor-mode's point of view:
-;;;     (remove-hook 'change-major-mode-hook 'turn-off-hideshow t)
 
-    (dolist (sym (reverse mumamo-survive))
+    ;;;;;;;;;;;;;;;;
+    ;; Save per buffer local variables
+    (dolist (sym (reverse mumamo-per-buffer-local-vars))
       (when (boundp sym)
         (when (and (get sym 'permanent-local)
-                   (not (memq sym mumamo-survive-done-by-me))
+                   (not (memq sym mumamo-per-buffer-local-vars-done-by-me))
                    (not (mumamo-hook-p sym)))
-          (delq sym mumamo-survive)
-          (lwarn 'mumamo-survive :warning
+          (delq sym mumamo-per-buffer-local-vars)
+          (lwarn 'mumamo-per-buffer-local-vars :warning
                  "Already 'permanent-local t: %s" sym))))
-    ;; Fix-me: Implement alternative way since there are problems with
-    ;; 'permanent-local right now. Copy the style used in
-    ;; visual-line-mode.
-;;;     (dolist (sym mumamo-survive)
-;;;       (add-to-list 'mumamo-survive-done-by-me sym)
-;;;       (put sym 'permanent-local t))
-    (dolist (var mumamo-survive)
+    (dolist (var mumamo-per-buffer-local-vars)
       (if (local-variable-p var)
           (push (cons var (symbol-value var))
-                saved-state)))
+                per-buffer-local-vars-state)))
+
+    ;;;;;;;;;;;;;;;;
+    ;; Save per main major local variables
+    (when (eq major-mode (mumamo-main-major-mode))
+      (dolist (var mumamo-per-main-major-local-vars)
+        (if (local-variable-p var)
+            (push (cons var (symbol-value var))
+                  per-main-major-local-vars-state))))
 
     ;; For all hooks that probably can have buffer local values, go
     ;; through the buffer local values and look for a permanent-local
@@ -5714,16 +5905,15 @@ default values."
 
     (setq mumamo-major-mode major)
 
-
-    ;; Save local variables before switching major
-    (mumamo-save-most-buffer-locals major-mode)
-    ;; Restore local variables after switching, but do it in the
-    ;; greatest ancestor's mode hook (see `run-mode-hooks'):
+    ;;;;;;;;;;;;;;;;
+    ;; Save per major mode local variables before switching major
+    (mumamo-save-per-major-local-vars major-mode)
+    ;; Prepare to restore per major mode local variables after
+    ;; switching back to major-mode, but do it in the greatest
+    ;; ancestor's mode hook (see `run-mode-hooks'):
     (let (ancestor-hook-sym
           parent-hook-sym
-          (parent major)
-          ;;(restore-fun (lambda () (mumamo-restore-most-buffer-locals major)))
-          )
+          (parent major))
       ;; We want the greatest ancestor's mode hook:
       (setq parent-hook-sym (intern-soft (concat (symbol-name parent) "-hook")))
       (when parent-hook-sym (setq ancestor-hook-sym parent-hook-sym))
@@ -5733,23 +5923,34 @@ default values."
         (when parent-hook-sym (setq ancestor-hook-sym parent-hook-sym)))
       (when ancestor-hook-sym
         ;; Put first in local hook to run it first:
-        (setq mumamo-restore-most-buffer-locals-in-hook-major major)
+        (setq mumamo-restore-per-major-local-vars-in-hook-major major)
         (add-hook ancestor-hook-sym
-                  ;;restore-fun
-                  'mumamo-restore-most-buffer-locals-in-hook
+                  'mumamo-restore-per-major-local-vars-in-hook
                   nil t))
-      ;;(msgtrc "mumamo-set-major before: font-lock-keywords-only =%s in buffer %s, def=%s" font-lock-keywords-only (current-buffer) (default-value 'font-lock-keywords-only))
-      (funcall major) ;; <-----------------------------------------------
-      ;;(msgtrc "mumamo-set-major after: font-lock-keywords-only =%s in buffer %s, def=%s" font-lock-keywords-only (current-buffer) (default-value 'font-lock-keywords-only))
-      ;;(message "backtrace there:\n%s" (with-output-to-string (backtrace)))
+
+      ;;(msgtrc "set-major A: buffer-invisibility-spec=%S" buffer-invisibility-spec)
+      ;;(msgtrc "set-major A: word-wrap=%S, cb=%s" word-wrap (current-buffer))
+      ;;(mumamo-backtrace "set-major")
+      (save-restriction
+        (let* ((minmax (mumamo-chunk-syntax-min-max chunk t))
+               (min (car minmax))
+               (max (cdr minmax)))
+          (narrow-to-region min max)
+          (funcall major) ;; <-----------------------------------------------
+          ))
+      ;;(msgtrc "set-major B: buffer-invisibility-spec=%S" buffer-invisibility-spec)
+      ;;(msgtrc "set-major B: word-wrap=%S, cb=%s" word-wrap (current-buffer))
+
       (setq font-lock-mode-major-mode major) ;; Tell font-lock it is ok
       (set (make-local-variable 'font-lock-function) 'mumamo-font-lock-function)
       (if (not ancestor-hook-sym)
-          (mumamo-restore-most-buffer-locals major)
+          (mumamo-restore-per-major-local-vars major)
         (remove-hook ancestor-hook-sym
-                     ;;restore-fun
-                     'mumamo-restore-most-buffer-locals-in-hook
+                     'mumamo-restore-per-major-local-vars-in-hook
                      t)))
+    ;;(msgtrc "set-major c: buffer-invisibility-spec=%S" buffer-invisibility-spec)
+
+    (when (eq major 'org-mode) (setq mumamo-org-startup-done t))
 
     (setq mumamo-major-mode-indent-line-function (cons major-mode indent-line-function))
     (make-local-variable 'indent-line-function)
@@ -5760,8 +5961,6 @@ default values."
                                "-mumamo-mode$" ""
                                (format "/%s" mumamo-multi-major-mode)))))
 
-    ;;(mumamo-restore-most-buffer-locals major)
-
     (dolist (hk mumamo-survive-hooks) (put hk 'permanent-local nil))
 
     ;;     (when (and (featurep 'flymake)
@@ -5770,23 +5969,28 @@ default values."
     ;;       (add-hook 'after-save-hook 'flymake-after-save-hook nil t)
     ;;       (add-hook 'kill-buffer-hook 'flymake-kill-buffer-hook nil t))
 
+    ;;;;;;;;;;;;;;;;
+    ;; Restore per buffer local variables
 
-;;;     (dolist (sym mumamo-survive)
-;;;       (when (boundp sym)
-;;;         (put sym 'permanent-local nil)))
-    (dolist (saved saved-state)
-      (set (make-local-variable (car saved)) (cdr saved)))
-    ;;(mumamo-addback-to-hook 'change-major-mode-hook mumamo-change-major-mode-no-nos)
+    ;; (dolist (sym mumamo-per-buffer-local-vars)
+    ;;   (when (boundp sym)
+    ;;     (put sym 'permanent-local nil)))
+    ;;(msgtrc "per-buffer-local-vars-state=%S" per-buffer-local-vars-state)
+    (dolist (saved per-buffer-local-vars-state)
+      ;;(msgtrc "restore p buffer: %s, local=%s" (car saved) (local-variable-p (car saved)))
+      (unless (local-variable-p (car saved))
+        (set (make-local-variable (car saved)) (cdr saved))))
+
+    ;;;;;;;;;;;;;;;;
+    ;; Restore per main major local variables
+    (unless (eq major-mode (mumamo-main-major-mode))
+      (dolist (saved per-main-major-local-vars-state)
+        (set (make-local-variable (car saved)) (cdr saved))))
+
     (mumamo-addback-to-hooks)
-    (when (and (featurep 'mlinks)
-               mlinks-mode)
-      (add-hook 'after-change-functions 'mlinks-after-change t t))
+    ;;(when (and (featurep 'mlinks) mlinks-mode) (add-hook 'after-change-functions 'mlinks-after-change t t))
 
     (setq cursor-type old-cursor-type)
-;;;     (unless (eq last-command old-last-command)
-;;;       (lwarn 'mumamo-set-major :error
-;;;              "last-command 3=%s, old-last-command" last-command old-last-command)
-;;;       (setq last-command old-last-command))
     (run-hooks 'mumamo-after-change-major-mode-hook)
 
     (when (derived-mode-p 'nxml-mode)
@@ -5819,9 +6023,6 @@ default values."
 ;;;     (when global-font-lock-mode
 ;;;       (add-hook 'change-major-mode-hook 'global-font-lock-mode-cmhh))
 ;;;     (add-hook 'change-major-mode-hook 'font-lock-change-mode nil t)
-;;;     (when (and (fboundp 'longlines-mode-off)
-;;;                longlines-mode)
-;;;       (add-hook 'change-major-mode-hook 'longlines-mode-off nil t))
 
     (mumamo-set-fontification-functions)
 
@@ -5837,8 +6038,6 @@ default values."
       (mumamo-save-buffer-state nil
         (remove-list-of-text-properties (point-min) (point-max) '(fontified)))
       (setq mumamo-done-first-set-major t))
-
-    (remove-hook 'pre-command-hook 'mumamo-set-major-pre-command t)
 
     ;; Timing, on a 3ghz cpu:
     ;;
@@ -5872,8 +6071,10 @@ default values."
   (or mumamo-set-major-keymap-checked
       (setq mumamo-set-major-keymap-checked
             (let ((map-sym (intern-soft (concat (symbol-name major-mode) "-map"))))
-              (equal (current-local-map)
-                     (symbol-value map-sym))))))
+              (if (not map-sym)
+                  t ;; Don't know what to do
+                (equal (current-local-map)
+                       (symbol-value map-sym)))))))
 
 (defvar mumamo-original-fill-paragraph-function nil)
 (make-variable-buffer-local 'mumamo-original-fill-paragraph-function)
@@ -5966,6 +6167,7 @@ mode in the chunk family is nil."
           (mumamo-insert-describe-button 'define-mumamo-multi-major-mode 'describe-function)
           (insert "'.\n")))
     ;; Load major mode:
+    (setq mumamo-org-startup-done nil)
     (let ((main-major-mode (mumamo-major-mode-from-modespec (mumamo-main-major-mode))))
       (unless main-major-mode
         (setcar (cdr mumamo-current-chunk-family) old-major-mode)
@@ -6005,7 +6207,7 @@ mode in the chunk family is nil."
         (when (eq win (selected-window))
           (let* ((ovl (mumamo-find-chunks wp "mumamo-turn-on-actions"))
                  (major (mumamo-chunk-major-mode ovl)))
-            (mumamo-set-major major)))))
+            (mumamo-set-major major ovl)))))
     ;;(msgtrc "mumamo-turn-on-action exit: font-lock-keywords-only =%s in buffer %s, def=%s" font-lock-keywords-only (current-buffer) (default-value 'font-lock-keywords-only))
     ;; This did not help for Emacs bug 3467:
     ;;(set-default 'font-lock-keywords-only nil)
@@ -6070,7 +6272,6 @@ mode in the chunk family is nil."
   (remove-hook 'after-change-functions 'mumamo-after-change t)
   (remove-hook 'post-command-hook 'mumamo-post-command t)
   ;;(remove-hook 'c-special-indent-hook 'mumamo-c-special-indent t)
-  (mumamo-remove-all-chunk-overlays)
   (mumamo-margin-info-mode -1)
   (when (fboundp 'mumamo-clear-all-regions) (mumamo-clear-all-regions))
   (save-restriction
@@ -6081,6 +6282,7 @@ mode in the chunk family is nil."
   (setq mumamo-major-mode nil)
   (setq mumamo-multi-major-mode nil) ;; for minor-mode-map-alist
   (setq mumamo-multi-major-mode nil)
+  (mumamo-remove-all-chunk-overlays)
   (when (fboundp 'rng-cancel-timers) (rng-cancel-timers))
   )
 
@@ -6143,8 +6345,8 @@ use `mumamo-quick-static-chunk'.")
 (defun mumamo-describe-chunks (chunks)
   "Return text describing CHUNKS."
   (let* ((desc
-          (concat "Main major mode: `" (symbol-name (nth 1 chunks)) "'\n"
-                  "\nFunctions for dividing into submodes:\n")))
+          (concat "* Main major mode: `" (symbol-name (nth 1 chunks)) "'\n"
+                  "\n* Functions for dividing into submodes:\n")))
     (dolist (divider (nth 2 chunks))
       (setq desc
             (concat
@@ -6337,12 +6539,10 @@ These are in the file mumamo-test.el."
            spec-doc
            "
 
-This function is called a multi major mode.  The main use for it
-is in `auto-mode-alist' to have Emacs do this setup whenever you
-open a file named in a certain way.  \(You can of course call
-this function directly yourself too.)
 
-It sets up for multiple mode in the following way:
+
+This function is called a multi major mode.  It sets up for
+multiple major modes in the buffer in the following way:
 
 "
            ;; Fix-me: During byte compilation the next line is not
@@ -6350,7 +6550,6 @@ It sets up for multiple mode in the following way:
            ;; not defined. How do I fix this?
            (funcall 'mumamo-describe-chunks chunks2)
            "
-
 At the very end this multi major mode function runs first the hook
 `mumamo-turn-on-hook' and then `" (symbol-name turn-on-hook) "'.
 
@@ -6360,17 +6559,21 @@ major mode's local keymap.
 
 The multi mode keymap is named `" (symbol-name turn-on-map) "'.
 
-Note: When adding new font-lock keywords for major mode chunks
-you should use the function `mumamo-refresh-multi-font-lock'
-afterwards.
 
-This major mode has an alias `mumamo-alias-"
-(symbol-name turn-on-fun) "'.
+
+The main use for a multi major mode is to use it instead of a
+normal major mode in `auto-mode-alist'.  \(You can of course call
+this function directly yourself too.)
 
 The value of `mumamo-multi-major-mode' tells you which multi
 major mode if any has been turned on in a buffer.  For more
 information about multi major modes please see
-`define-mumamo-multi-major-mode'."  )))
+`define-mumamo-multi-major-mode'.
+
+Note: When adding new font-lock keywords for major mode chunks
+you should use the function `mumamo-refresh-multi-font-lock'
+afterwards.
+"  )))
 `(progn
 (add-to-list 'mumamo-defined-multi-major-modes (cons (car ',chunks2) ',turn-on-fun))
 (defvar ,turn-on-hook nil ,turn-on-hook-doc)
@@ -6412,21 +6615,22 @@ This is the buffer local value of `indent-line-function' when
 mumamo is used."
   (let ((here (point-marker))
         (before-text (<= (current-column) (current-indentation))))
-    (mumamo-indent-line-function-1 nil nil)
+    (mumamo-indent-line-function-1 nil nil nil)
     ;; If the marker was in the indentation part strange things happen
     ;; if we try to go back to the marker, at least in php-mode parts.
     (if before-text
         (back-to-indentation)
       (goto-char here))))
 
-;; Fix-me: return chunks instead?
-;;(defun mumamo-indent-line-major-modes ()
-(defun mumamo-indent-line-chunks ()
+(defun mumamo-indent-current-line-chunks (last-chunk-prev-line)
   "Return major modes for indenting current line.
 A list with major mode at beginning and dito at the end of line
 is returned."
-  ;; Fix-me: must take markers into account to when a submode includes
-  ;; the markers.
+  ;; Fix-me: must take markers into account too when a submode
+  ;; includes the markers.
+  ;;(message "mumamo-indent-current-line-chunks multi=%s" mumamo-multi-major-mode)
+  ;;(message "mumamo-indent-current-line-chunks cb=%s" (current-buffer))
+  ;;(message "mumamo-indent-current-line-chunks bt=%s" (mumamo-backtrace "here"))
   (save-restriction
     (widen)
     (let* ((lb-pos (line-beginning-position))
@@ -6439,11 +6643,19 @@ is returned."
            (pos4 (if (< le-pos (point-max))
                      (1+ le-pos)
                    (point-max)))
-           (ovl1 (mumamo-get-chunk-save-buffer-state pos1))
+           ;;(ovl1 (mumamo-get-chunk-save-buffer-state pos1))
+           (ovl1 (if (and last-chunk-prev-line
+                          (overlay-buffer last-chunk-prev-line)
+                          (>= (overlay-end last-chunk-prev-line) pos1))
+                     last-chunk-prev-line
+                   (mumamo-get-chunk-save-buffer-state pos1)))
            (ovl2 (if (>= (overlay-end ovl1) pos2)
                      ovl1
                    (mumamo-get-chunk-save-buffer-state pos2)))
-           (ovl3 (mumamo-get-chunk-save-buffer-state pos3))
+           ;;(ovl3 (mumamo-get-chunk-save-buffer-state pos3))
+           (ovl3 (if (<= pos3 (overlay-end ovl2))
+                     ovl2
+                   (mumamo-get-chunk-save-buffer-state pos3)))
            (ovl4 (if (<= pos4 (overlay-end ovl3))
                      ovl3
                    (mumamo-get-chunk-save-buffer-state pos4)))
@@ -6454,9 +6666,14 @@ is returned."
 ;; fix-me: clean up
 (put 'mumamo-error-ind-0 'error-conditions '(error mumamo-error-ind-0))
 (put 'mumamo-error-ind-0 'error-message "indentation 0 in sub chunk")
-;; Fix-me: error indenting in xml-as-string at <?\n?>
+
 (defun mumamo-indent-line-function-1 (prev-line-chunks
-                                      last-main-major-indent)
+                                      last-parent-major-indent
+                                      entering-submode-arg)
+  ;; Fix-me: error indenting in xml-as-string at <?\n?>
+  ;; Fix-me: clean up, use depth diff. go back to sibling not to main etc.
+  ;; Fix-me: Add indentation hints to chunks, for example heredocs and rhtml.
+  ;; Fix-me: maybe use special indentation functions for certain multi major modes? rhtml?
   "Indent current line.
 When doing that care must be taken if this line's major modes at
 the start and end are different from previous line major modes.
@@ -6464,7 +6681,7 @@ The latter may be known through the parameter PREV-LINE-CHUNKS.
 
 Also the indentation of the last previous main major line may be
 necessary to know.  This may be known through the parameter
-LAST-MAIN-MAJOR-INDENT.
+LAST-PARENT-MAJOR-INDENT.
 
 If the two parameters above are nil then this function will
 search backwards in the buffer to try to determine their values.
@@ -6472,31 +6689,97 @@ search backwards in the buffer to try to determine their values.
 The following rules are used when indenting:
 
 - If the major modes are the same in this and the previous line
-  then indentation is done using that mode.
+  then indentation is done using that major mode.
 
 - Otherwise if going into a submode indentation is increased by
-  `mumamo-submode-indent-offset'.
+  `mumamo-submode-indent-offset' (if this is nil then indentation
+  will instead be 0).
+
+- However first non-empty line indentation in a chunk when going
+  in is special if prev-prev chunk is on same mumamo-depth and
+  have the same major mode. Then indent relative last non-empty
+  line in prev-prev chunk.
 
 - When going out of a submode indentation is reset to
-  LAST-MAIN-MAJOR-INDENT.
+  LAST-PARENT-MAJOR-INDENT.
 
-- When going from one submode to another the new submode's
-  indentation will be relative LAST-MAIN-MAJOR-INDENT."
-  (let* ((this-line-chunks (mumamo-indent-line-chunks))
+- At the border the 'dividers' should be indented as the parent
+  chunk. There are the following typical situations regarding
+  inner/outer major modes:
+
+  1) <style type='text/css'>
+     Going in next line; first char outer; line end inner;
+
+  2) </style>
+     Going out this line; First char inner or outer; line end outer;
+
+  3) <?php
+     Going in next line; first char outer or inner; line end inner;
+
+  4) ?>
+     Going out this line; first char inner; line end outer;
+
+  From this we deduce the following way to compute if we are
+  going in or out:
+
+  - Odd above (going in): Compare prev line end's mumamo-depth
+    with current line end's dito. Set flag for first line in
+    chunk.
+
+  - Even above (going out): Same test as for going in, but going
+    out happens on current line.
+"
+  ;;(msgtrc "indent-line-function-1 blp=%s" (line-beginning-position))
+  (unless prev-line-chunks
+    (save-excursion
+      (goto-char (line-beginning-position 1))
+      (skip-chars-backward "\n\t ")
+      (goto-char (line-beginning-position 1))
+      (setq prev-line-chunks (mumamo-indent-current-line-chunks nil))))
+  (let* ((prev-line-chunk0 (nth 0 prev-line-chunks))
+         (prev-line-chunk3 (nth 3 prev-line-chunks))
+         (prev-line-major0 (mumamo-chunk-major-mode (nth 0 prev-line-chunks)))
+         (prev-line-major1 (mumamo-chunk-major-mode (nth 1 prev-line-chunks)))
+         (prev-line-major2 (mumamo-chunk-major-mode (nth 2 prev-line-chunks)))
+         (prev-line-major3 (mumamo-chunk-major-mode (nth 3 prev-line-chunks)))
+         (prev-depth3 (overlay-get prev-line-chunk3 'mumamo-depth))
+
+         (this-line-chunks (mumamo-indent-current-line-chunks (nth 3 prev-line-chunks)))
+         (this-line-chunk0 (nth 0 this-line-chunks))
+         (this-line-chunk3 (nth 3 this-line-chunks))
          (this-line-major0 (mumamo-chunk-major-mode (nth 0 this-line-chunks)))
          (this-line-major1 (mumamo-chunk-major-mode (nth 1 this-line-chunks)))
          (this-line-major2 (mumamo-chunk-major-mode (nth 2 this-line-chunks)))
          (this-line-major3 (mumamo-chunk-major-mode (nth 3 this-line-chunks)))
-         prev-line-major0
-         prev-line-major1
-         prev-line-major2
-         prev-line-major3
+         (this-depth3 (overlay-get this-line-chunk3 'mumamo-depth))
+
          this-line-indent-major
          major-indent-line-function
          (main-major (mumamo-main-major-mode))
          (old-indent (current-indentation))
-         (entering-submode nil)
-         (leaving-submode nil)
+         (next-entering-submode (if (< prev-depth3 this-depth3) 'yes 'no))
+         (entering-submode
+          (progn
+            (unless entering-submode-arg
+              (let* ((prev-prev-line-chunks
+                      (save-excursion
+                        (goto-char (line-beginning-position 0))
+                        (unless (bobp)
+                          (skip-chars-backward "\n\t ")
+                          (goto-char (line-beginning-position 1))
+                          (mumamo-indent-current-line-chunks nil))))
+                     (prev-prev-line-chunk3 (nth 3 prev-prev-line-chunks))
+                     (prev-prev-depth3 (when prev-prev-line-chunk3
+                                         (overlay-get prev-prev-line-chunk3 'mumamo-depth))))
+                (setq entering-submode-arg
+                      (if prev-prev-depth3
+                          (if (< prev-prev-depth3 prev-depth3) 'yes 'no)
+                        (if (> this-depth3 0) 'yes 'no)
+                        ))
+                ))
+            (eq 'yes entering-submode-arg))) ;; fix-me
+
+         (leaving-submode (> prev-depth3 this-depth3))
          want-indent ;; The indentation we desire
          got-indent
          (here-on-line (point-marker))
@@ -6505,200 +6788,184 @@ The following rules are used when indenting:
          (while-n2 0)
          (while-n3 0)
          )
-    (unless prev-line-chunks
-      (save-excursion
-        (goto-char (line-beginning-position 1))
-        (skip-chars-backward "\n\t ")
-        (goto-char (line-beginning-position 1))
-        (setq prev-line-chunks (mumamo-indent-line-chunks))
-        ))
-    (setq prev-line-major0 (mumamo-chunk-major-mode (nth 0 prev-line-chunks)))
-    (setq prev-line-major1 (mumamo-chunk-major-mode (nth 1 prev-line-chunks)))
-    (setq prev-line-major2 (mumamo-chunk-major-mode (nth 2 prev-line-chunks)))
-    (setq prev-line-major3 (mumamo-chunk-major-mode (nth 3 prev-line-chunks)))
     (mumamo-msgindent "mumamo-indent-line-function-1 L%s last=%s\n  this0=%s  %s  %s  %s\n  prev0=%s  %s  %s  %s"
                       (line-number-at-pos)
-                      last-main-major-indent
+                      last-parent-major-indent
                       this-line-major0 this-line-major1 this-line-major2 this-line-major3
                       prev-line-major0 prev-line-major1 prev-line-major2 prev-line-major3
                       )
-    (setq entering-submode
-          (or
-           ;; Going from main to sub
-           (and (eq prev-line-major1 main-major)
-                (not (eq this-line-major1 main-major))
-                (not (eq this-line-major2 main-major))
-                (let ((this-chunk-1 (nth 1 this-line-chunks)))
-                  (not (= (line-beginning-position) (overlay-start this-chunk-1))))
-                )
-           ;; Going from sub to sub
-           (and (not (eq prev-line-major1 main-major))
-                (not (eq this-line-major1 main-major))
-                (not (eq prev-line-major1
-                         this-line-major1
-                         )))))
-    (setq leaving-submode
-          (and (not (eq prev-line-major2 main-major))
-               (eq this-line-major2 main-major)
-               ))
-    ;; Fix-me: indentation of <?\n?>
-    (assert (not (and leaving-submode entering-submode)) t)
+    (when (and leaving-submode entering-submode)
+      (error "Do not know how to indent here (both leaving and entering sub chunks)"))
     ;; Fix-me: indentation
     ;;(error "Leaving=%s, entering=%s this0,1,2,3=%s,%s,%s,%s" leaving-submode entering-submode this-line-major0 this-line-major1 this-line-major2 this-line-major3)
     (when (or leaving-submode entering-submode)
-      (unless last-main-major-indent
+      (unless last-parent-major-indent
         (save-excursion
-          (while (and (> 500 (setq while-n1 (1+ while-n1)))
-                      (not last-main-major-indent))
+          ;;(while (and (> 500 (setq while-n1 (1+ while-n1)))
+          (while (and (mumamo-while 500 'while-n1 "last-parent-major-indent")
+                      (not last-parent-major-indent))
             (if (bobp)
-                (setq last-main-major-indent 0)
+                (setq last-parent-major-indent 0)
               (goto-char (line-beginning-position 0))
               (when (eq main-major
                         (mumamo-chunk-major-mode
                          (car
-                          (mumamo-indent-line-chunks)))
+                          (mumamo-indent-current-line-chunks nil)))
                         )
                 (skip-chars-forward " \t")
                 (if (eolp)
-                    (setq last-main-major-indent 0)
-                  (setq last-main-major-indent (current-column)))))))))
+                    (setq last-parent-major-indent 0)
+                  (setq last-parent-major-indent (current-column)))))))))
     (mumamo-msgindent "  leaving-submode=%s, entering-submode=%s" leaving-submode entering-submode)
+    ;;(msgtrc "  leaving-submode=%s, entering-submode=%s" leaving-submode entering-submode)
+
     (cond
-     (leaving-submode
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      ;;;;; First line after submode
-      (mumamo-msgindent "  leaving last-main-major-indent=%s" last-main-major-indent)
-      (setq want-indent last-main-major-indent))
-     (entering-submode
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      ;;;;; First line in submode
-      (setq this-line-indent-major this-line-major0)
-      ;;(when (and prev-line-major0 (not (eq this-line-major0 prev-line-major0))) (setq this-line-indent-major prev-line-major0))
-      (mumamo-msgindent "  this-line-indent-major=%s, major-mode=%s this0=%s" this-line-indent-major major-mode this-line-major0)
-      (mumamo-msgindent "  mumamo-submode-indent-offset=%s" mumamo-submode-indent-offset)
-      (unless (eq this-line-indent-major major-mode) (mumamo-set-major this-line-indent-major))
-      (setq want-indent (+ last-main-major-indent
-                           (if (= 0 last-main-major-indent)
-                               (if mumamo-submode-indent-offset-0
-                                   mumamo-submode-indent-offset-0
-                                 -1000)
-                             (if mumamo-submode-indent-offset
-                                 mumamo-submode-indent-offset
-                               -1000))))
-      (unless (< 0 want-indent) (setq want-indent nil))
-      (when (and want-indent (mumamo-indent-use-widen major-mode))
-        ;; In this case only use want-indent if it is bigger than the
-        ;; indentation calling indent-line-function would give.
-        (condition-case nil
-            (atomic-change-group
-              (mumamo-call-indent-line (nth 0 this-line-chunks))
-              (when (> want-indent (current-indentation))
-                (signal 'mumamo-error-ind-0 nil))
-              (setq want-indent nil))
-          (mumamo-error-ind-0)))
-      (unless want-indent
-        (mumamo-call-indent-line (nth 0 this-line-chunks)))
-      (mumamo-msgindent "  enter sub.want-indent=%s, curr=%s, last-main=%s" want-indent (current-indentation)
-                        last-main-major-indent)
-      ;;(unless (> want-indent (current-indentation)) (setq want-indent nil))
-      )
-     (t
-      ;; We have to change major mode, because we know nothing
-      ;; about the requirements of the indent-line-function:
-      ;; Fix-me: This may be cured by RMS suggestion to
-      ;; temporarily set all variables back to global values?
-      (setq this-line-indent-major this-line-major0)
-      (mumamo-msgindent "  this-line-indent-major=%s" this-line-indent-major)
-      (unless (eq this-line-indent-major major-mode) (mumamo-set-major this-line-indent-major))
-      ;; Use the major mode at the beginning of since a sub chunk may
-      ;; start at start of line.
-      (if (eq this-line-major1 main-major)
+     ( leaving-submode
+       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+       ;;;;; First line after submode
+       (mumamo-msgindent "  leaving last-parent-major-indent=%s" last-parent-major-indent)
+       (if (eq (overlay-get (overlay-get this-line-chunk0 'mumamo-prev-chunk)
+                            'mumamo-next-indent)
+               'heredoc)
+           (setq want-indent 0)
+         (setq want-indent last-parent-major-indent)))
+
+     ( entering-submode
+       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+       ;;;;; First line in submode
+       ;;(setq this-line-indent-major this-line-major0)
+       (setq this-line-indent-major (mumamo-indent-get-major-to-use this-line-major0))
+       ;;(when (and prev-line-major0 (not (eq this-line-major0 prev-line-major0))) (setq this-line-indent-major prev-line-major0))
+       (mumamo-msgindent "  this-line-indent-major=%s, major-mode=%s this0=%s" this-line-indent-major major-mode this-line-major0)
+       (mumamo-msgindent "  mumamo-submode-indent-offset=%s" mumamo-submode-indent-offset)
+       (unless (eq this-line-indent-major major-mode) (mumamo-set-major this-line-indent-major this-line-chunk0))
+       (setq want-indent (+ last-parent-major-indent
+                            (if (= 0 last-parent-major-indent)
+                                (if mumamo-submode-indent-offset-0
+                                    mumamo-submode-indent-offset-0
+                                  -1000)
+                              (if mumamo-submode-indent-offset
+                                  mumamo-submode-indent-offset
+                                -1000))))
+       (unless (< 0 want-indent) (setq want-indent nil))
+       (when (and want-indent (mumamo-indent-use-widen major-mode))
+         ;; In this case only use want-indent if it is bigger than the
+         ;; indentation calling indent-line-function would give.
+         (condition-case nil
+             (atomic-change-group
+               (mumamo-call-indent-line (nth 0 this-line-chunks))
+               (when (> want-indent (current-indentation))
+                 (signal 'mumamo-error-ind-0 nil))
+               (setq want-indent nil))
+           (mumamo-error-ind-0)))
+       (unless want-indent
+         (mumamo-call-indent-line (nth 0 this-line-chunks)))
+       (mumamo-msgindent "  enter sub.want-indent=%s, curr=%s, last-main=%s" want-indent (current-indentation)
+                         last-parent-major-indent)
+       ;;(unless (> want-indent (current-indentation)) (setq want-indent nil))
+       )
+
+     ( t
+       ;; We have to change major mode, because we know nothing
+       ;; about the requirements of the indent-line-function:
+       ;; Fix-me: This may be cured by RMS suggestion to
+       ;; temporarily set all variables back to global values?
+       ;;(setq this-line-indent-major this-line-major0)
+       (setq this-line-indent-major (mumamo-indent-get-major-to-use this-line-major0))
+       (mumamo-msgindent "  this-line-indent-major=%s" this-line-indent-major)
+       (unless (eq this-line-indent-major major-mode) (mumamo-set-major this-line-indent-major this-line-chunk0))
+       ;; Use the major mode at the beginning of since a sub chunk may
+       ;; start at start of line.
+       (if (eq this-line-major1 main-major)
           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
           ;;;;; In main major mode
-          ;;
-          ;; Fix-me: Take care of the case when all the text is in a
-          ;; sub chunk. In that case use the same indentation as if
-          ;; the code all belongs to the surrounding major mode.
-          (progn
-            (mumamo-msgindent "  In main major mode")
-            (mumamo-call-indent-line (nth 0 this-line-chunks))
-            (setq last-main-major-indent (current-indentation)))
+           ;;
+           ;; Fix-me: Take care of the case when all the text is in a
+           ;; sub chunk. In that case use the same indentation as if
+           ;; the code all belongs to the surrounding major mode.
+           (progn
+             (mumamo-msgindent "  In main major mode")
+             (mumamo-call-indent-line (nth 0 this-line-chunks))
+             (setq last-parent-major-indent (current-indentation)))
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         ;;;;; In sub major mode
-        ;;
-        ;; Get the indentation the major mode alone would use:
-        ;;(setq got-indent (mumamo-get-major-mode-indent-column))
-        ;; Since this line has another major mode than the
-        ;; previous line we instead want to indent relative to
-        ;; that line in a way decided in mumamo:
-        (mumamo-msgindent "  In sub major mode")
-        (let ((chunk (mumamo-get-chunk-save-buffer-state (point)))
-              (font-lock-dont-widen t)
-              ind-zero
-              (here (point))
-              ind-on-first-sub-line)
-          (save-restriction
-            (mumamo-update-obscure chunk here)
-            (let ((syn-min-max (mumamo-chunk-syntax-min-max chunk nil)))
-              (narrow-to-region (car syn-min-max)
-                                (cdr syn-min-max)))
-            (save-restriction
-              (condition-case nil
-                  (atomic-change-group
-                    (mumamo-call-indent-line (nth 0 this-line-chunks))
-                    (when (= 0 (current-indentation))
-                      (setq ind-zero t)
-                      ;; It is maybe ok if indentation on first sub
-                      ;; line is 0 so check that:
-                      (goto-char (point-min))
-                      (widen)
-                      (setq ind-on-first-sub-line (current-indentation))
-                      (goto-char here)
-                      (signal 'mumamo-error-ind-0 nil)))
-                (mumamo-error-ind-0)))
-            ;; Unfortunately the indentation can sometimes get 0
-            ;; here even though it is clear it should not be 0. This
-            ;; happens when there are only comments or empty lines
-            ;; above.
-            ;;
-            ;; See c:/test/erik-lilja-index.php for an example.
-            (when ind-zero ;(and t (= 0 (current-indentation)))
-              (save-excursion
-                (setq want-indent 0)
-                (unless (= 0 ind-on-first-sub-line)
-                  (while (and (> 500 (setq while-n2 (1+ while-n2)))
-                              (= 0 want-indent)
-                              (/= (point) (point-min)))
-                    (beginning-of-line 0)
-                    (setq want-indent (current-indentation)))
-                  ;; Now if want-indent is still 0 we need to look further above
-                  (when (= 0 want-indent)
-                    (widen)
-                    (while (and (> 500 (setq while-n3 (1+ while-n3)))
-                                (= 0 want-indent)
-                                (/= (point) (point-min)))
-                      (beginning-of-line 0)
-                      (setq want-indent (current-indentation)))
-                    ;; If we got to the main major mode we need to add
-                    ;; the special submode offset:
-                    (let* ((ovl (mumamo-get-chunk-save-buffer-state (point)))
-                           (major (mumamo-chunk-major-mode ovl)))
-                      (when (eq major main-major)
-                        (setq want-indent (+ want-indent
-                                             (if (= 0 want-indent)
-                                                 mumamo-submode-indent-offset-0
-                                               mumamo-submode-indent-offset)))))))))
-            )))))
+         ;;
+         ;; Get the indentation the major mode alone would use:
+         ;;(setq got-indent (mumamo-get-major-mode-indent-column))
+         ;; Since this line has another major mode than the
+         ;; previous line we instead want to indent relative to
+         ;; that line in a way decided in mumamo:
+         (mumamo-msgindent "  In sub major mode")
+         (let ((chunk (mumamo-get-chunk-save-buffer-state (point)))
+               (font-lock-dont-widen t)
+               ind-zero
+               (here (point))
+               ind-on-first-sub-line)
+           (save-restriction
+             (mumamo-update-obscure chunk here)
+             (let ((syn-min-max (mumamo-chunk-syntax-min-max chunk nil)))
+               (narrow-to-region (car syn-min-max)
+                                 (cdr syn-min-max)))
+             (condition-case nil
+                 (atomic-change-group
+                   (mumamo-call-indent-line (nth 0 this-line-chunks))
+                   (when (= 0 (current-indentation))
+                     (setq ind-zero t)
+                     ;; It is maybe ok if indentation on first sub
+                     ;; line is 0 so check that:
+                     (goto-char (point-min))
+                     (widen)
+                     (setq ind-on-first-sub-line (current-indentation))
+                     (goto-char here)
+                     (signal 'mumamo-error-ind-0 nil)))
+               (mumamo-error-ind-0))
+             ;; Unfortunately the indentation can sometimes get 0
+             ;; here even though it is clear it should not be 0. This
+             ;; happens when there are only comments or empty lines
+             ;; above.
+             ;;
+             ;; See c:/test/erik-lilja-index.php for an example.
+             (when ind-zero ;(and t (= 0 (current-indentation)))
+               (save-excursion
+                 (setq want-indent 0)
+                 (unless (= 0 ind-on-first-sub-line)
+                   ;;(while (and (> 500 (setq while-n2 (1+ while-n2)))
+                   (while (and (mumamo-while 500 'while-n2 "want-indent")
+                               (= 0 want-indent)
+                               (/= (point) (point-min)))
+                     (beginning-of-line 0)
+                     (setq want-indent (current-indentation)))
+                   ;; Now if want-indent is still 0 we need to look further above
+                   (when (= 0 want-indent)
+                     (widen)
+                     ;;(while (and (> 500 (setq while-n3 (1+ while-n3)))
+                     (while (and (mumamo-while 500 'while-n3 "want-indent 2")
+                                 (= 0 want-indent)
+                                 (/= (point) (point-min)))
+                       (beginning-of-line 0)
+                       (setq want-indent (current-indentation)))
+                     ;; If we got to the main major mode we need to add
+                     ;; the special submode offset:
+                     (let* ((ovl (mumamo-get-chunk-save-buffer-state (point)))
+                            (major (mumamo-chunk-major-mode ovl)))
+                       (when (eq major main-major)
+                         (setq want-indent (+ want-indent
+                                              (if (= 0 want-indent)
+                                                  mumamo-submode-indent-offset-0
+                                                mumamo-submode-indent-offset)))))))))
+             )))))
     (when want-indent
+      ;;(msgtrc "indent-line-to %s at line-beginning=%s" want-indent (line-beginning-position))
       (indent-line-to want-indent))
     (goto-char here-on-line)
-    ;;(message "exit: %s" (list this-line-chunks last-main-major-indent))
-    (list this-line-chunks last-main-major-indent)))
+    ;;(message "exit: %s" (list this-line-chunks last-parent-major-indent))
+    (list this-line-chunks last-parent-major-indent next-entering-submode)))
 
 ;; Fix-me: use this for first line in a submode
+;; Fix-me: check more carefully for widen since it may lead to bad results.
 (defun mumamo-indent-use-widen (major-mode)
   "Return non-nil if widen before indentation in MAJOR-MODE."
-  (let* ((specials (cadr (assoc major-mode mumamo-major-mode-indent-specials)))
+  (let* ((specials (cadr (assoc major-mode mumamo-indent-widen-per-major)))
          (use-widen (memq 'use-widen specials))
          (use-widen-maybe (assq 'use-widen specials)))
     (or use-widen
@@ -6708,19 +6975,20 @@ The following rules are used when indenting:
 ;;(mumamo-indent-use-widen 'html-mode)
 
 ;; Fix-me: remove
-(defun mumamo-indent-special-or-default (default-indent)
-  "Indent to DEFAULT-INDENT unless a special indent can be done."
-  (mumamo-with-major-mode-indentation major-mode
-    `(progn
-       (if (mumamo-indent-use-widen major-mode)
-           (save-restriction
-             (widen)
-             (mumamo-msgindent "=> special-or-default did widen, %s" major-mode)
-             (funcall indent-line-function))
-         (indent-to-column default-indent)))))
+;; (defun mumamo-indent-special-or-default (default-indent)
+;;   "Indent to DEFAULT-INDENT unless a special indent can be done."
+;;   (mumamo-with-major-mode-indentation major-mode
+;;     `(progn
+;;        (if (mumamo-indent-use-widen major-mode)
+;;            (save-restriction
+;;              (widen)
+;;              (mumamo-msgindent "=> special-or-default did widen, %s" major-mode)
+;;              (funcall indent-line-function))
+;;          (indent-to-column default-indent)))))
 
 (defun mumamo-call-indent-line (chunk)
   "Call the relevant `indent-line-function'."
+  ;;(msgtrc "call-indent-line %s, lbp=%s" chunk (line-beginning-position))
   (if nil
       (mumamo-with-major-mode-indentation major-mode
         `(save-restriction
@@ -6736,6 +7004,7 @@ The following rules are used when indenting:
         ;;   (let ((syn-min-max (mumamo-chunk-syntax-min-max chunk nil)))
         ;;     (narrow-to-region (car syn-min-max) (cdr syn-min-max))))
         (when (mumamo-indent-use-widen major-mode) (widen))
+        ;;(msgtrc "call-indent-line fun=%s" fun)
         (funcall fun)
         ))))
 
@@ -6745,21 +7014,35 @@ The following rules are used when indenting:
     (setq end (copy-marker end))
     (goto-char start)
     (let ((old-point -1)
-          prev-line-major
-          last-main-major-indent
+          prev-line-chunks
+          last-parent-major-indent
+          entering-submode-arg
+          ;; Turn off validation during indentation
+          (old-rng-validate-mode (when (boundp 'rng-validate-mode) rng-validate-mode))
+          (rng-nxml-auto-validate-flag nil)
+          (nxhtml-use-imenu nil)
+          (nxhtml-mode-hook (mumamo-get-hook-value
+                             'nxhtml-mode-hook
+                             '(html-imenu-setup)))
+          ;;
           (while-n1 0))
-      (while (and (> 3000 (setq while-n1 (1+ while-n1)))
+      (when old-rng-validate-mode (rng-validate-mode -1))
+      ;;(while (and (> 3000 (setq while-n1 (1+ while-n1)))
+      (while (and (mumamo-while 3000 'while-n1 "indent-region")
                   (< (point) end)
                   (/= old-point (point)))
         ;;(message "mumamo-indent-region-function, point=%s" (point))
         (or (and (bolp) (eolp))
             (let ((ret (mumamo-indent-line-function-1
-                        prev-line-major
-                        last-main-major-indent)))
-              (setq prev-line-major        (nth 0 ret))
-              (setq last-main-major-indent (nth 1 ret))))
+                        prev-line-chunks
+                        last-parent-major-indent
+                        entering-submode-arg)))
+              (setq prev-line-chunks         (nth 0 ret))
+              (setq last-parent-major-indent (nth 1 ret))
+              (setq entering-submode-arg     (nth 2 ret))))
         (setq old-point (point))
-        (forward-line 1)))
+        (forward-line 1))
+      (when old-rng-validate-mode (rng-validate-mode 1)))
     (message "Ready indenting region")))
 
 
@@ -6784,8 +7067,8 @@ mumamo is used."
     ;; always change mode when fill-paragraph-function is
     ;; c-fill-paragraph.
 
-    ;;(unless (eq major major-mode) (mumamo-set-major major))
-    (mumamo-set-major major)
+    ;;(unless (eq major major-mode) (mumamo-set-major major ovl))
+    (mumamo-set-major major ovl)
 
     (save-restriction
       (mumamo-update-obscure ovl (point))
@@ -6927,6 +7210,10 @@ when `c-fill-paragraph' is the real function used."
     (put 'sgml-tag-help 'permanent-local t)
     ))
 
+(eval-after-load 'hl-line
+  (progn
+    (put 'hl-line-overlay 'permanent-local t)
+    ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; New versions of syntax-ppss functions, temporary written as defadvice.
@@ -7160,6 +7447,7 @@ Do here also other necessary adjustments for this."
                         (msgtrc "parse-partial-sexp %s %s nil nil %s" old-pos pos old-ppss))
                       (setq ret-val (parse-partial-sexp old-pos pos nil nil old-ppss)))))
                 (when dump2 (msgtrc " ==>ret-val=%s" ret-val))
+                ;;(mumamo-backtrace "syntax-ppss")
                 (setq ad-return-value ret-val))
               (overlay-put chunk-at-pos 'syntax-ppss-last syntax-ppss-last)
               (overlay-put chunk-at-pos 'syntax-ppss-cache syntax-ppss-cache)
@@ -7259,8 +7547,9 @@ For more info see also `rng-get-major-mode-chunk-function'.")
           xmltok-errors
           (while-n1 0)
           (while-n2 0)
+          (old-point -1)
           )
-      ;;(message "> > > > > enter rng-do-some-validation-1, continue-p-function=%s" continue-p-function)
+      ;;(msgtrc "> > > > > enter rng-do-some-validation-1, continue-p-function=%s" continue-p-function)
       (setq have-remaining-chars (< (point) point-max))
       (when (and continue (= (point) 1))
         (let ((regions (xmltok-forward-prolog)))
@@ -7274,8 +7563,10 @@ For more info see also `rng-get-major-mode-chunk-function'.")
           (rng-clear-conditional-region))
         (setq rng-dtd xmltok-dtd))
       (setq while-n1 0)
-      (while (and (> 500 (setq while-n1 (1+ while-n1)))
+      (while (and (mumamo-while 2000 'while-n1 "continue")
+                  (/= old-point (point))
                   continue)
+        (setq old-point (point))
         ;; If mumamo (or something similar) is used then jump over parts
         ;; that can not be parsed by nxml-mode.
         (when (and rng-get-major-mode-chunk-function
@@ -7292,12 +7583,16 @@ For more info see also `rng-get-major-mode-chunk-function'.")
               (setq end-major-mode-chunk nil)
               (setq major-mode-chunk (funcall rng-get-major-mode-chunk-function next-non-space-pos "rng-do-some-validation-1 A"))
               (setq while-n2 0)
-              (while (and (> 500 (setq while-n2 (1+ while-n2)))
+              (while (and (mumamo-while 500 'while-n2 "major-mode-chunk")
                           major-mode-chunk
                           (not (funcall rng-valid-nxml-major-mode-chunk-function major-mode-chunk))
                           (< next-non-space-pos (point-max)))
+                ;;(msgtrc "next-non-space-pos=%s, cb=%s" next-non-space-pos (current-buffer))
                 (let ((end-pos (funcall rng-end-major-mode-chunk-function major-mode-chunk)))
-                  (goto-char (+ end-pos 0))
+                  ;; fix-me: The problem here is that
+                  ;; mumamo-find-chunks can return a 0-length chunk.
+                  ;;(goto-char (+ end-pos 0))
+                  (goto-char (+ end-pos (if (= end-pos (point)) 1 0)))
                   (setq major-mode-chunk (funcall rng-get-major-mode-chunk-function (point) "rng-do-some-validation-1 B"))
                   ;;(message "---> here 3, point=%s, ep=%s, mm-chunk=%s" (point) end-pos major-mode-chunk)
                   )
@@ -7420,9 +7715,9 @@ For more info see also `rng-get-major-mode-chunk-function'.")
     ad-do-it))
 
 (defadvice rng-validate-quick-while-idle (around
-                                    mumamo-ad-rng-validate-quick-while-idle
-                                    activate
-                                    compile)
+                                          mumamo-ad-rng-validate-quick-while-idle
+                                          activate
+                                          compile)
   (if (not (buffer-live-p buffer))
       (rng-kill-timers)
     ad-do-it))
@@ -7501,6 +7796,81 @@ a narrow-to-multiple-regions function!"
  '(("\\<define-mumamo-multi-major-mode\\>" . font-lock-keyword-face)))
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Simple defadvice to move into Emacs later
+
+(defun mumamo-ad-desktop-buffer-info (buffer)
+  (set-buffer buffer)
+  (list
+   ;; base name of the buffer; replaces the buffer name if managed by uniquify
+   (and (fboundp 'uniquify-buffer-base-name) (uniquify-buffer-base-name))
+   ;; basic information
+   (desktop-file-name (buffer-file-name) desktop-dirname)
+   (buffer-name)
+   (if mumamo-multi-major-mode mumamo-multi-major-mode major-mode)
+   ;; minor modes
+   (let (ret)
+     (mapc
+      #'(lambda (minor-mode)
+	  (and (boundp minor-mode)
+	       (symbol-value minor-mode)
+	       (let* ((special (assq minor-mode desktop-minor-mode-table))
+		      (value (cond (special (cadr special))
+				   ((functionp minor-mode) minor-mode))))
+		 (when value (add-to-list 'ret value)))))
+      (mapcar #'car minor-mode-alist))
+     ret)
+   ;; point and mark, and read-only status
+   (point)
+   (list (mark t) mark-active)
+   buffer-read-only
+   ;; auxiliary information
+   (when (functionp desktop-save-buffer)
+     (funcall desktop-save-buffer desktop-dirname))
+   ;; local variables
+   (let ((locals desktop-locals-to-save)
+	 (loclist (buffer-local-variables))
+	 (ll))
+     (while locals
+       (let ((here (assq (car locals) loclist)))
+	 (if here
+	     (setq ll (cons here ll))
+	   (when (member (car locals) loclist)
+	     (setq ll (cons (car locals) ll)))))
+       (setq locals (cdr locals)))
+     ll)))
+
+(defadvice desktop-buffer-info (around
+                                mumamo-ad-desktop-buffer-info
+                                activate
+                                compile)
+  (setq ad-return-value (mumamo-ad-desktop-buffer-info (ad-get-arg 0))))
+
+(defun mumamo-ad-set-auto-mode-0 (mode &optional keep-mode-if-same)
+  "Apply MODE and return it.
+If optional arg KEEP-MODE-IF-SAME is non-nil, MODE is chased of
+any aliases and compared to current major mode.  If they are the
+same, do nothing and return nil."
+  (unless (and keep-mode-if-same
+	       (eq (indirect-function mode)
+                   (if mumamo-multi-major-mode
+                       (indirect-function mumamo-multi-major-mode)
+                     (indirect-function major-mode))))
+    (when mode
+      (funcall mode)
+      mode)))
+
+(defadvice set-auto-mode-0 (around
+                            mumamo-ad-set-auto-mode-0
+                            activate
+                            compile)
+  (setq ad-return-value (mumamo-ad-set-auto-mode-0 (ad-get-arg 0)
+                                                   (ad-get-arg 1)
+                                                   )))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; The END
 (when buffer-file-name (message "\nFinished evaluating %s\n" buffer-file-name))
 (when load-file-name (message "\nFinished loading %s\n" load-file-name))
 

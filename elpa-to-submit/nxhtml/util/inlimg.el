@@ -109,6 +109,7 @@
 (defun inlimg-img-spec-p (spec)
   (assoc spec inlimg-modes-img-values))
 
+;;;###autoload
 (defgroup inlimg nil
   "Customization group for inlimg."
   :group 'nxhtml)
@@ -138,7 +139,7 @@
   :group 'inlimg)
 
 (define-widget 'inlimg-spec-widget 'symbol
-  "A major mode lisp function."
+  "An inline image specification."
   :complete-function (lambda ()
                        (interactive)
                        (lisp-complete-symbol 'inlimg-img-spec-p))
