@@ -35,6 +35,8 @@
 ;; technical acronym :(
 (add-hook 'rst-mode-hook 'turn-off-flyspell)
 
+(add-to-list 'auto-mode-alist '("\\.html$" . django-nxhtml-mumamo-mode))
+
 (setq browse-url-browser-function 'browse-url-firefox)
 (setq require-final-newline t)
 ;; omg i don't want things to flicker and flash and beep every darn
