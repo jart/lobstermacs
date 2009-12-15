@@ -2,25 +2,6 @@
 ;;
 ;; Part of Lobstermacs
 
-;; Use IDO for extended execute (M-x)
-;;
-;; ToDo: After done starting up, add a hook to all eval functions or
-;;"advise" to get this dumb cache regenerated
-(setq ido-execute-command-cache nil)
-(defun ido-execute-command ()
-  (interactive)
-  (call-interactively
-   (intern
-    (ido-completing-read
-     "M-x "
-     (progn
-       (unless ido-execute-command-cache
-         (mapatoms (lambda (s)
-                     (when (commandp s)
-                       (setq ido-execute-command-cache
-                             (cons (format "%S" s) ido-execute-command-cache))))))
-       ido-execute-command-cache)))))
-
 ;; This seems to make other stuff use ido like `C-h f`, `C-h v`, etc.
 ;; Stolen from 'InteractivelyDoThings' on EmacsWiki
 ;;
