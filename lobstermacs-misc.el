@@ -12,6 +12,9 @@
       require-final-newline t
       hg-outgoing-repository "default")
 
+;; we don't want flyspell for certain modes
+(add-hook 'dns-mode-hook 'turn-off-flyspell)
+
 ;; lets you use the mouse in terminal mode.  seems to be a bug using
 ;; this on read-only buffers.  also highlighting doesn't take effect
 ;; until you let go of the mouse :\  ALSO this highlighting doesn't
