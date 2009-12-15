@@ -11,8 +11,7 @@
                                    'magit
                                    'yasnippet-bundle
                                    'gist
-                                   'nxml-mode
-                                   'paredit)
+                                   'nxml-mode)
   "Libraries that should be installed by default.")
 
 (defun starter-kit-elpa-install ()

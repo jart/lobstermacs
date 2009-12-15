@@ -167,13 +167,13 @@ hippie-expand list seems to work wonders."
 
 (defun lob/is-editing-english ()
   "Returns true if \\[lob/is-text-mode] or \\[fundamental-mode],
-otherwise detects if cursor is inside a comment by checking
-\\[face-at-point] to see if it matches \\[font-lock-comment-face]
-or \\[font-lock-doc-face]"
+otherwise detects if cursor is inside a comment by font face at
+current cursor point to see if it matches
+\\[font-lock-comment-face] or \\[font-lock-doc-face]"
   (or (lob/is-text-mode)
       (string= "fundamental-mode" (symbol-name major-mode))
-      (string= "font-lock-comment-face" (symbol-name (face-at-point)))
-      (string= "font-lock-doc-face" (symbol-name (face-at-point)))))
+      (string= "font-lock-comment-face" (symbol-name (get-char-property (point) 'face)))
+      (string= "font-lock-doc-face" (symbol-name (get-char-property (point) 'face)))))
 
 (autoload 'lookup-words "ispell" "Lookup word for dictionary completions." nil)
 

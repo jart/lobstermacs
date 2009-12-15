@@ -47,7 +47,7 @@
 (if (fboundp 'server-start)
     (progn
       (require 'server) ;; server-running-p is not autoloaded
-      (if (not (server-running-p))
+      (if (and (fboundp 'server-running-p) (not (server-running-p)))
           (server-start))))
 
 ;; Overwrite highlighted text if you start typing
