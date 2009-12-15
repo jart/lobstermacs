@@ -15,9 +15,12 @@
 ;; lets you use the mouse in terminal mode.  seems to be a bug using
 ;; this on read-only buffers.  also highlighting doesn't take effect
 ;; until you let go of the mouse :\  ALSO this highlighting doesn't
-;; seem to work when editing lisp files
-(when (not window-system)
-  (xterm-mouse-mode t))
+;; seem to work when editing lisp files.
+;;
+;; I'm keeping this off because most people expect to be able to use
+;; the *terminal* itself to copy/paste
+;; (when (not window-system)
+;;   (xterm-mouse-mode t))
 
 ;; Line numbers are cool but you can always have too much of a good
 ;; thing.  Disable `linum-on` so it doesn't apply to popup buffers
