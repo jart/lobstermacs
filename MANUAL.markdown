@@ -386,7 +386,7 @@ Important Shortcuts:
 Advanced:
 
 * `C-)`, `C-(`: If your s-expr needs more friends (slurping)
-* `C-}`, `C-{`: To kick stuff out of your s-expr (barfing)
+* `C-}`, `C-{`: To kick stuff out of your s-expr (barfing/vomiting)
 
 ## Python
 

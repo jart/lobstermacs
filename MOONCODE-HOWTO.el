@@ -225,12 +225,20 @@ nil
 
 ;; strings
 ;; Do M-x apropos RET \bstring\b RET to see a list of functions related to strings.
-(substring "hello" 0 1)
-(substring "hello" 1 2)
+(length "hello")
+(substring "hello" 0 1) ;; first char
+(substring "hello" 1 2) ;; second char
+(substring "hello" (- (length "hello") 1) (length "hello")) ;; last char
+
+(string-match  "while")
+
 ;; determines if substring exists, and at what position
 (string-match "h" "hello")
 (string-match "ell" "hello")
+(string-match "Z" "hello")
 ;; this uses regular expressions so be careful
+(string-match "^hello$" "hello")
+(string-match "^hello$" "hello ")
 (string-match "o$" "hello")
 (string-match "ll$" "hello")
 (string-match "CODE" (buffer-name (current-buffer)))
@@ -240,6 +248,10 @@ nil
 (string-match "^[-a-z][-rwx]+[ \t\n]*" "drwxr-xr-x 15 jart jart  4096 2009-10-10 12:22 elpa")
 ;; they're not perl compatible!!! argh
 (string-match "^[-_[:alnum:]]+$" "J-o-E")
+;; simple whitespace test
+(string-match "^[ \t]*$" "  \t  ")
+
+;; something crazy
 (let ((lsregex (concat "^"
                        "[^ ]+ +"                 ;; file mode
                        "[^ ]+ +"                 ;; some weird number
@@ -264,7 +276,9 @@ nil
 (capitalize "bob dole")
 ;; join list of strings
 (mapconcat 'identity (list "hello" "little" "kitty") "__")
+(mapconcat 'symbol-name '(hello little kitty) "\\|")
 (split-string "war,is,peace" ",")
+
 
 ;; type checking
 (null nil)
@@ -283,6 +297,7 @@ nil
 ;; represent any term as a string
 (format "%S" (list "hi" 'bob))
 
+;; trim(), strip(), etc.
 (defun trim (s)
   (if (string-match "^[ \t]*\\([^ \t]*\\)[ \t]*$" s)
       (match-string 1 s)
@@ -359,7 +374,7 @@ nil
        (insert "Enjoy your command results!!\n"))
 
 
-;; working with lists like arrays
+;; working with lists (like you would with arrays)
 (length (list 1 2 3))
 (nth 0 (list 6 7 8))
 (nth 2 (list 6 7 8))
