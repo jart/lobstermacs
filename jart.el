@@ -11,7 +11,9 @@
      (define-key paredit-mode-map (kbd "C-h") 'paredit-backward-delete)
      (define-key paredit-mode-map (kbd "M-h") 'paredit-backward-kill-word)))
 
-;; Some keybindings I like that others might not
+(eval-after-load 'python
+  '(progn
+     (define-key python-mode-map (kbd "C-u C-e") 'lob/pymacs-eval)))
 
 (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
 (global-set-key (kbd "C-x b") 'ibuffer)

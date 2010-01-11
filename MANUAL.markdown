@@ -393,9 +393,20 @@ Advanced:
 Ubuntu users starting off with Python should install the following
 packages to get started:
 
-    sudo apt-get install python python-setuptools python-tz
-    sudo easy_install django # 9.04 ships with 1.0.. 1.1 is so worth it!
-    sudo easy_install py     # my personal favorite unit testing framework
+    sudo apt-get install python python-setuptools python-tz pymacs
+    sudo easy_install django py
+
+* When in Python mode, pressing C-x C-e (like with lisp) will evaluate
+  the python statement under your cursor (unless you've highlighted
+  something specific) and show the result in the minibuffer.
+
+* It is smart enough to understand statements that span multiple
+  lines.  It is also smart enough to know when to call eval()
+  vs. exec() so you can use this for import statements, or an entire
+  script.
+
+* The code is sent to a python process running inside emacs.  Your
+  script's output is sent to the *Pymacs* buffer.
 
 ## Ruby
 
