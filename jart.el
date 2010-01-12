@@ -13,7 +13,7 @@
 
 (eval-after-load 'python
   '(progn
-     (define-key python-mode-map (kbd "C-u C-e") 'lob/pymacs-eval)))
+     (define-key python-mode-map (kbd "C-u C-e") 'lob/python-eval)))
 
 (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
 (global-set-key (kbd "C-x b") 'ibuffer)
