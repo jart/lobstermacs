@@ -1,5 +1,3 @@
-(setq message-log-max t)
-(setq debug-on-error t)
 ;;; autostart.el --- Load nxhtml
 ;;
 ;; Author: By: Lennart Borgman
@@ -42,6 +40,11 @@
 ;;; Code:
 
 (message "Nxml/Nxhtml Autostart.el loading ...")
+
+(defconst nxhtml-menu:version "2.05")
+;;(setq message-log-max t)
+;;(setq debug-on-error t)
+
 (defconst nxhtml-load-time-start (float-time))
 
 (defconst nxhtml-install-dir
@@ -57,6 +60,19 @@
 ;; (defun nxhtml-custom-load-and-get-value (symbol)
 ;;   (custom-load-symbol symbol)
 ;;   (symbol-value symbol))
+
+(defun flymake-init-load-flymakemsg ()
+  (require 'flymakemsg))
+
+(defcustom nxhtml-flymake-setup t
+  "Let nXhtml add some addtions to flymake.
+This adds support for CSSS and JavaScript files.
+
+It also adds showing of errors in minibuffer when point is on
+them."
+  :type 'boolean
+  :group 'nxhtml
+  :group 'flymake)
 
 (defun nxhtml-custom-autoload (symbol load &optional noset)
   "Like `custom-autoload', but also run :set for defcustoms etc."
@@ -81,9 +97,9 @@
       (custom-load-symbol symbol)
       )))
 
-(defun nxhtml-list-loaded-features ()
-  (interactive)
-  (let ((buf (when (called-interactively-p)
+(defun nxhtml-list-loaded-features (use-message)
+  (interactive (list t))
+  (let ((buf (when use-message ;(called-interactively-p)
                (get-buffer-create "*nXhtml loaded features*"))))
     (if buf
         (with-current-buffer buf (erase-buffer))
@@ -128,20 +144,20 @@
   ;; Provide the feature here to avoid loading looping on error.
   (provide 'nxhtml-autostart)
 
-  (if (< emacs-major-version 23)
-      (load (expand-file-name "autostart22" nxhtml-install-dir))
-    ;; Check that the nxml-mode included with Emacs is used. There
-    ;; has been some problems on Debian with this.
-    (let ((nxml-mode-file (locate-library "nxml-mode"))
-          (help-file      (locate-library "help")))
-      (unless (string= (expand-file-name ".." help-file)
-                       (expand-file-name "../.." nxml-mode-file))
-        (error "Wrong nxml-mode=%s used, please use the one that comes with Emacs" nxml-mode-file))))
+  ;; (if (< emacs-major-version 23)
+  ;;     (load (expand-file-name "autostart22" nxhtml-install-dir))
+  ;;   ;; Check that the nxml-mode included with Emacs is used. There
+  ;;   ;; has been some problems on Debian with this.
+  ;;   (let ((nxml-mode-file (locate-library "nxml-mode"))
+  ;;         (help-file      (locate-library "help")))
+  ;;     (unless (string= (expand-file-name ".." help-file)
+  ;;                      (expand-file-name "../.." nxml-mode-file))
+  ;;       (error "Wrong nxml-mode=%s used, please use the one that comes with Emacs" nxml-mode-file))))
 
   (let* ((util-dir (file-name-as-directory (expand-file-name "util" nxhtml-install-dir)))
          (related-dir (file-name-as-directory (expand-file-name "related" nxhtml-install-dir)))
          (nxhtml-dir (file-name-as-directory (expand-file-name "nxhtml" nxhtml-install-dir)))
-         (company-dir (file-name-as-directory (expand-file-name "util/company-mode" nxhtml-install-dir)))
+         (company-dir (file-name-as-directory (expand-file-name "util/nxhtml-company-mode" nxhtml-install-dir)))
          (tests-dir (file-name-as-directory (expand-file-name "tests" nxhtml-install-dir))))
     (add-to-list 'load-path nxhtml-dir)
     (add-to-list 'load-path related-dir)
@@ -173,10 +189,16 @@
 
     ;; Load nXhtml
     (load (expand-file-name "nxhtml/nxhtml-autoload" nxhtml-install-dir)))
-    (message "... nXhtml loading %.1f seconds elapsed ..." (- (float-time) nxhtml-load-time-start))
+  (message "... nXhtml loading %.1f seconds elapsed ..." (- (float-time) nxhtml-load-time-start))
+
+  ;; Flymake, this may break some users setup initially, but I see no better way...
+  (when nxhtml-flymake-setup
+    (flymake-js-load)
+    (flymake-css-load)
+    (add-hook 'flymake-mode-hook 'flymake-init-load-flymakemsg))
 
   ;; Tell what have been loaded of nXhtml:
-  (nxhtml-list-loaded-features)
+  (nxhtml-list-loaded-features nil)
 
   ;; How long time did it all take?
   (message "Nxml/Nxhtml Autostart.el loaded in %.1f seconds" (- (float-time) nxhtml-load-time-start))

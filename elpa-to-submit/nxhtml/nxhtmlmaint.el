@@ -136,6 +136,7 @@ Update nXhtml autoload file with them."
          (sub-dirs (mapcar (lambda (file)
                              (when (and (not (member file '("." "..")))
                                         (not (member file '("nxml-mode-20041004" "old")))
+                                        (not (member file '("nxhtml-company-mode")))
                                         (not (member file '("in")))
                                         (file-directory-p (expand-file-name file root)))
                                file))
@@ -184,7 +185,8 @@ Update nXhtml autoload file with them."
 
 (defun nxhtmlmaint-autoload-file-load-name (file)
   "Return relative file name for FILE to autoload file directory."
-  (let ((name (if nxhtmlmaint-autoload-default-directory
+  (let ((name (if (and nxhtmlmaint-autoload-default-directory
+                       (file-name-absolute-p file))
                   (file-relative-name
                    file nxhtmlmaint-autoload-default-directory)
                 (file-name-nondirectory file))))
@@ -274,6 +276,9 @@ remove then with `nxhtmlmaint-byte-uncompile-all'."
          (util-dir (file-name-as-directory
                     (expand-file-name "util"
                                       nxhtmlmaint-dir)))
+         (nxhtml-company-dir (file-name-as-directory
+                              (expand-file-name "nxhtml-company-mode"
+                                                util-dir)))
          (related-dir (file-name-as-directory
                        (expand-file-name "related"
                                          nxhtmlmaint-dir)))
@@ -286,6 +291,7 @@ remove then with `nxhtmlmaint-byte-uncompile-all'."
          )
     (add-to-list 'load-path nxhtml-dir)
     (add-to-list 'load-path util-dir)
+    (add-to-list 'load-path nxhtml-company-dir)
     (add-to-list 'load-path related-dir)
     (add-to-list 'load-path tests-dir)
     (when (file-directory-p emacsw32-dir)

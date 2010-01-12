@@ -524,7 +524,7 @@ See `mumamo-find-possible-chunk' for POS, MIN and MAX."
   "Helper for `mumamo-chunk-inlined-script'.
 POS is where to start search and MIN is where to stop."
   (goto-char (+ pos 7))
-  (let ((marker-start (search-backward "<script" min t))
+  (let ((marker-start (when (< min (point)) (search-backward "<script" min t)))
         exc-mode
         exc-start)
     (when marker-start
@@ -582,14 +582,20 @@ See `mumamo-find-possible-chunk' for POS, MIN and MAX."
 
 ;;;; on[a-z]+=\"javascript:"
 
-(defconst mumamo-onjs=start-regex
+(defconst mumamo-onjs=-attr=
+  (rx
+   ;;"on[a-z]+="
+   (or "onclick" "ondblclick" "onmousedown" "onmousemove" "onmouseout" "onmouseover" "onmouseup" "onkeydown" "onkeypress" "onkeyup")
+   "="))
+
+(defconst mumamo-onjs=-attr-regex
   (rx point
       (or "<" "?>")
       (* (not (any ">")))
       space
       (submatch
-       "on"
-       (1+ (any "a-za-z"))
+       ;;"on" (1+ (any "a-za-z"))
+       (or "onclick" "ondblclick" "onmousedown" "onmousemove" "onmouseout" "onmouseover" "onmouseup" "onkeydown" "onkeypress" "onkeyup")
        "=")
       (0+ space)
       ?\"
@@ -601,8 +607,66 @@ See `mumamo-find-possible-chunk' for POS, MIN and MAX."
 
 (defun mumamo-chunk-onjs=(pos min max)
   "Find javascript on...=\"...\".  Return range and 'javascript-mode."
-  (mumamo-chunk-attr= pos min max "on[a-z]+=" t mumamo-onjs=start-regex
+  (mumamo-chunk-attr= pos min max mumamo-onjs=-attr= t mumamo-onjs=-attr-regex
                       'javascript-mode))
+
+;;;; py:somthing=\"python\"
+
+(defconst mumamo-py:=-attr= "py:[a-z]+=")
+
+(defconst mumamo-py:=-attr-regex
+  (rx point
+      (or "<" "?>")
+      (* (not (any ">")))
+      space
+      (submatch
+       "py:" (1+ (any "a-za-z"))
+       "=")
+      (0+ space)
+      ?\"
+      (submatch
+       (0+
+        (not (any "\""))))
+      ))
+
+(defun mumamo-chunk-py:=(pos min max)
+  "Find python py:...=\"...\".  Return range and 'python-mode."
+  (mumamo-chunk-attr= pos min max mumamo-py:=-attr= t mumamo-py:=-attr-regex
+                      'python-mode))
+
+(defun mumamo-chunk-py:match (pos min max)
+  (save-match-data
+    (let ((here (point))
+          (py:match (progn
+                      (goto-char pos)
+                      (re-search-forward (rx "py:match"
+                                             (1+ space)
+                                             (0+ (not (any ">")))
+                                             word-start
+                                             (submatch "path=")
+                                             (0+ space)
+                                             ?\"
+                                             (submatch
+                                              (0+
+                                               (not (any "\"")))))
+                                         max t)))
+          start end borders
+          )
+      (when py:match
+        (setq start (match-beginning 1))
+        (setq end   (match-end 2))
+        (setq borders (list (match-end 1) (1- end)))
+        )
+      (goto-char here)
+      (when start
+        (list start
+              end
+              'python-mode
+              borders
+              nil ;; parseable-by
+              'mumamo-chunk-attr=-new-fw-exc-fun ;; fw-exc-fun
+              'mumamo-chunk-attr=-new-find-borders-fun ;; find-borders-fun
+            )))))
 
 ;;;; style=
 
@@ -782,6 +846,107 @@ See also `mumamo-alt-php-tags-mode'."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Mason (not ready)
+;; http://www.masonhq.com/docs/manual/Devel.html#examples_and_recommended_usage
+
+(defun mumamo-chunk-mason-perl-line (pos min max)
+  (mumamo-whole-line-chunk pos min max "%" 'perl-mode))
+
+(defun mumamo-chunk-mason-perl-single (pos min max)
+  (mumamo-quick-static-chunk pos min max "<% " " %>" t 'perl-mode t))
+
+(defun mumamo-chunk-mason-perl-block (pos min max)
+  (mumamo-quick-static-chunk pos min max "<%perl>" "</%perl>" t 'perl-mode t))
+
+(defun mumamo-chunk-mason-perl-init (pos min max)
+  (mumamo-quick-static-chunk pos min max "<%init>" "</%init>" t 'perl-mode t))
+
+(defun mumamo-chunk-mason-perl-once (pos min max)
+  (mumamo-quick-static-chunk pos min max "<%once>" "</%once>" t 'perl-mode t))
+
+(defun mumamo-chunk-mason-perl-cleanup (pos min max)
+  (mumamo-quick-static-chunk pos min max "<%cleanup>" "</%cleanup>" t 'perl-mode t))
+
+(defun mumamo-chunk-mason-perl-shared (pos min max)
+  (mumamo-quick-static-chunk pos min max "<%shared>" "</%shared>" t 'perl-mode t))
+
+(defun mumamo-chunk-mason-simple-comp (pos min max)
+  (mumamo-quick-static-chunk pos min max "<& " " &>" t 'text-mode t))
+
+(defun mumamo-chunk-mason-args (pos min max)
+  ;; Fix-me: perl-mode is maybe not the best here?
+  (mumamo-quick-static-chunk pos min max "<%args>" "</%args>" t 'perl-mode t))
+
+(defun mumamo-chunk-mason-doc (pos min max)
+  (mumamo-quick-static-chunk pos min max "<%doc>" "</%doc>" t 'mumamo-comment-mode t))
+
+(defun mumamo-chunk-mason-text (pos min max)
+  (mumamo-quick-static-chunk pos min max "<%text>" "</%text>" t 'text-mode t))
+
+;; component calls with content
+
+(defun mumamo-chunk-mason-compcont-bw-exc-start-fun (pos min)
+  (let ((exc-start (mumamo-chunk-start-bw-str-inc pos min "<&| ")))
+    (and exc-start
+         (<= exc-start pos)
+         (cons exc-start 'html-mode))))
+(defun mumamo-chunk-mason-compcont-fw-exc-start-fun (pos max)
+  (mumamo-chunk-start-fw-str-inc pos max "<&| "))
+(defun mumamo-chunk-mason-compcont-fw-exc-end-fun (pos max)
+  (mumamo-chunk-end-fw-str-inc pos max "</&>"))
+(defun mumamo-chunk-mason-compcont-find-borders-fun (start end dummy)
+  (when dummy
+    (list
+     (when start
+       (save-match-data
+         (let ((here (point))
+               ret)
+           (goto-char start)
+           (when (re-search-forward "[^>]* &>" end t)
+             (setq ret (point))
+             (goto-char here)
+             ret))
+         ))
+     (when end (- end 4))
+     dummy)))
+
+(defun mumamo-chunk-mason-compcont (pos min max)
+  (mumamo-find-possible-chunk-new pos
+                                  max
+                                  'mumamo-chunk-mason-compcont-bw-exc-start-fun
+                                  'mumamo-chunk-mason-compcont-fw-exc-start-fun
+                                  'mumamo-chunk-mason-compcont-fw-exc-end-fun
+                                  'mumamo-chunk-mason-compcont-find-borders-fun))
+
+;;;###autoload
+(define-mumamo-multi-major-mode mason-html-mumamo-mode
+  "Turn on multiple major modes for Mason using main mode `html-mode'.
+This covers inlined style and javascript and PHP.
+
+See also `mumamo-alt-php-tags-mode'."
+  ("Mason html Family" html-mode
+   (
+    mumamo-chunk-mason-perl-line
+    mumamo-chunk-mason-perl-single
+    mumamo-chunk-mason-perl-block
+    mumamo-chunk-mason-perl-init
+    mumamo-chunk-mason-perl-once
+    mumamo-chunk-mason-perl-cleanup
+    mumamo-chunk-mason-perl-shared
+    mumamo-chunk-mason-simple-comp
+    mumamo-chunk-mason-compcont
+    mumamo-chunk-mason-args
+    mumamo-chunk-mason-doc
+    mumamo-chunk-mason-text
+    mumamo-chunk-inlined-style
+    mumamo-chunk-inlined-script
+    mumamo-chunk-style=
+    mumamo-chunk-onjs=
+    )))
+(add-hook 'mason-html-mumamo-mode-hook 'mumamo-define-html-file-wide-keys)
+(mumamo-inherit-sub-chunk-family-locally 'mason-html-mumamo-mode 'mason-html-mumamo-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Embperl
 
 (defun mumamo-chunk-embperl-<- (pos min max)
@@ -875,42 +1040,22 @@ This also covers inlined style and javascript."
 (defun mumamo-chunk-django4(pos min max)
   "Find {% comment %}.  Return range and `django-mode'.
 See `mumamo-find-possible-chunk' for POS, MIN and MAX."
-  (mumamo-quick-static-chunk pos min max "{% comment %}" "{% endcomment %}" t 'django-comment-mode t))
-;;;   (mumamo-find-possible-chunk pos min max
-;;;                               'mumamo-search-bw-exc-start-django4
-;;;                               'mumamo-search-bw-exc-end-django4
-;;;                               'mumamo-search-fw-exc-start-django4
-;;;                               'mumamo-search-fw-exc-end-django4))
+  (mumamo-quick-static-chunk pos min max "{% comment %}" "{% endcomment %}" t 'mumamo-comment-mode t))
 
 (defun mumamo-chunk-django3(pos min max)
   "Find {# ... #}.  Return range and `django-mode'.
 See `mumamo-find-possible-chunk' for POS, MIN and MAX."
-  (mumamo-quick-static-chunk pos min max "{#" "#}" t 'django-comment-mode t))
-;;;   (mumamo-find-possible-chunk pos min max
-;;;                               'mumamo-search-bw-exc-start-django3
-;;;                               'mumamo-search-bw-exc-end-django3
-;;;                               'mumamo-search-fw-exc-start-django3
-;;;                               'mumamo-search-fw-exc-end-django3))
+  (mumamo-quick-static-chunk pos min max "{#" "#}" t 'mumamo-comment-mode t))
 
 (defun mumamo-chunk-django2(pos min max)
   "Find {{ ... }}.  Return range and `django-mode'.
 See `mumamo-find-possible-chunk' for POS, MIN and MAX."
   (mumamo-quick-static-chunk pos min max "{{" "}}" t 'django-variable-mode t))
-;;;   (mumamo-find-possible-chunk pos min max
-;;;                               'mumamo-search-bw-exc-start-django2
-;;;                               'mumamo-search-bw-exc-end-django2
-;;;                               'mumamo-search-fw-exc-start-django2
-;;;                               'mumamo-search-fw-exc-end-django2))
 
 (defun mumamo-chunk-django (pos min max)
   "Find {% ... %}.  Return range and `django-mode'.
 See `mumamo-find-possible-chunk' for POS, MIN and MAX."
   (mumamo-quick-static-chunk pos min max "{%" "%}" t 'django-mode t))
-;;;   (mumamo-find-possible-chunk pos min max
-;;;                               'mumamo-search-bw-exc-start-django
-;;;                               'mumamo-search-bw-exc-end-django
-;;;                               'mumamo-search-fw-exc-start-django
-;;;                               'mumamo-search-fw-exc-end-django))
 
 (defun mumamo-search-bw-exc-start-django (pos min)
   "Helper for `mumamo-chunk-django'.
@@ -934,7 +1079,7 @@ POS is where to start search and MIN is where to stop."
   (let ((exc-start (mumamo-chunk-start-bw-str-inc pos min "{#")))
     (and exc-start
          (<= exc-start pos)
-         (cons exc-start 'django-comment-mode))))
+         (cons exc-start 'mumamo-comment-mode))))
 
 (defun mumamo-search-bw-exc-start-django4(pos min)
   "Helper for `mumamo-chunk-django4'.
@@ -943,7 +1088,7 @@ POS is where to start search and MIN is where to stop."
                                                        "{% comment %}")))
     (and exc-start
          (<= exc-start pos)
-         (cons exc-start 'django-comment-mode))))
+         (cons exc-start 'mumamo-comment-mode))))
 
 (defun mumamo-search-bw-exc-end-django (pos min)
   "Helper for `mumamo-chunk-django'.
@@ -1075,6 +1220,8 @@ affect your editing normally."
    (
     mumamo-chunk-genshi%
     mumamo-chunk-genshi$
+    mumamo-chunk-py:=
+    mumamo-chunk-py:match
     mumamo-chunk-xml-pi
     mumamo-chunk-inlined-style
     mumamo-chunk-inlined-script
@@ -1109,39 +1256,25 @@ This also covers inlined style and javascript."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; smarty
 
+(defun mumamo-chunk-smarty-literal (pos min max)
+  "Find {literal} ... {/literal}.  Return range and 'html-mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  (mumamo-quick-static-chunk pos min max "{literal}" "{/literal}" t 'html-mode t))
+
+(defun mumamo-chunk-smarty-t (pos min max)
+  "Find {t} ... {/t}.  Return range and 'html-mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  (mumamo-quick-static-chunk pos min max "{t}" "{/t}" t 'text-mode t))
+
+(defun mumamo-chunk-smarty-comment (pos min max)
+  "Find {* ... *}.  Return range and 'mumamo-comment-mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  (mumamo-quick-static-chunk pos min max "{*" "*}" t 'mumamo-comment-mode nil))
+
 (defun mumamo-chunk-smarty (pos min max)
   "Find { ... }.  Return range and 'smarty-mode.
 See `mumamo-find-possible-chunk' for POS, MIN and MAX."
-  (mumamo-find-possible-chunk pos min max
-                              'mumamo-search-bw-exc-start-smarty
-                              'mumamo-search-bw-exc-end-smarty
-                              'mumamo-search-fw-exc-start-smarty
-                              'mumamo-search-fw-exc-end-smarty))
-
-(defun mumamo-search-bw-exc-start-smarty (pos min)
-  "Helper for `mumamo-chunk-smarty'.
-POS is where to start search and MIN is where to stop."
-  (let ((exc-start (mumamo-chunk-start-bw-str-inc pos min "{")))
-    (when (and exc-start
-               (<= exc-start pos))
-      (cons exc-start 'smarty-mode))))
-
-(defun mumamo-search-bw-exc-end-smarty (pos min)
-  "Helper for `mumamo-chunk-smarty'.
-POS is where to start search and MIN is where to stop."
-  (mumamo-chunk-end-bw-str-inc pos min "}"))
-
-(defun mumamo-search-fw-exc-start-smarty (pos max)
-  "Helper for `mumamo-chunk-smarty'.
-POS is where to start search and MAX is where to stop."
-  (let ((end-out (mumamo-chunk-start-fw-str-inc pos max "{")))
-    end-out))
-
-(defun mumamo-search-fw-exc-end-smarty (pos max)
-  "Helper for `mumamo-chunk-smarty'.
-POS is where to start search and MAX is where to stop."
-  (save-match-data
-    (mumamo-chunk-end-fw-str-inc pos max "}")))
+  (mumamo-quick-static-chunk pos min max "{" "}" t 'smarty-mode nil))
 
 ;;;###autoload
 (define-mumamo-multi-major-mode smarty-html-mumamo-mode
@@ -1149,14 +1282,138 @@ POS is where to start search and MAX is where to stop."
 This also covers inlined style and javascript."
   ("Smarty HTML Family" html-mode
    (mumamo-chunk-xml-pi
-    mumamo-chunk-smarty
     mumamo-chunk-style=
     mumamo-chunk-onjs=
+    ;;mumamo-chunk-inlined-style
+    ;;mumamo-chunk-inlined-script
+    mumamo-chunk-smarty-literal
+    mumamo-chunk-smarty-t
+    mumamo-chunk-smarty-comment
+    mumamo-chunk-smarty
     )))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; jsp
+;;;; ssjs - server side javascript
+
+;; http://www.sitepoint.com/blogs/2009/03/10/server-side-javascript-will-be-as-common-as-php/
+;;
+;; It looks like there are different syntaxes, both
+;;
+;;  <script runat="server">...</script> and <% ... %>.
+
+(defun mumamo-chunk-ssjs-% (pos min max)
+  "Find <% ... %>.  Return range and 'javascript-mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  (mumamo-quick-static-chunk pos min max "<%" "%>" t 'javascript-mode t))
+
+(defconst mumamo-ssjs-tag-start-regex
+  (rx "<script"
+      space
+      (0+ (not (any ">")))
+      "runat"
+      (0+ space)
+      "="
+      (0+ space)
+      ?\"
+      ;;(or "text" "application")
+      ;;"/"
+      ;;(or "javascript" "ecmascript")
+      (or "server" "both" "server-proxy")
+      ?\"
+      (0+ (not (any ">")))
+      ">"
+      ;; FIX-ME: Commented out because of bug in Emacs
+      ;;
+      ;;(optional (0+ space) "<![CDATA[" )
+      ))
+
+(defun mumamo-search-bw-exc-start-inlined-ssjs (pos min)
+  "Helper for `mumamo-chunk-inlined-ssjs'.
+POS is where to start search and MIN is where to stop."
+  (goto-char (+ pos 7))
+  (let ((marker-start (when (< min (point)) (search-backward "<script" min t)))
+        exc-mode
+        exc-start)
+    (when marker-start
+      (when (looking-at mumamo-ssjs-tag-start-regex)
+        (setq exc-start (match-end 0))
+        (goto-char exc-start)
+        (when (<= exc-start pos)
+          ;;(cons (point) 'javascript-mode)
+          (list (point) 'javascript-mode '(nxml-mode))
+          )
+        ))))
+
+(defun mumamo-search-fw-exc-start-inlined-ssjs (pos max)
+  "Helper for `mumamo-chunk-inlined-ssjs'.
+POS is where to start search and MAX is where to stop."
+  (goto-char (1+ pos))
+  (skip-chars-backward "^<")
+  ;; Handle <![CDATA[
+  (when (and
+         (eq ?< (char-before))
+         (eq ?! (char-after))
+         (not (bobp)))
+    (backward-char)
+    (skip-chars-backward "^<"))
+  (unless (bobp)
+    (backward-char 1))
+  (let ((exc-start (search-forward "<script" max t))
+        exc-mode)
+    (when exc-start
+      (goto-char (- exc-start 7))
+      (when (looking-at mumamo-ssjs-tag-start-regex)
+        (goto-char (match-end 0))
+        (point)
+        ))))
+
+(defun mumamo-chunk-inlined-ssjs (pos min max)
+  "Find <script runat=...>...</script>.  Return range and 'javascript-mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  (mumamo-find-possible-chunk pos min max
+                              'mumamo-search-bw-exc-start-inlined-ssjs
+                              'mumamo-search-bw-exc-end-inlined-script
+                              'mumamo-search-fw-exc-start-inlined-ssjs
+                              'mumamo-search-fw-exc-end-inlined-script))
+
+;;;###autoload
+(define-mumamo-multi-major-mode ssjs-html-mumamo-mode
+  "Turn on multiple major modes for SSJS with main mode `html-mode'.
+This covers inlined style and javascript."
+  ("HTML Family" html-mode
+   (mumamo-chunk-inlined-style
+    mumamo-chunk-inlined-script
+    mumamo-chunk-inlined-ssjs
+    mumamo-chunk-ssjs-%
+    mumamo-chunk-style=
+    mumamo-chunk-onjs=
+    )))
+(add-hook 'html-mumamo-mode-hook 'mumamo-define-html-file-wide-keys)
+(mumamo-inherit-sub-chunk-family 'ssjs-html-mumamo-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; gsp
+
+(defun mumamo-chunk-gsp (pos min max)
+  "Find <% ... %>.  Return range and 'groovy-mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  (mumamo-quick-static-chunk pos min max "<%" "%>" t 'groovy-mode t))
+
+;;;###autoload
+(define-mumamo-multi-major-mode gsp-html-mumamo-mode
+  "Turn on multiple major modes for GSP with main mode `html-mode'.
+This also covers inlined style and javascript."
+    ("GSP HTML Family" html-mode
+     (mumamo-chunk-gsp
+      mumamo-chunk-inlined-style
+      mumamo-chunk-inlined-script
+      mumamo-chunk-style=
+      mumamo-chunk-onjs=
+      )))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; jsp - Java Server Pages
 
 (defun mumamo-chunk-jsp (pos min max)
   "Find <% ... %>.  Return range and 'java-mode.
@@ -1226,6 +1483,7 @@ This also covers inlined style and javascript."
     ("CSS" css-mode)
     ("JAVASCRIPT" javascript-mode)
     ("JAVA" java-mode)
+    ("GROOVY" groovy-mode)
     )
   "Matches for heredoc modes.
 The entries in this list have the form
@@ -1266,6 +1524,7 @@ POS, MIN and MAX have the same meaning as there.
 LANG is the programming language.
 Supported values are 'perl."
   ;; Fix-me: LANG
+  ;; Fix-me: use mumamo-end-in-code
   (mumamo-condition-case err
       (let ((old-point (point)))
         (goto-char pos)
@@ -1303,7 +1562,7 @@ Supported values are 'perl."
                (skip-chars-forward " \t")
                (when (memq (char-after) '(?\" ?\'))
                  (setq delimiter (list (char-after))))
-               (when (looking-at (concat delimiter "\\([^\n;]*\\)" delimiter "[[:blank:]]*\n"))
+               (when (looking-at (concat delimiter "\\([^\n<>;]*\\)" delimiter "[[:blank:]]*\n"))
                  (setq heredoc-mark  (buffer-substring-no-properties
                                       (match-beginning 1)
                                       (match-end 1)))
@@ -1325,6 +1584,10 @@ Supported values are 'perl."
                  (setq heredoc-mark  (buffer-substring-no-properties
                                       (match-beginning 1)
                                       (match-end 1)))
+                 ;; fix-me: nowdoc
+                 (when (and (= ?\' (string-to-char heredoc-mark))
+                            (= ?\' (string-to-char (substring heredoc-mark (1- (length heredoc-mark))))))
+                   (setq heredoc-mark (substring heredoc-mark 1 (- (length heredoc-mark) 1))))
                  (setq start-inner (match-end 0)))))
             ('perl
              (while want-<<
@@ -1399,11 +1662,18 @@ Supported values are 'perl."
                                       (goto-char pos)
                                       (prog1
                                           (when (re-search-forward ,endmark-regexp max t)
-                                            (- (point) 0))
+                                            (- (point) 1 ,(length heredoc-mark))
+                                            (- (point) 0)
+                                            )
                                         (goto-char here)))))))
             (setq exc-mode (mumamo-mode-for-heredoc heredoc-mark))
             (list start-inner end exc-mode nil nil fw-exc-fun nil)
-            (list start-outer end exc-mode (list start-inner end) nil fw-exc-fun border-fun)
+            ;; Fix me: Add overriding for inner chunks (see
+            ;; http://www.emacswiki.org/emacs/NxhtmlMode#toc13). Maybe
+            ;; make fw-exc-fun a list (or a cons, since overriding is
+            ;; probably all that I want to add)? And make the
+            ;; corresponding chunk property a list too?
+            (list start-outer end exc-mode (list start-inner end) nil fw-exc-fun border-fun 'heredoc)
             )))
     (error (mumamo-display-error 'mumamo-chunk-heredoc
                                  "%s" (error-message-string err)))))
@@ -1892,6 +2162,7 @@ See `mumamo-find-possible-chunk' for POS, MIN and MAX."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; noweb
 
+;;;###autoload
 (defgroup mumamo-noweb2 nil
   "Customization group for `noweb2-mumamo-mode'."
   :group 'mumamo-modes)
@@ -2010,15 +2281,11 @@ This also covers inlined style and javascript."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Asp
 
-(defun mumamo-chunk-asp (pos min max)
-  "Find <% ... %>.  Return range and 'asp-js-mode.
-See `mumamo-find-possible-chunk' for POS, MIN and MAX."
-  ;; Fix-me: this is broken!
-  (mumamo-find-possible-chunk pos min max
-                              'mumamo-search-bw-exc-start-asp
-                              'mumamo-search-bw-exc-end-jsp
-                              'mumamo-search-fw-exc-start-jsp
-                              'mumamo-search-fw-exc-end-jsp))
+;;;; asp <%@language="javscript"%>
+
+(defvar mumamo-asp-default-major 'asp-js-mode)
+(make-variable-buffer-local 'mumamo-asp-default-major)
+(put 'mumamo-asp-default-major 'permanent-local t)
 
 (defconst mumamo-asp-lang-marker
   (rx "<%@"
@@ -2032,25 +2299,40 @@ See `mumamo-find-possible-chunk' for POS, MIN and MAX."
       "\""
       (0+ space)))
 
-(defun mumamo-search-bw-exc-start-asp (pos min)
-  "Helper function for `mumamo-chunk-asp'.
-POS is where to start search and MIN is where to stop."
-  (let ((exc-start (mumamo-chunk-start-bw-str pos min "<%")))
-    (when (and exc-start
-               (<= exc-start pos))
-      (let ((here (point))
-            (mode 'asp-vb-mode)
-            lang)
-        (when (re-search-backward mumamo-asp-lang-marker nil t)
-          (setq lang (downcase (match-string-no-properties 1)))
-          (lwarn 't :warning "lang=%s" lang)
-          (cond
-           ((string= lang "javascript")
-            (setq mode 'asp-js-mode))
-           )
-          )
-        (cons exc-start mode)))))
+(defun mumamo-chunk-asp (pos min max)
+  "Find <% ... %>.  Return range and 'asp-js-mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  ;; Fix-me: this is broken!
+  (mumamo-find-possible-chunk pos min max
+                              'mumamo-search-bw-exc-start-asp
+                              'mumamo-search-bw-exc-end-jsp
+                              'mumamo-search-fw-exc-start-jsp
+                              'mumamo-search-fw-exc-end-jsp))
 
+
+;;;; asp <% ...>
+
+(defun mumamo-chunk-asp% (pos min max)
+  "Find <% ... %>.  Return range and 'asp-js-mode or 'asp-vb-mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  (let* ((chunk (mumamo-quick-static-chunk pos min max "<%" "%>" t 'java-mode t))
+         (beg (nth 0 chunk))
+         (here (point))
+         glang)
+    (when chunk
+      (goto-char beg)
+      (if (looking-at mumamo-asp-lang-marker)
+          (progn
+            (setq glang (downcase (match-string 1)))
+            (cond
+             ((string= glang "javascript")
+              (setq mumamo-asp-default-major 'asp-js-mode))
+             ((string= glang "vbscript")
+              (setq mumamo-asp-default-major 'asp-vb-mode))
+             )
+            (setcar (nthcdr 2 chunk) 'mumamo-comment-mode))
+        (setcar (nthcdr 2 chunk) mumamo-asp-default-major))
+      chunk)))
 
 ;;;; asp <script ...>
 
@@ -2067,7 +2349,8 @@ POS is where to start search and MIN is where to stop."
       ;;"/"
       ;;(or "javascript" "ecmascript")
       ;; "text/javascript"
-      (or "javascript" "vbscript")
+      (submatch
+       (or "javascript" "vbscript"))
       ?\"
       (0+ (not (any ">")))
       ">"
@@ -2085,16 +2368,40 @@ POS is where to start search and MIN is where to stop."
         exc-start
         lang)
     (when marker-start
-      (when (looking-at mumamo-script-tag-start-regex)
+      (when (looking-at mumamo-asp-script-tag-start-regex)
         (setq lang (downcase (match-string-no-properties 1)))
         (cond
          ((string= lang "javascript")
           (setq exc-mode 'asp-js-mode))
-         )
-        (setq exc-start (match-end 0))
-        (goto-char exc-start)
-        (when (<= exc-start pos)
-          (cons (point) exc-mode))
+         ((string= lang "vbscript")
+          (setq exc-mode 'asp-vb-mode))))
+      (setq exc-start (match-end 0))
+      (goto-char exc-start)
+      (when (<= exc-start pos)
+        (cons (point) exc-mode))
+      )))
+
+(defun mumamo-asp-search-fw-exc-start-inlined-script (pos max)
+  "Helper for `mumamo-chunk-inlined-script'.
+POS is where to start search and MAX is where to stop."
+  (goto-char (1+ pos))
+  (skip-chars-backward "^<")
+  ;; Handle <![CDATA[
+  (when (and
+         (eq ?< (char-before))
+         (eq ?! (char-after))
+         (not (bobp)))
+    (backward-char)
+    (skip-chars-backward "^<"))
+  (unless (bobp)
+    (backward-char 1))
+  (let ((exc-start (search-forward "<script" max t))
+        exc-mode)
+    (when exc-start
+      (goto-char (- exc-start 7))
+      (when (looking-at mumamo-asp-script-tag-start-regex)
+        (goto-char (match-end 0))
+        (point)
         ))))
 
 (defun mumamo-asp-chunk-inlined-script (pos min max)
@@ -2103,7 +2410,7 @@ See `mumamo-find-possible-chunk' for POS, MIN and MAX."
   (mumamo-find-possible-chunk pos min max
                               'mumamo-asp-search-bw-exc-start-inlined-script
                               'mumamo-search-bw-exc-end-inlined-script
-                              'mumamo-search-fw-exc-start-inlined-script
+                              'mumamo-asp-search-fw-exc-start-inlined-script
                               'mumamo-search-fw-exc-end-inlined-script))
 
 ;;;###autoload
@@ -2111,7 +2418,7 @@ See `mumamo-find-possible-chunk' for POS, MIN and MAX."
   "Turn on multiple major modes for ASP with main mode `html-mode'.
 This also covers inlined style and javascript."
   ("ASP Html Family" html-mode
-   (mumamo-chunk-asp
+   (mumamo-chunk-asp%
     mumamo-asp-chunk-inlined-script
     mumamo-chunk-inlined-script
     mumamo-chunk-style=
@@ -2129,7 +2436,54 @@ This also covers inlined style and javascript."
 (defun mumamo-chunk-org-html (pos min max)
   "Find #+BEGIN_HTML ... #+END_HTML, return range and `html-mode'.
 See `mumamo-find-possible-chunk' for POS, MIN and MAX."
-  (mumamo-quick-static-chunk pos min max "#+BEGIN_HTML" "#+END_HTML" t 'html-mode t))
+  (mumamo-quick-static-chunk pos min max "#+BEGIN_HTML" "#+END_HTML" nil 'html-mode nil))
+
+
+(defun mumamo-search-bw-org-src-start (pos min)
+  "Helper for `mumamo-chunk-org-src'.
+POS is where to start search and MIN is where to stop."
+  (let* ((exc-start (mumamo-chunk-start-bw-str pos min "#+BEGIN_SRC"))
+         (exc-mode (when exc-start
+                     (let ((here (point)))
+                       (goto-char exc-start)
+                       (prog1
+                           (read (current-buffer))
+                         (goto-char here))))))
+    ;;(setq exc-mode (eval exc-mode))
+    ;;(setq exc-mode 'text-mode)
+    ;;(when exc-mode (setq exc-mode (quote exc-mode)))
+    ;;(assert (eq exc-mode 'emacs-lisp-mode) t)
+    (when exc-start
+      (when (<= exc-start pos)
+        (cons exc-start exc-mode)))))
+
+(defun mumamo-search-bw-org-src-end (pos min)
+  "Helper for `mumamo-chunk-org-src'.
+POS is where to start search and MIN is where to stop."
+  (mumamo-chunk-end-bw-str pos min "#+END_SRC"))
+
+(defun mumamo-search-fw-org-src-start (pos max)
+  "Helper for `mumamo-chunk-org-src'.
+POS is where to start search and MAX is where to stop."
+  (mumamo-chunk-start-fw-str pos max "#+BEGIN_SRC"))
+
+(defun mumamo-search-fw-org-src-end (pos max)
+  "Helper for `mumamo-chunk-org-src'.
+POS is where to start search and MAX is where to stop."
+  (save-match-data
+    (mumamo-chunk-end-fw-str pos max "#+END_SRC")))
+
+(defun mumamo-chunk-org-src (pos min max)
+  "Find #+BEGIN_SRC ... #+END_SRC, return range and choosen major mode.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX.
+
+See Info node `(org) Literal Examples' for how to specify major
+mode."
+  (mumamo-find-possible-chunk pos min max
+                              'mumamo-search-bw-org-src-start
+                              'mumamo-search-bw-org-src-end
+                              'mumamo-search-fw-org-src-start
+                              'mumamo-search-fw-org-src-end))
 
 ;;;###autoload
 (define-mumamo-multi-major-mode org-mumamo-mode
@@ -2138,6 +2492,7 @@ Unfortunately this only allows `html-mode' (not `nxhtml-mode') in
 sub chunks."
     ("Org Mode + Html" org-mode
      (mumamo-chunk-org-html
+      mumamo-chunk-org-src
       )))
 
 
@@ -2428,6 +2783,86 @@ This also covers inlined style and javascript."
     mumamo-chunk-style=
     mumamo-chunk-onjs=
     )))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; XSL
+
+(define-mumamo-multi-major-mode xsl-nxml-mumamo-mode
+  "Turn on multi major mode for XSL with main mode `nxml-mode'.
+This also covers inlined style and javascript."
+  ("XSL HTML Family" nxml-mode
+   (
+    mumamo-chunk-inlined-style
+    mumamo-chunk-inlined-script
+    )))
+
+(define-mumamo-multi-major-mode xsl-sgml-mumamo-mode
+  "Turn on multi major mode for XSL with main mode `sgml-mode'.
+This also covers inlined style and javascript."
+  ("XSL SGML Family" sgml-mode
+   (
+    mumamo-chunk-inlined-style
+    mumamo-chunk-inlined-script
+    )))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Markdown
+
+(defun mumamo-chunk-markdown-html-1 (pos min max)
+  (save-restriction
+    (goto-char pos)
+    (narrow-to-region (or min (point)) (or max (point-max)))
+    (save-match-data
+      (let ((here (point)))
+        (when (re-search-forward (rx (* space)
+                                     (submatch "<")
+                                     (* (any "a-z"))
+                                     (or ">" (any " \t\n")))
+                                 nil t)
+          (let ((beg (match-beginning 1))
+                (end))
+            (goto-char beg)
+            (condition-case err
+                (progn
+                  (while (not (sgml-skip-tag-forward 1)))
+                  (setq end (point)))
+              (error (message "mumamo-chunk-markdown-html-1: %s" err)))
+            (goto-char here)
+            (when (and beg end)
+              (cons beg end))))))))
+
+(defun mumamo-chunk-markdown-html-fw-exc-fun (pos max)
+  (let ((beg-end (mumamo-chunk-markdown-html-1 pos nil max)))
+    (cdr beg-end)))
+
+(defun mumamo-chunk-markdown-html (pos min max)
+  "Find a chunk of html code in `markdown-mode'.
+Return range and `html-mode'.
+See `mumamo-find-possible-chunk' for POS, MIN and MAX."
+  (let ((beg-end (mumamo-chunk-markdown-html-1 pos nil max)))
+    (when beg-end
+      (let ((beg (car beg-end))
+            (end (cdr beg-end)))
+        (list beg end 'html-mode
+              nil ;; borders
+              nil ;; parseable y
+              'mumamo-chunk-markdown-html-fw-exc-fun
+              nil ;; find-borders fun
+              )))))
+
+(define-mumamo-multi-major-mode markdown-html-mumamo-mode
+  "Turn on multi major markdown mode in buffer.
+Main major mode will be `markdown-mode'.
+Inlined html will be in `html-mode'.
+
+You need `markdown-mode' which you can download from URL
+`http://jblevins.org/projects/markdown-mode/'."
+  ("Markdown HTML Family" markdown-mode
+   (
+    mumamo-chunk-markdown-html
+    )))
+
 
 
 (provide 'mumamo-fun)

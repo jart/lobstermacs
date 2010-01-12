@@ -115,9 +115,16 @@ prevent use of them."
 (defsubst majmodpri-priority (mode)
   "Return major mode MODE priority."
   (if (and majmodpri-no-nxml
-           (symbolp mode)
-           (save-match-data
-             (string-match "nxhtml-mumamo" (symbol-name mode))))
+           ;; (symbolp mode)
+           ;; (save-match-data
+           ;;   (string-match "nxhtml-mumamo" (symbol-name mode))))
+           (let* ((real (or (ourcomments-indirect-fun mode)
+                            mode))
+                  (chunk (when real (get real 'mumamo-chunk-family)))
+                  (major-mode (when chunk
+                                (cadr chunk))))
+             (when major-mode
+               (derived-mode-p 'nxml-mode))))
       0
     (length (memq mode majmodpri-mode-priorities))))
 
@@ -228,13 +235,16 @@ in buffers."
 
 (defun majmodpri-check-normal-mode ()
   "Like `normal-mode', but keep major mode if same."
-  (let ((old-major-mode major-mode)
+  (let ((keep-mode-if-same t)
+        (old-major-mode major-mode)
         (old-mumamo-multi-major-mode (when (boundp 'mumamo-multi-major-mode)
                                        mumamo-multi-major-mode)))
     (report-errors "File mode specification error: %s"
       (set-auto-mode t))
+    ;;(msgtrc "majmodpri-check %s %s %s" (current-buffer) major-mode mumamo-multi-major-mode)
     (unless (and (eq old-major-mode major-mode)
                  (eq old-mumamo-multi-major-mode mumamo-multi-major-mode))
+      ;;(msgtrc "majmodpri-check changing")
       (report-errors "File local-variables error: %s"
         (hack-local-variables))
       ;; Turn font lock off and on, to make sure it takes account of

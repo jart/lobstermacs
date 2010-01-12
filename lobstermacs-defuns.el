@@ -7,6 +7,16 @@
 unhelpful noise in *Messages*"
   (message (concat "\n*** WARNING: " msg "\n")))
 
+(defun lob/strip (s)
+  (if (string-match "^[ \t]*\\([^ \t]*\\)[ \t]*$" s)
+      (match-string 1 s)
+    s))
+
+(defun lob/highlighted-text ()
+  (if mark-active
+      (buffer-substring-no-properties (region-beginning)
+                                      (region-end))))
+
 (defun turn-on-company ()
   (company-mode t))
 

@@ -7,10 +7,29 @@
 ;; what a particular function does.  If that doesn't work try using
 ;; `C-h a` to search for a name.
 
-;; Resources:
-;;  http://steve-yegge.blogspot.com/2008_01_01_archive.html
-;;  http://www.emacswiki.org/cgi-bin/emacs-en?CategoryCode
-;;  http://cl-cookbook.sourceforge.net/strings.html
+;;; Resources
+;; * http://steve-yegge.blogspot.com/2008_01_01_archive.html
+;; * http://www.emacswiki.org/cgi-bin/emacs-en?CategoryCode
+;; * http://cl-cookbook.sourceforge.net/strings.html
+
+;;; Cool Stuff
+;; * \\[simple.el] has a lot of great stuff
+
+
+;; LIST COMPREHENSION
+;;
+;; Create a list:
+;;   Python: [x for x in range(5)]
+(loop for x to 4 collect x)
+(loop for x from 0 to 4 collect x)
+(reverse (loop for x from 4 downto 0 collect x))
+;; Filter/Grep a list to even numbers:
+;;   Python: [x for x in range(10) if x % 2 == 0]
+(loop for x to 9 if (evenp x) collect x)
+;; Map a list to a function:
+;;   Python: [sys.stdout.write(x) for x in range(5)]
+(loop for x in '(0 1 2 3 4) do (insert (int-to-string x)))
+
 
 (setq debug-on-error t)
 (message "hello kitty")
@@ -46,6 +65,11 @@
 (eval '(+ 2 2 2))
 (apply '+ '(2 2 2))
 
+(setq ido-execute-command-cache nil)
+(mapatoms (lambda (s)
+            (when (commandp s)
+              (setq ido-execute-command-cache
+                    (cons (format "%S" s) ido-execute-command-cache)))))
 
 ;; user input
 (defun asker (name)
@@ -201,14 +225,50 @@ nil
 
 ;; strings
 ;; Do M-x apropos RET \bstring\b RET to see a list of functions related to strings.
-(substring "hello" 0 1)
-(substring "hello" 1 2)
+(length "hello")
+(substring "hello" 0 1) ;; first char
+(substring "hello" 1 2) ;; second char
+(substring "hello" (- (length "hello") 1) (length "hello")) ;; last char
+
+(string-match  "while")
+
+;; determines if substring exists, and at what position
 (string-match "h" "hello")
 (string-match "ell" "hello")
+(string-match "Z" "hello")
 ;; this uses regular expressions so be careful
+(string-match "^hello$" "hello")
+(string-match "^hello$" "hello ")
 (string-match "o$" "hello")
 (string-match "ll$" "hello")
 (string-match "CODE" (buffer-name (current-buffer)))
+;; escaping is weird, both seem to work for me
+(string-match "\[a-z\]" "123 hello")
+(string-match "[a-z]" "123 hello")
+(string-match "^[-a-z][-rwx]+[ \t\n]*" "drwxr-xr-x 15 jart jart  4096 2009-10-10 12:22 elpa")
+;; they're not perl compatible!!! argh
+(string-match "^[-_[:alnum:]]+$" "J-o-E")
+;; simple whitespace test
+(string-match "^[ \t]*$" "  \t  ")
+
+;; something crazy
+(let ((lsregex (concat "^"
+                       "[^ ]+ +"                 ;; file mode
+                       "[^ ]+ +"                 ;; some weird number
+                       "\\([-_[:alnum:]]+\\) +"  ;; 1. owner
+                       "\\([-_[:alnum:]]+\\) +"  ;; 2. group
+                       "\\([-_.[:alnum:]]+\\) +" ;; 3. size
+                       "\\([-0-9]+\\) +"         ;; 4. date
+                       "\\([:0-9]+\\) +"         ;; 5. time
+                       "\\(.+\\)"                ;; 6. file
+                       "$"))
+      (line "drwxr-xr-x  7 jart jart 4.0K 2008-04-21 20:20 Alanis Morissette"))
+  (if (string-match lsregex line)
+      (let ((owner (match-string 1 line))
+            (size (match-string 3 line))
+            (file (match-string 6 line)))
+        (message (format "%s owns file %s of size %s" owner file size)))))
+;; replacing with regexps!
 (replace-regexp-in-string " " "-" "is this the place i used to call fatherland")
 (split-string "war,is,peace" ",")
 (downcase "OMG what you know about Emacs dawg?")
@@ -216,7 +276,9 @@ nil
 (capitalize "bob dole")
 ;; join list of strings
 (mapconcat 'identity (list "hello" "little" "kitty") "__")
+(mapconcat 'symbol-name '(hello little kitty) "\\|")
 (split-string "war,is,peace" ",")
+
 
 ;; type checking
 (null nil)
@@ -232,11 +294,22 @@ nil
 ;; is function declared?
 (fboundp 'message)
 
+;; represent any term as a string
+(format "%S" (list "hi" 'bob))
+
+;; trim(), strip(), etc.
+(defun trim (s)
+  (if (string-match "^[ \t]*\\([^ \t]*\\)[ \t]*$" s)
+      (match-string 1 s)
+    s))
+(trim "  hello ")
+
 ;; type-casting
 (intern "hello")      ;; string -> atom
 (make-symbol "hello") ;; string -> atom
 (symbol-name 'hi)     ;; atom -> string
 (eval `(,(intern "message") "take THAT moon code"))
+;; converting types
 (number-to-string 256)
 (string-to-number "256")
 
@@ -278,11 +351,16 @@ nil
                                   (doctor)
                                   (message "omg you're so crazy")))
 
-
 ;; working with files
 (file-exists-p "/tmp")
 (expand-file-name "../../../etc/passwd")
 (file-name-extension "/the/dir/filez.pdf")
+(file-name-as-directory "/etc/passwd")
+;; basename (sort of)
+(file-name-nondirectory "/etc/lol/passwd")
+(file-name-nondirectory "/etc/lol/passwd/")
+;; strip trailing slash
+(directory-file-name "/etc/passwd/")
 
 
 ;; running shell commands
@@ -296,7 +374,7 @@ nil
        (insert "Enjoy your command results!!\n"))
 
 
-;; working with lists like arrays
+;; working with lists (like you would with arrays)
 (length (list 1 2 3))
 (nth 0 (list 6 7 8))
 (nth 2 (list 6 7 8))
@@ -316,6 +394,8 @@ nil
 (last '(2 3 4 5 6))
 (butlast '(2 3 4 5 6))
 ;; put them back together
+(cons 'lol nil)
+(cons 'lol ())
 (cons '+ '(2 2))
 ;; glue two lists together
 (append (list 1 2) (list 3 4))
@@ -326,6 +406,13 @@ nil
 (setq mylist (list 6 7 8))
 (pop mylist)
 (push 6 mylist)
+;; variable scoping and let's use cdr+car+cons to reverse!
+(setq nums '(1 2 3 4 5 6 7 8 9 10))
+(let ((nums nums) x new)
+  (while (set 'x (car nums))
+    (set 'nums (cdr nums))
+    (set 'new (cons x new)))
+  new)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -383,19 +470,23 @@ nil
 
 (sort (list 2 3 4 5) '<)
 ;; sum
-
 (reduce #'+ (list 2 3 4 5))
 (reduce '+ (list 2 3 4 5) :initial-value 20)
 
+(setq dog #'(lambda (x) (insert (car x))))
+(mapl dog '("hi" "there" "yo"))
+
 ;; map (doubler)
 (mapcar (lambda (x) (* x 2)) (list 2 3 4 5))
-
+(comprehend)
 ;; flatten list
 (nconc (list  "hi" "there") (list  "yo" "yo"))
 (mapcar (lambda (x) (list "-f" x)) (list "file1" "file2" "file3"))
 (mapcan (lambda (x) (list "-f" x)) (list "file1" "file2" "file3"))
 (eval (cons 'concat (mapcan (lambda (x) (list "-f" x)) (list "file1" "file2" "file3"))))
 (mapconcat (lambda (x) (concat "-f " x)) (list "file1" "file2" "file3") " ")
+
+
 
 
 (defun factorial (x)

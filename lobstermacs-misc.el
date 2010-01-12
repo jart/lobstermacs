@@ -12,29 +12,40 @@
       require-final-newline t
       hg-outgoing-repository "default")
 
+;; we don't want flyspell for certain modes
+(add-hook 'dns-mode-hook 'turn-off-flyspell)
+
+;; DISABLED because it's irritating/astonishing to not be able to use
+;; the terminal's copy/paste feature
+
 ;; lets you use the mouse in terminal mode.  seems to be a bug using
 ;; this on read-only buffers.  also highlighting doesn't take effect
 ;; until you let go of the mouse :\  ALSO this highlighting doesn't
-;; seem to work when editing lisp files
-(when (not window-system)
-  (xterm-mouse-mode t))
-
-;; Line numbers are cool but you can always have too much of a good
-;; thing.  Disable `linum-on` so it doesn't apply to popup buffers
-;; starting with '*' like `*Ido Completions*` and `*Help*`.  We're not
-;; going to bother with this on 4-bit terminals.
+;; seem to work when editing lisp files.
 ;;
-;; BUG: flaky with company completion popups
-(when (and (fboundp 'global-linum-mode)
-           lob/is-colorful)
-  (global-linum-mode 1)
-  ;; in terminal there's no gutter, so give a little space
-  (if (not window-system)
-      (setq linum-format 'lob/linum-format-with-space)))
-(defun linum-on ()
-  (unless (or (minibufferp)
-              (string-match "^\*" (buffer-name (current-buffer))))
-    (linum-mode 1)))
+;; (when (not window-system)
+;;   (xterm-mouse-mode t))
+
+;; DISABLED because it's buggy and seemed to make emacs flicker like
+;; you wouldn't believe on a computer with a cheap monitor and
+;; graphics card.
+
+;; ;; Line numbers are cool but you can always have too much of a good
+;; ;; thing.  Disable `linum-on` so it doesn't apply to popup buffers
+;; ;; starting with '*' like `*Ido Completions*` and `*Help*`.  We're not
+;; ;; going to bother with this on 4-bit terminals.
+;; ;;
+;; ;; BUG: flaky with company completion popups
+;; (when (and (fboundp 'global-linum-mode)
+;;            lob/is-colorful)
+;;   (global-linum-mode 1)
+;;   ;; in terminal there's no gutter, so give a little space
+;;   (if (not window-system)
+;;       (setq linum-format 'lob/linum-format-with-space)))
+;; (defun linum-on ()
+;;   (unless (or (minibufferp)
+;;               (string-match "^\*" (buffer-name (current-buffer))))
+;;     (linum-mode 1)))
 
 ;; tiny scroll bars in minibuffer is silly
 (set-window-scroll-bars (minibuffer-window) nil)
@@ -69,6 +80,16 @@
               (concat "#" (file-name-nondirectory buffer-file-name) "#")
             (expand-file-name
              (concat "#%" (buffer-name) "#")))))
+
+;; trying to make shell suck less
+(setq ansi-color-names-vector ; better contrast colors
+      ["black" "red4" "green4" "yellow4"
+       "blue3" "magenta4" "cyan4" "white"])
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(add-hook 'shell-mode-hook '(lambda () (toggle-truncate-lines 1)))
+(setq comint-prompt-read-only t)
+(autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
 (provide 'lobstermacs-misc)
 ;;; lobstermacs-misc.el ends here

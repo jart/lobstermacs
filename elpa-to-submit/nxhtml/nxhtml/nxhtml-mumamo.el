@@ -154,6 +154,8 @@ This also covers inlined style and javascript."
   ("Genshi HTML Family" nxhtml-genshi-mode
    (mumamo-chunk-genshi%
     mumamo-chunk-genshi$
+    mumamo-chunk-py:=
+    mumamo-chunk-py:match
     mumamo-chunk-xml-pi
     mumamo-chunk-alt-php
     mumamo-chunk-inlined-style
@@ -212,7 +214,27 @@ This also covers inlined style and javascript."
 This also covers inlined style and javascript."
   ("Smarty nXhtml Family" nxhtml-mode
    (mumamo-chunk-xml-pi
+    mumamo-chunk-style=
+    mumamo-chunk-onjs=
+    ;;mumamo-chunk-inlined-style
+    ;;mumamo-chunk-inlined-script
+    mumamo-chunk-smarty-literal
+    mumamo-chunk-smarty-t
+    mumamo-chunk-smarty-comment
     mumamo-chunk-smarty
+    )))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; GSP
+
+;;;###autoload
+(define-mumamo-multi-major-mode gsp-nxhtml-mumamo-mode
+  "Turn on multiple major modes for GSP with main mode `nxhtml-mode'.
+This also covers inlined style and javascript."
+  ("GSP nXhtml Family" nxhtml-mode
+   (mumamo-chunk-gsp
+    mumamo-chunk-inlined-style
+    mumamo-chunk-inlined-script
     mumamo-chunk-style=
     mumamo-chunk-onjs=
     )))
@@ -249,7 +271,7 @@ This also covers inlined style and javascript."
   "Turn on multiple major modes for ASP with main mode `nxhtml-mode'.
 This also covers inlined style and javascript."
   ("ASP nXhtml Family" nxhtml-mode
-   (mumamo-chunk-asp
+   (mumamo-chunk-asp%
     mumamo-asp-chunk-inlined-script
     mumamo-chunk-inlined-script
     mumamo-chunk-style=

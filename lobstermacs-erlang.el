@@ -79,6 +79,7 @@
     (add-to-list 'load-path (concat dotfiles-dir "/vendor/distel/elisp"))
     (require 'distel)
     (distel-setup)
+    (add-hook 'erlang-mode-hook 'run-coding-hook)
     (add-hook 'erlang-mode-hook 'erlang-setup-default-shell)
     (add-hook 'erlang-mode-hook 'sanitize-erlang-mode)
     (add-hook 'erlang-shell-mode-hook 'sanitize-erlang-shell-mode)))

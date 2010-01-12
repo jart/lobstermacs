@@ -25,6 +25,9 @@
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/jabber"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml/util"))
+(if (>= emacs-major-version 23)
+    (load (expand-file-name (concat dotfiles-dir "/elpa-to-submit/nxhtml/autostart.el")))
+  (load (expand-file-name (concat dotfiles-dir "/elpa-to-submit/nxhtml/autostart22.el"))))
 
 (setq autoload-file (concat dotfiles-dir "loaddefs.el"))
 (setq package-user-dir (concat dotfiles-dir "elpa"))
@@ -33,6 +36,7 @@
 ;; until they fix the elpa package thing
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
 (autoload 'company-mode "company" nil t)
+
 
 ;; Load these earlier, they contain important system checks and gui
 ;; changes
@@ -77,10 +81,10 @@
 (require 'starter-kit-js)
 
 ;; lobstermacs stuff
-(require 'ourcomments-util)
 (require 'lobstermacs-ido)
 (require 'lobstermacs-c)
 (require 'lobstermacs-rst)
+(require 'lobstermacs-html)
 (require 'lobstermacs-lisp)
 (require 'lobstermacs-python)
 (require 'lobstermacs-erlang)
