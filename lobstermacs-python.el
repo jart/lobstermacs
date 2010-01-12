@@ -8,8 +8,8 @@
      (define-key python-mode-map (kbd "<return>") 'newline-and-indent)
      (define-key python-mode-map (kbd "C-x C-e") 'lob/python-eval)
      (define-key lisp-mode-shared-map (kbd "C-c l") "lambda")
-     (add-hook 'python-mode-hook 'run-coding-hook)
-     (add-hook 'python-mode-hook 'idle-highlight)))
+     ;; (add-hook 'python-mode-hook 'idle-highlight)
+     (add-hook 'python-mode-hook 'run-coding-hook)))
 
 
 (defun lob/python-eval (&optional code)
