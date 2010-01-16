@@ -8,12 +8,12 @@ Lobstermacs is intended for professional computer programmers.
 Lobstermacs is one of my personal hobby projects.  This is pre-alpha
 software so let the user beware.
 
-The long goals are:
+## The Long-Term Goals
 
-# Python support...  Really, really good Python support.
-# Make Emacs friendlier to human beings.
+- Python support...  Really, really good Python support.
+- Make Emacs friendlier to human beings.
 
-What *unique* features have been written so far?
+## What *Unique* Features Have Been Written So Far?
 
 - Interactive Python programming.  `C-x C-e` and `C-c v` now work just
   as well for Python as they do for Emacs Lisp.  This is a more
