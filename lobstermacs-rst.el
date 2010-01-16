@@ -8,11 +8,11 @@
 (eval-after-load 'rst
   '(progn
      (add-hook 'rst-adjust-hook 'rst-toc-update)
-     (define-key rst-mode-map (kbd "C-c 4") 'rst-preview-pdf)
-     (define-key rst-mode-map (kbd "C-c 5") 'rst-preview-pdf-latex)
-     (define-key rst-mode-map (kbd "C-c 6") 'rst-preview-html)))
+     (define-key rst-mode-map (kbd "C-c 4") 'lob/rst-preview-pdf)
+     (define-key rst-mode-map (kbd "C-c 5") 'lob/rst-preview-pdf-latex)
+     (define-key rst-mode-map (kbd "C-c 6") 'lob/rst-preview-html)))
 
-(defun rst-preview-html ()
+(defun lob/rst-preview-html ()
   (interactive)
   (let ((out-file (concat temporary-file-directory "rst2html_output.html")))
     (if (= 0 (shell-command (format "rst2html %s %s" buffer-file-name out-file)))
@@ -21,7 +21,7 @@
                     "Try this:\n"
                     "  sudo apt-get install python-docutils")))))
 
-(defun rst-preview-pdf ()
+(defun lob/rst-preview-pdf ()
   "Takes the current restructured text buffer, generates a PDF
 with the very excellent rst2pdf program which typesets with
 ReportLab instead of TeX, and then displays that PDF file either
@@ -47,7 +47,7 @@ TODO: Look for a sheet file like /usr/share/doc/rst2pdf/examples/montecristo/mon
                       "-or-"
                       "  sudo apt-get install rst2pdf"))))))
 
-(defun rst-preview-pdf-latex ()
+(defun lob/rst-preview-pdf-latex ()
   "Takes the current restructured text buffer, generates a
 beautiful PDF file with LaTeX typesetting, and then displays that
 PDF file either inside emacs or in your web browser."
