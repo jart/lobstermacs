@@ -422,6 +422,13 @@ static char *gnus-pointer[] = {
      '(apt-utils-broken
        ((t (:inherit font-lock-warning))))
 
+     ;; jart: make html NOT BLUE!!!
+     '(mumamo-background-chunk-major ((((class color) (min-colors 88) (background dark)) nil)))
+     '(mumamo-background-chunk-submode1 ((((class color) (min-colors 88) (background dark)) nil)))
+     '(mumamo-background-chunk-submode2 ((((class color) (min-colors 88) (background dark)) nil)))
+     '(mumamo-background-chunk-submode3 ((((class color) (min-colors 88) (background dark)) nil)))
+     '(mumamo-background-chunk-submode4 ((((class color) (min-colors 88) (background dark)) nil)))
+
      '(breakpoint-enabled-bitmap ((t (:inherit zenburn-primary-1))))
      '(breakpoint-disabled-bitmap ((t (:inherit font-lock-comment))))
 
