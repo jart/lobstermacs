@@ -32,7 +32,6 @@
 (add-to-list 'auto-mode-alist '("\\.xslt$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
 (add-to-list 'auto-mode-alist '("\\.hrl\\'" . erlang-mode))
-(add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
 (add-to-list 'auto-mode-alist '("\\.rst$" . rst-mode))
 (add-to-list 'auto-mode-alist '("\\.\(net|com|org|info|us\).db$" . zone-mode))
 (add-to-list 'auto-mode-alist '("bind/db\\." . zone-mode))

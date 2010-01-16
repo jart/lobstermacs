@@ -3,10 +3,12 @@
 ;; Part of Lobstermacs.
 
 
+(add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
 (eval-after-load 'python
   '(progn
      (define-key python-mode-map (kbd "<return>") 'newline-and-indent)
      (define-key python-mode-map (kbd "C-x C-e") 'lob/python-eval)
+     (define-key python-mode-map (kbd "C-c v") 'lob/python-eval-file)
      (define-key python-mode-map [f10] 'lob/python-eval-file)
      (define-key python-mode-map (kbd "C-<f10>") 'lob/python-eval-file-in-thread)
      (define-key lisp-mode-shared-map (kbd "C-c l") "lambda")
