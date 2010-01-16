@@ -4,9 +4,9 @@ A friendly fork of Emacs Starter Kit.
 
 ![ScreenShot](http://lobstertech.com/media/misc/starter-kit.png)
 
-Lobstermacs is intended for professional computer programmers.
-Lobstermacs is one of my personal hobby projects.  This is pre-alpha
-software so let the user beware.
+Lobstermacs is intended for professional computer programmers.  This
+is pre-alpha software and a hobby project with one developer so let
+the user beware.
 
 ## The Long-Term Goals
 
@@ -27,5 +27,7 @@ software so let the user beware.
 - Restructured Text Previewing.  See `lob/rst-preview-html`,
   `lob/rst-preview-pdf` and `lob/rst-preview-pdf-latex`.
 
-- Made "zenburn" color scheme fix some of the crazy color schemes that
-  ship with certain third-party libraries.
+- Made "zenburn" theme fix some of the crazy color schemes that ship
+  with certain third-party libraries.
+
+- `F3` will re-open current buffer with sudo permissions.
