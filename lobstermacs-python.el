@@ -14,6 +14,44 @@
      (add-hook 'python-mode-hook 'run-coding-hook)))
 
 
+(defcustom lobstermacs-python-output-buffer "*python-output*"
+  "When you evaluate Python code using `lob/python-eval',
+anything your code prints will be sent to this buffer."
+  :group 'lobstermacs-python
+  :type 'string)
+
+
+(defun lob/strip-pymacs-messages (data)
+  "Removes Pymacs frames from a string.
+
+This was written so we can extract the printed output of a Python
+script from the Pymacs buffer without all the noise of Pymacs
+chatting with the Python process.
+
+(lob/strip-pymacs-messages
+ \"<17	(version \\\"0.23\\\")
+hello
+>45	eval pymacs_load_helper(\\\"ropemacs\\\", \\\"rope-\\\")
+world\")
+  => \"hello\\nworld\"
+"
+  (let ((frame-start (string-match "^\\([><]\\([0-9]+\\)\t\\)" data)))
+    (if frame-start
+        (let ((frame-length (+ (length (match-string 1 data))
+                               (string-to-number (match-string 2 data)))))
+          (concat (substring data 0 frame-start)
+                  (lob/strip-pymacs-messages
+                   (substring data (+ frame-start frame-length) (length data)))))
+      data)))
+
+
+(defun lob/split-lines-no-blanks (data)
+  "Split a string into a list of lines, removing blank lines"
+  (loop for l in (split-string data "\n")
+        if (string-match "[^ \t]" l)
+        collect l))
+
+
 (defun lob/python-eval (&optional code)
   "Evaluate or Load Python Code into Emacs
 
@@ -24,6 +62,8 @@ Where the code comes from, ordered by priority:
   3. Python statement or expression under cursor
   4. Ask user inside mini-buffer
 
+Program output will be shown in `lobstermacs-python-output-buffer'.
+
 This provides a simpler user interface to the `pymacs-eval' and
 `pymacs-exec' functions.
 
@@ -33,16 +73,49 @@ requests (unless you call `pymacs-terminate-services'.)
   (interactive)
   (if (not (fboundp 'textwrap-dedent))
       (pymacs-load "textwrap" "textwrap-"))
+  ;; get the code string itself
   (let ((code (or code
                   (lob/highlighted-text)
                   (lob/current-python-statement)
                   (read-string "Python expression? "))))
-    (let ((result (if (lob/is-python-expression code)
-                      (pymacs-eval code)
-                    (pymacs-exec (textwrap-dedent code)))))
-      (if (interactive-p)
-          (message "%S" result))
-      result)))
+    ;; determine if we should use eval or exec
+    (let* ((my-eval 'pymacs-eval)
+           (my-exec '(lambda (code) (pymacs-exec (textwrap-dedent code))))
+           (func-to-use (if (lob/is-python-expression code) my-eval my-exec)))
+      ;; run the code
+      (let ((before-output-pos (if (interactive-p)
+                                   (save-excursion
+                                     (set-buffer "*Pymacs*")
+                                     (end-of-buffer)
+                                     (beginning-of-line)
+                                     (point))))
+            (result (funcall func-to-use code)))
+        ;; if a human ran me...
+        (if (interactive-p)
+            (let ((output (lob/split-lines-no-blanks
+                           (lob/strip-pymacs-messages
+                            (save-excursion
+                              (set-buffer "*Pymacs*")
+                              (buffer-substring-no-properties before-output-pos
+                                                              (point-max)))))))
+              ;; send printed output to a special buffer
+              (if output
+                  (save-excursion
+                    (set-buffer (get-buffer-create lobstermacs-python-output-buffer))
+                    (end-of-buffer)
+                    (loop for line in output
+                          do (insert (concat line "\n")))))
+              ;; if we used eval() show result in minibuf
+              (if (equal func-to-use my-eval)
+                  (message "Result: %S" result)
+                ;; if we used exec() show the last few lines
+                (if output
+                    (message (concat
+                              (if (> (length output) 10)
+                                  (format "%d lines truncated (See %s buffer)\n[...]\n"
+                                          (- (length output) 10) lobstermacs-python-output-buffer))
+                              (mapconcat 'identity (last output 10) "\n")))))))
+        result))))
 
 
 (defun lob/python-run (&optional filepath in_thread)
