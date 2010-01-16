@@ -7,8 +7,8 @@
   '(progn
      (define-key python-mode-map (kbd "<return>") 'newline-and-indent)
      (define-key python-mode-map (kbd "C-x C-e") 'lob/python-eval)
-     (define-key python-mode-map [f10] 'lob/python-run)
-     (define-key python-mode-map (kbd "C-<f10>") 'lob/python-run-in-thread)
+     (define-key python-mode-map [f10] 'lob/python-eval-file)
+     (define-key python-mode-map (kbd "C-<f10>") 'lob/python-eval-file-in-thread)
      (define-key lisp-mode-shared-map (kbd "C-c l") "lambda")
      ;; (add-hook 'python-mode-hook 'idle-highlight)
      (add-hook 'python-mode-hook 'run-coding-hook)))
@@ -118,7 +118,7 @@ requests (unless you call `pymacs-terminate-services'.)
         result))))
 
 
-(defun lob/python-run (&optional filepath in_thread)
+(defun lob/python-eval-file (&optional filepath in_thread)
   "Loads and Executes Python Script
 
 This is essentially the same as highlighting your entire buffer
@@ -151,10 +151,12 @@ finally: __name__ = 'Pymacs.pymacs'
 " path)))))
 
 
-(defun lob/python-run-in-thread (&optional filepath)
-  "Run your script with its own thread and namespace"
+(defun lob/python-eval-file-in-thread (&optional filepath)
+  "Same as `python-eval-file' except your code gets its own
+namespace and runs in the background so it won't freeze up
+emacs."
   (interactive)
-  (lob/python-run filepath t))
+  (lob/python-eval-file filepath t))
 
 
 (defun lob/is-python-expression (code)
