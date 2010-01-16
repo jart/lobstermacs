@@ -84,7 +84,6 @@
 (require 'lobstermacs-ido)
 (require 'lobstermacs-c)
 (require 'lobstermacs-rst)
-(require 'lobstermacs-html)
 (require 'lobstermacs-lisp)
 (require 'lobstermacs-python)
 (require 'lobstermacs-erlang)
