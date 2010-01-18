@@ -8,10 +8,12 @@ Lobstermacs is intended for professional computer programmers.  This
 is pre-alpha software and a hobby project with one developer so let
 the user beware.
 
-## The Long-Term Goals
+
+## Eventual Goal
 
 - Python support...  Really, really good Python support.
 - Make Emacs friendlier to human beings.
+
 
 ## What *Unique* Features Have Been Written So Far?
 
@@ -25,9 +27,36 @@ the user beware.
   needs polishing)
 
 - Restructured Text Previewing.  See `lob/rst-preview-html`,
-  `lob/rst-preview-pdf` and `lob/rst-preview-pdf-latex`.
+  `lob/rst-preview-pdf` and `lob/rst-preview-pdf-latex`.  Emacs seems
+  to have major issues viewing large PDF files.
 
 - Made "zenburn" theme fix some of the crazy color schemes that ship
   with certain third-party libraries.
 
 - `F3` will re-open current buffer with sudo permissions.
+
+
+## Installation
+
+- Ubuntu: `sudo apt-get install git-core emacs-snapshot emacs-snapshot-el ispell pymacs`
+- Mac: [Download Emacs 23 for Mac OS X](http://emacsformacosx.com/)
+- Windows: [Download Emacs 23 for Windows](http://ftp.gnu.org/pub/gnu/emacs/windows/emacs-23.1-bin-i386.zip)
+
+Initial Setup:
+
+    git clone git://github.com/jart/lobstermacs.git ~/.emacs.d
+    echo 'export TERM=xterm-256color' >>~/.bashrc
+    source ~/.bashrc
+    emacs-snapshot
+
+Upgrade:
+
+    cd ~/.emacs.d
+    git pull
+
+
+## Basic Usage
+
+- Put your personal Lisp stuff: `~/.emacs.d/$USER.el`
+- Emacs configuration settings are saved to: `~/.emacs.d/custom.el`
+- ELPA Package Manager `M-x package-list-packages`
