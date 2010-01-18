@@ -65,11 +65,10 @@
 ;; ".. -*-restructuredtext-*-" which emacs isn't going to understand
 ;; without this alias
 (defalias 'restructuredtext-mode 'rst-mode)
-
 ;; Save backups in one place Put autosave files (ie #foo#) in one
 ;; place, *not* scattered all over the file system!
 (defvar autosave-dir
-  (concat "/tmp/emacs_autosaves/" (user-login-name) "/"))
+  (expand-file-name "~/.lobstermacs/autosaves/"))
 (make-directory autosave-dir t)
 (defun auto-save-file-name-p (filename)
   (string-match "^#.*#$" (file-name-nondirectory filename)))
