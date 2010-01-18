@@ -71,6 +71,9 @@
 ;;     ;; Add distel-dir to the end of load-path
 ;;     (setq load-path (append load-path (list distel-dir)))))
 
+
+(add-to-list 'auto-mode-alist '("\\.erl\\'" . erlang-mode))
+(add-to-list 'auto-mode-alist '("\\.hrl\\'" . erlang-mode))
 (eval-after-load 'erlang
   '(progn
     (load "erlang_appwiz" t nil)
@@ -84,6 +87,7 @@
     (add-hook 'erlang-mode-hook 'sanitize-erlang-mode)
     (add-hook 'erlang-shell-mode-hook 'sanitize-erlang-shell-mode)))
 
+
 (defun sanitize-erlang-mode ()
   ;;(set-fill-column 78)
   (setq indent-tabs-mode nil)
@@ -94,10 +98,12 @@
   (define-key erlang-mode-map (kbd "M-?") 'erl-complete)
   (define-key erlang-mode-map (kbd "M-.") 'erl-find-source-under-point))
 
+
 (defun sanitize-erlang-shell-mode ()
   ;;(define-key erlang-shell-mode-map (kbd "M-/") 'erl-complete)
   (define-key erlang-shell-mode-map (kbd "M-?") 'erl-complete)
   (define-key erlang-shell-mode-map (kbd "M-.") 'erl-find-source-under-point))
+
 
 (defun erlang-setup-default-shell ()
   "Creates a new interactive erlang shell named 'emacs@yourhost'
@@ -124,6 +130,7 @@ Bug: Will fail if two emacsen are open using an erlang shell."
             (sleep-for 2) ; give it a little time to init
             (erl-ping (intern node-name)))))
     (setq inferior-erlang-machine-options oldopts)))
+
 
 (provide 'lobstermacs-erlang)
 ;;; lobstermacs-erlang.el ends here

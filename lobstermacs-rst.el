@@ -5,6 +5,13 @@
 (defcustom rst-rst2pdf-command "rst2pdf"
   "Command used to generate rst2pdf previews")
 
+;; ReST files from bitbucket in particular have the header
+;; ".. -*-restructuredtext-*-" which emacs isn't going to understand
+;; without this alias
+(defalias 'restructuredtext-mode 'rst-mode)
+
+(add-to-list 'auto-mode-alist '("\\.rst$" . rst-mode))
+
 (eval-after-load 'rst
   '(progn
      (add-hook 'rst-adjust-hook 'rst-toc-update)

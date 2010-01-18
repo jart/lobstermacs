@@ -97,20 +97,6 @@ we'll try evince, xpdf, and if all else fails we'll just throw it in the "
 ;; (macroexpand-all '(lob/safen-command paredit-close-parenthesis (insert ")")))
 ;; (paredit-close-parenthesis-safe)
 
-(defun paredit-close-parenthesis-safe ()
-  "How do you expect me to rebalance my parens if you won't let
-  me type omg!"
-  (interactive)
-  (lob/nevar-fail (paredit-close-parenthesis)
-                  (insert ")")))
-
-(defun paredit-close-parenthesis-and-newline-safe ()
-  "How do you expect me to rebalance my parens if you won't let
-  me type omg!"
-  (interactive)
-  (lob/nevar-fail (paredit-close-parenthesis-and-newline)
-                  (insert ")")))
-
 ;; credit: chris capel's emacs file
 (defun close-or-bury-window ()
   "Closes the open window or buries it if it's the only
@@ -137,9 +123,10 @@ open window.  Example:
       (delete-active-region)
     (delete-backward-char 1)))
 
-(defun sudo-edit-me ()
+(defun lob/sudo-edit (&optional path)
   (interactive)
-  (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name)))
+  (find-alternate-file
+   (concat "/sudo:root@localhost:" (or path buffer-file-name))))
 
 (defun lob/linum-format-with-space (line)
   "This is here because in terminal mode the fringe goes away,
