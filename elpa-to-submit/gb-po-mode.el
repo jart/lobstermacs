@@ -19,7 +19,7 @@
 
 ;;; Commentary:
 
-;; jart 2010-01-19: Grabbed from http://www.emacswiki.org/emacs/PoMode
+;; jart 2009-01-19: Made it autoload
 
 ;; This extension for po-mode does four things:
 ;;
@@ -42,10 +42,6 @@
 ;;   window is more like what you would expect.
 ;;
 ;; * Finally, the fuzzy mark on an entry is removed after a successful edit.
-
-;; Usage: just load this file after loading po-mode, e.g. with
-;;
-;;   (eval-after-load 'po-mode '(load "gb-po-mode"))
 
 ;;; Code:
 
@@ -185,3 +181,6 @@ If FORM is itself a string, then this string is used for insertion."
     (setq inhibit-read-only t)
     (remove-text-properties (1- (point-max)) (point-max) '(read-only t))
     (setq inhibit-read-only old-inhibit-read-only)))
+
+;;;###autoload
+(eval-after-load 'po-mode '(load "gb-po-mode"))

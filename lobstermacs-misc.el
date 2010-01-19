@@ -107,11 +107,6 @@
 ;; RHEL Style: /var/lib/named/something.com.db
 (add-to-list 'auto-mode-alist '("\\.\\(net\\|com\\|org\\|info\\|us\\).db$" . zone-mode))
 
-;; gettext Translation File Editing
-;; You need `po-mode': sudo apt-get install gettext-el
-(add-to-list 'auto-mode-alist '("\\.po$\\|\\.pot$" . po-mode))
-(eval-after-load 'po-mode '(load "gb-po-mode"))
-
 ;; DISABLED because it's irritating/astonishing to not be able to use
 ;; the terminal's copy/paste feature
 
