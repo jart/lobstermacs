@@ -38,7 +38,7 @@ the user beware.
 
 ## Installation
 
-- Ubuntu: `sudo apt-get install git-core emacs-snapshot emacs-snapshot-el ispell pymacs`
+- Ubuntu: `sudo apt-get install git-core emacs-snapshot emacs-snapshot-el ispell pymacs gettext-el`
 - Mac: [Download Emacs 23 for Mac OS X](http://emacsformacosx.com/)
 - Windows: [Download Emacs 23 for Windows](http://ftp.gnu.org/pub/gnu/emacs/windows/emacs-23.1-bin-i386.zip)
 
