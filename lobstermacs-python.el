@@ -2,7 +2,7 @@
 ;;
 ;; Part of Lobstermacs.
 
-
+;; (add-to-list 'completion-ignored-extensions ".blah")
 (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
 (eval-after-load 'python
   '(progn
@@ -11,6 +11,7 @@
      (define-key python-mode-map (kbd "C-c v") 'lob/python-eval-file)
      (define-key python-mode-map [f10] 'lob/python-eval-file)
      (define-key python-mode-map (kbd "C-<f10>") 'lob/python-eval-file-in-thread)
+     (define-key python-mode-map (kbd "M-/") 'hippie-expand)
      (define-key lisp-mode-shared-map (kbd "C-c l") "lambda")
      ;; (add-hook 'python-mode-hook 'idle-highlight)
      (add-hook 'python-mode-hook 'run-coding-hook)))
