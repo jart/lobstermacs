@@ -44,8 +44,9 @@
 (require 'lobstermacs-defuns)
 (require 'lobstermacs-system)
 ;; enable zenburn theme if we have 256+ colors
-(if (and lob/is-colorful (not (featurep 'zenburn)))
-  (require 'zenburn))
+(when (and lob/is-colorful (not (featurep 'zenburn)))
+  (require 'zenburn)
+  (color-theme-zenburn))
 
 ;; These should be loaded on startup rather than autoloaded on demand
 ;; since they are likely to be used in every session
