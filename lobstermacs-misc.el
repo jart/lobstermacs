@@ -103,9 +103,9 @@
 ;; BIND DNS Zone Editing
 (add-hook 'dns-mode-hook 'turn-off-flyspell)
 ;; Debian Style: /etc/bind/db.something.com
-(add-to-list 'auto-mode-alist '("\\(bind\\|named\\)/db\\." . zone-mode))
+(add-to-list 'auto-mode-alist '("\\(bind\\|named\\)/db\\." . dns-mode))
 ;; RHEL Style: /var/lib/named/something.com.db
-(add-to-list 'auto-mode-alist '("\\.\\(net\\|com\\|org\\|info\\|us\\).db$" . zone-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(net\\|com\\|org\\|info\\|us\\).db$" . dns-mode))
 
 ;; DISABLED because it's irritating/astonishing to not be able to use
 ;; the terminal's copy/paste feature
