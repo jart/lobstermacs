@@ -60,3 +60,9 @@ Upgrade:
 - Put your personal Lisp stuff: `~/.emacs.d/$USER.el`
 - Emacs configuration settings are saved to: `~/.emacs.d/custom.el`
 - ELPA Package Manager `M-x package-list-packages`
+
+
+## License
+
+- Lobstermacs is distributed under the same terms as Emacs itself (GPL
+  v3+) See `COPYING` for more details.
