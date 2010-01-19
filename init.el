@@ -23,6 +23,7 @@
 (add-to-list 'load-path dotfiles-dir)
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/jabber"))
+(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml/util"))
 (if (>= emacs-major-version 23)
@@ -34,9 +35,7 @@
 (setq custom-file (concat dotfiles-dir "custom.el"))
 
 ;; until they fix the elpa package thing
-(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
 (autoload 'company-mode "company" nil t)
-
 
 ;; Load these earlier, they contain important system checks and gui
 ;; changes

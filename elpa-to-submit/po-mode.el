@@ -3449,11 +3449,6 @@ strings remain."
               (save-buffer)
               (kill-buffer (current-buffer)))))))
 
-;;;###autoload
-(progn
-  (add-to-list 'auto-mode-alist '("\\.po[tx]?\\'\\|\\.po\\." . po-mode))
-  (modify-coding-system-alist 'file "\\.po[tx]?\\'\\|\\.po\\." 'po-find-file-coding-system))
-
 (provide 'po-mode)
 
 ;; Hey Emacs!
