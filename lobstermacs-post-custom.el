@@ -11,10 +11,10 @@
 ;; to toggle its display.  let's make ido ignore it
 (add-to-list 'ido-ignore-buffers "\\*SPEEDBAR\\*")
 
-;; add ispell support to hippie-expand so i don't have to work as hard
-;; to be pretentious when typing big complicated words...  so cool!
-(if lob/have-ispell
-    (add-to-list 'hippie-expand-try-functions-list 'lob/try-complete-ispell))
+;; TODO: Fix me, I am buggy :'(
+;; ;; add ispell support to hippie-expand
+;; (if lob/have-ispell
+;;     (add-to-list 'hippie-expand-try-functions-list 'lob/try-complete-ispell))
 
 (provide 'lobstermacs-post-custom)
 ;;; lobstermacs-defuns.el ends here
