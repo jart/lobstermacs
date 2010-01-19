@@ -110,7 +110,6 @@
 ;; gettext translation files
 (add-to-list 'auto-mode-alist '("\\.po[tx]?\\'\\|\\.po\\." . po-mode))
 (modify-coding-system-alist 'file "\\.po[tx]?\\'\\|\\.po\\." 'po-find-file-coding-system)
-(eval-after-load 'po-mode '(load "gb-po-mode"))
 
 ;; DISABLED because it's irritating/astonishing to not be able to use
 ;; the terminal's copy/paste feature
