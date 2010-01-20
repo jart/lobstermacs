@@ -23,6 +23,8 @@
 
 ;; my function keys
 (global-set-key (kbd "<f2>") 'jart/lobstermacs-build)
+(global-set-key (kbd "<f4>") 'jart/face-at-point)
+(global-set-key (kbd "C-<f4>") 'customize-apropos-faces)
 (global-set-key [f9] 'eshell)
 (global-set-key [f10] 'compile)
 
@@ -45,12 +47,17 @@
 (setq visible-bell nil)                 ;; disable epilepsy
 
 
+(defun jart/face-at-point ()
+  "Tells me who is responsible for ugly color under cursor"
+  (interactive)
+  (message "%S: %s" (face-at-point)
+           (face-documentation (face-at-point))))
+
 (defun jart/lobstermacs-build ()
+  "Recompiles everything so emacs loads wicked fast"
   (interactive)
   (regen-autoloads)
   (recompile-init))
-
-
 
 ;; (require 'smex)
 ;; (eval-after-load "init.el" '(lambda ()
