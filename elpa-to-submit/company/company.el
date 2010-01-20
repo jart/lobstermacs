@@ -25,6 +25,8 @@
 ;;
 ;;; Commentary:
 ;;
+;; jart 2010-01-20: Removed references to ropemacs and pysmell.
+;;
 ;; Company is a modular completion mechanism.  Modules for retrieving completion
 ;; candidates are called back-ends, modules for displaying them are front-ends.
 ;;
@@ -282,8 +284,6 @@ If this many lines are not available, prefer to display the tooltip above."
     (company-keywords . "Programming language keywords")
     (company-nxml . "nxml")
     (company-oddmuse . "Oddmuse")
-    (company-pysmell . "PySmell")
-    (company-ropemacs . "ropemacs")
     (company-semantic . "CEDET Semantic")
     (company-tempo . "Tempo templates")
     (company-xcode . "Xcode")))
@@ -299,9 +299,8 @@ If this many lines are not available, prefer to display the tooltip above."
 
 (defcustom company-backends '(company-elisp company-nxml company-css
                               company-eclim company-semantic company-xcode
-                              company-ropemacs
                               (company-gtags company-etags company-dabbrev-code
-                               company-pysmell company-keywords)
+                               company-keywords)
                               company-oddmuse company-files company-dabbrev)
   "*The list of active back-ends (completion engines).
 Each list elements can itself be a list of back-ends.  In that case their
