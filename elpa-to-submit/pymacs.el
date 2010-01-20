@@ -2,6 +2,8 @@
 ;;; Copyright © 2001, 2002, 2003 Progiciels Bourbeau-Pinard inc.
 ;;; François Pinard <pinard@iro.umontreal.ca>, 2001.
 
+;;; jart 2010-01-20: Added autoload comments
+;;;
 ;;; jart 2010-01-18: Source originally from Pymacs version 0.23.  See:
 ;;; http://github.com/pinard/Pymacs/
 
@@ -76,6 +78,7 @@ The status of the Pymacs helper is checked at every such timeout.")
   "If zombies should trigger hard errors, whenever they get called.
 If `nil', calling a zombie will merely produce a diagnostic message.")
 
+;;;###autoload
 (defun pymacs-load (module &optional prefix noerror)
   "Import the Python module named MODULE into Emacs.
 Each function in the Python module is made available as an Emacs function.
@@ -97,6 +100,7 @@ If NOERROR is not nil, do not raise error when the module is not found."
           (noerror (message "Pymacs loading %s...failed" module) nil)
           (t (pymacs-report-error "Pymacs loading %s...failed" module)))))
 
+;;;###autoload
 (defun pymacs-eval (text)
   "Compile TEXT as a Python expression, and return its value."
   (interactive "sPython expression? ")
@@ -105,6 +109,7 @@ If NOERROR is not nil, do not raise error when the module is not found."
       (message "%S" value))
     value))
 
+;;;###autoload
 (defun pymacs-exec (text)
   "Compile and execute TEXT as a sequence of Python statements.
 This functionality is experimental, and does not appear to be useful."
@@ -114,6 +119,7 @@ This functionality is experimental, and does not appear to be useful."
       (message "%S" value))
     value))
 
+;;;###autoload
 (defun pymacs-call (function &rest arguments)
   "Return the result of calling a Python function FUNCTION over ARGUMENTS.
 FUNCTION is a string denoting the Python function, ARGUMENTS are separate
@@ -122,6 +128,7 @@ to Python equivalents, other structures are converted into Lisp handles."
   (pymacs-serve-until-reply
    "eval" `(pymacs-print-for-apply ',function ',arguments)))
 
+;;;###autoload
 (defun pymacs-apply (function arguments)
   "Return the result of calling a Python function FUNCTION over ARGUMENTS.
 FUNCTION is a string denoting the Python function, ARGUMENTS is a list of
@@ -450,6 +457,7 @@ The timer is used only if `post-gc-hook' is not available.")
 
 ;;; Communication protocol.
 
+;;;###autoload
 (defvar pymacs-transit-buffer nil
   "Communication buffer between Emacs and Python.")
 
@@ -471,6 +479,7 @@ The timer is used only if `post-gc-hook' is not available.")
 ;; occurs that two successive messages are sent in the same direction.  The
 ;; first message is received from the Python side, it is `(version VERSION)'.
 
+;;;###autoload
 (defun pymacs-start-services ()
   ;; This function gets called automatically, as needed.
   (let ((buffer (get-buffer-create "*Pymacs*")))
@@ -536,6 +545,7 @@ The timer is used only if `post-gc-hook' is not available.")
     ;; If nothing failed, only then declare that Pymacs has started!
     (setq pymacs-transit-buffer buffer)))
 
+;;;###autoload
 (defun pymacs-terminate-services ()
   ;; This function is mainly provided for documentation purposes.
   (interactive)
