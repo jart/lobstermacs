@@ -34,6 +34,9 @@
 (setq package-user-dir (concat dotfiles-dir "elpa"))
 (setq custom-file (concat dotfiles-dir "custom.el"))
 
+;; Python load path
+(setenv "PYTHONPATH" (expand-file-name (concat dotfiles-dir "/python/lib/")))
+
 ;; until they fix the elpa package thing
 (autoload 'company-mode "company" nil t)
 

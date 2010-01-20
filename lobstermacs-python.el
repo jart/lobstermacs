@@ -2,21 +2,6 @@
 ;;
 ;; Part of Lobstermacs.
 
-;; (add-to-list 'completion-ignored-extensions ".blah")
-(add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
-(eval-after-load 'python
-  '(progn
-     (define-key python-mode-map (kbd "<return>") 'newline-and-indent)
-     (define-key python-mode-map (kbd "C-x C-e") 'lob/python-eval)
-     (define-key python-mode-map (kbd "C-c v") 'lob/python-eval-file)
-     (define-key python-mode-map [f10] 'lob/python-eval-file)
-     (define-key python-mode-map (kbd "C-<f10>") 'lob/python-eval-file-in-thread)
-     (define-key python-mode-map (kbd "M-/") 'hippie-expand)
-     (define-key lisp-mode-shared-map (kbd "C-c l") "lambda")
-     ;; (add-hook 'python-mode-hook 'idle-highlight)
-     (add-hook 'python-mode-hook 'run-coding-hook)))
-
-
 (defcustom lobstermacs-python-output-buffer "*python-output*"
   "When you evaluate Python code using `lob/python-eval',
 anything your code prints will be sent to this buffer."
@@ -74,8 +59,11 @@ Any variables you set or imports you make will persist between
 requests (unless you call `pymacs-terminate-services'.)
 "
   (interactive)
-  (if (not (fboundp 'textwrap-dedent))
-      (pymacs-load "textwrap" "textwrap-"))
+  ;; make sure pymacs is running
+  (unless (and pymacs-transit-buffer
+               (buffer-name pymacs-transit-buffer)
+               (get-buffer-process pymacs-transit-buffer))
+    (pymacs-start-services))
   ;; get the code string itself
   (let ((code (or code
                   (lob/highlighted-text)
@@ -202,16 +190,31 @@ placed anywhere within the expression.
               current-line)))))
 
 
-;; (defun turn-on-company-python ()
-;;   (require 'pymacs)
-;;   ;;(setenv "PYMACS_PYTHON" (expand-file-name "~/code/myenv/bin/python"))
-;;   ;;(pymacs-exec "import foo")
-;;   (pymacs-load "ropemacs" "rope-")
-;;   (require 'pysmell)
-;;   (autoload 'company-mode "company" nil t)
-;;   (company-mode))
-;; (add-hook 'python-mode-hook 'turn-on-company-python)
+(defadvice pymacs-start-services (after lob/python-init)
+  "Load our libraries whenever Pymacs starts a Python process"
+  (pymacs-load "textwrap" "textwrap-")
+  (assert (fboundp 'textwrap-dedent)))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
+
+(eval-after-load 'python
+  '(progn
+     (define-key python-mode-map (kbd "<return>") 'newline-and-indent)
+     (define-key python-mode-map (kbd "C-x C-e") 'lob/python-eval)
+     (define-key python-mode-map (kbd "C-c v") 'lob/python-eval-file)
+     (define-key python-mode-map [f10] 'lob/python-eval-file)
+     (define-key python-mode-map (kbd "C-<f10>") 'lob/python-eval-file-in-thread)
+     (define-key python-mode-map (kbd "M-/") 'hippie-expand)
+     (define-key lisp-mode-shared-map (kbd "C-c l") "lambda")
+     ;; (add-hook 'python-mode-hook 'idle-highlight)
+     (add-hook 'python-mode-hook 'run-coding-hook)))
+
+(eval-after-load 'pymacs
+  '(progn
+     (ad-activate 'lob/python-init)))
 
 (provide 'lobstermacs-python)
 ;; lobstermacs-python.el ends here
