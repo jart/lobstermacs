@@ -55,6 +55,7 @@
 (defvar zenburn-bg "#3f3f3f")
 (defvar zenburn-bg+1 "#4f4f4f")
 (defvar zenburn-bg+2 "#5f5f5f")
+(defvar zenburn-bg+3 "#6f6f6f")
 (defvar zenburn-yellow "#f0dfaf")
 (defvar zenburn-yellow-1 "#e0cf9f")
 (defvar zenburn-yellow-2 "#d0bf8f")
@@ -220,6 +221,12 @@ static char *gnus-pointer[] = {
 
      `(zenburn-background-1 ((t (:background ,zenburn-bg+1))))
      `(zenburn-background-2 ((t (:background ,zenburn-bg+2))))
+     `(zenburn-background-3 ((t (:background ,zenburn-bg+3))))
+     '(zenburn-background-lighten ((t (:background "#464646"))))
+     '(zenburn-background-darken ((t (:background "#363636"))))
+     '(zenburn-background-bluish ((t (:background "#53536a"))))
+     '(zenburn-background-reddish ((t (:background "#6a5353"))))
+     '(zenburn-background-greenish ((t (:background "#536a53"))))
 
      `(zenburn-primary-1 ((t (:foreground ,zenburn-yellow :weight bold))))
      `(zenburn-primary-2 ((t (:foreground ,zenburn-orange :weight bold))))
@@ -494,6 +501,27 @@ static char *gnus-pointer[] = {
      '(diff-added ((t (:inherit zenburn-primary-3))))
      '(diff-removed ((t (:inherit zenburn-blue))))
      '(diff-context ((t (:inherit font-lock-comment))))
+
+     ;; each hunk that's different gets a *very subtle* darkening
+     '(ediff-odd-diff-A ((t (:inherit zenburn-background-darken))))
+     '(ediff-even-diff-A ((t (:inherit zenburn-background-darken))))
+     '(ediff-odd-diff-B ((t (:inherit zenburn-background-darken))))
+     '(ediff-even-diff-B ((t (:inherit zenburn-background-darken))))
+     '(ediff-odd-diff-C ((t (:inherit zenburn-background-darken))))
+     '(ediff-even-diff-C ((t (:inherit zenburn-background-darken))))
+     '(ediff-odd-diff-Ancestor ((t (:inherit zenburn-background-darken))))
+     '(ediff-even-diff-Ancestor ((t (:inherit zenburn-background-darken))))
+     ;; currently selected hunk is highlighted quite a bit more
+     '(ediff-current-diff-A ((t (:inherit zenburn-background-1))))
+     '(ediff-current-diff-B ((t (:inherit zenburn-background-1))))
+     '(ediff-current-diff-C ((t (:inherit zenburn-background-1))))
+     '(ediff-current-diff-Ancestor ((t (:inherit zenburn-background-1))))
+     ;; the little pieces inside a hunk that are colorized
+     ;; A = old version, B = new version
+     '(ediff-fine-diff-A ((t (:inherit zenburn-background-reddish))))
+     '(ediff-fine-diff-B ((t (:inherit zenburn-background-greenish))))
+     '(ediff-fine-diff-C ((t (:inherit zenburn-background-bluish))))
+     '(ediff-fine-diff-Ancestor ((t (:inherit zenburn-background-bluish))))
 
      `(emms-pbi-song ((t (:foreground ,zenburn-yellow))))
      '(emms-pbi-current ((t (:inherit zenburn-primary-1))))
