@@ -11,8 +11,10 @@ the user beware.
 
 ## Eventual Goal
 
-- Python support...  Really, really good Python support.
-- Make Emacs friendlier to human beings.
+- Fine-tune the latest/greatest features to *just work* without bugs.
+
+- Python support...  Like *really amazing* Python support that's easy
+  to use, requires no configuration and isn't ugly.
 
 
 ## What *Unique* Features Have Been Written So Far?
