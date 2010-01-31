@@ -25,6 +25,7 @@
 (global-set-key (kbd "<f2>") 'jart/lobstermacs-build)
 (global-set-key (kbd "<f4>") 'jart/face-at-point)
 (global-set-key (kbd "C-<f4>") 'customize-apropos-faces)
+(global-set-key [f1] 'man)
 (global-set-key [f9] 'eshell)
 (global-set-key [f10] 'compile)
 
