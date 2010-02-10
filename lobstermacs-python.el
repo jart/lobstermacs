@@ -120,12 +120,11 @@ and running `lob/python-eval'.  The only differences are:
 "
   (interactive)
   (let ((path (or filepath
-                  (if (or (string-match "\\.py$" (buffer-file-name))
-                          (equal major-mode 'python-mode))
-                      (progn
-                        (if (buffer-modified-p)
-                            (save-buffer))
-                        (buffer-file-name)))
+                  (when (or (string-match "\\.py$" (buffer-file-name))
+                            (equal major-mode 'python-mode))
+                    (if (buffer-modified-p)
+                        (save-buffer))
+                    (buffer-file-name))
                   (ido-read-file-name "Python Script? "))))
     (if in_thread
         (pymacs-exec (format "
