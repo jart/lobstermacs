@@ -25,11 +25,18 @@
 (global-set-key (kbd "<f2>") 'jart/lobstermacs-build)
 (global-set-key (kbd "<f4>") 'jart/face-at-point)
 (global-set-key (kbd "C-<f4>") 'customize-apropos-faces)
-(global-set-key [f1] 'man)
-(global-set-key [f9] 'eshell)
-(global-set-key [f10] 'compile)
+(global-set-key (kbd "<f1>") 'man)
+(global-set-key (kbd "<f9>") 'eshell)
+(global-set-key (kbd "<f10>") 'compile)
+
+(defun lob/run-buffer ()
+  (interactive)
+  (shell-command buffer-file-name))
 
 ;; some mode specific stuff
+(eval-after-load 'sh-script
+  '(progn
+     (define-key sh-mode-map (kbd "C-c v") 'lob/run-buffer)))
 (eval-after-load 'paredit
   '(progn
      (define-key paredit-mode-map (kbd "C-h") 'paredit-backward-delete)
