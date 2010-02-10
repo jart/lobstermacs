@@ -1,11 +1,15 @@
-;;; lobstermacs-c.el --- For Crazy Hackers
+;;; lobstermacs-c.el
 ;;
 ;; Part of Lobstermacs
 
-(defun anything-but-gnu-indents-please ()
-  (define-key c-mode-map (kbd "<return>") 'newline-and-indent)
-  (c-set-style "linux"))
+;; change default style for curly brace langs from 'gnu' to 'linux'
+(setq c-default-style
+      (cons (cons 'other "linux")
+            (assq-delete-all 'other c-default-style)))
 
-(add-hook 'c-mode-hook 'anything-but-gnu-indents-please)
+(eval-after-load 'cc-mode
+  '(progn
+     (define-key c-mode-map (kbd "C-M-h") 'backward-kill-word)
+     (define-key c-mode-map (kbd "<return>") 'newline-and-indent)))
 
 (provide 'lobstermacs-c)
