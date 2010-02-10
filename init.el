@@ -89,6 +89,7 @@
 (require 'lobstermacs-lisp)
 (require 'lobstermacs-python)
 (require 'lobstermacs-erlang)
+(require 'lobstermacs-erc)
 (require 'lobstermacs-misc)
 
 (regen-autoloads)

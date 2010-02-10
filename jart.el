@@ -2,6 +2,8 @@
 ;; my personal settings.  this is where i put all the configurations
 ;; i'm afraid others might not like.
 
+(if (file-exists-p "/home/jart/.emacs-private")
+    (load "/home/jart/.emacs-private"))
 
 ;; Make emacs a little nicer on dvorak keyboards
 (global-set-key (kbd "C-u") ctl-x-map)
@@ -58,6 +60,15 @@
   (interactive)
   (regen-autoloads)
   (recompile-init))
+
+(defun jart/erc-on-connect (server nick)
+  (when (string-match "freenode\\.net$" server)
+    (if (equal nick "jart")
+        (erc-message "PRIVMSG" (concat "NickServ identify " jart/freenode-password))))
+  (when (string-match "xi01" server)
+    (erc-join-channel "#halo")))
+(eval-after-load 'erc
+  '(add-hook 'erc-after-connect 'jart/erc-on-connect))
 
 ;; (require 'smex)
 ;; (eval-after-load "init.el" '(lambda ()
