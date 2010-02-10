@@ -27,8 +27,11 @@
 (global-set-key (kbd "<f2>") 'jart/lobstermacs-build)
 (global-set-key (kbd "<f4>") 'jart/face-at-point)
 (global-set-key (kbd "C-<f4>") 'customize-apropos-faces)
+(global-set-key (kbd "<f5>") 'jart/dedicate-window)
 (global-set-key [f9] 'eshell)
 (global-set-key [f10] 'compile)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; some mode specific stuff
 (eval-after-load 'paredit
@@ -48,6 +51,12 @@
 (setq ring-bell-function 'ignore)       ;; disable epilepsy
 (setq visible-bell nil)                 ;; disable epilepsy
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun jart/dedicate-window ()
+  (interactive)
+  (let ((win (get-buffer-window (current-buffer))))
+    (set-window-dedicated-p win (not (window-dedicated-p win)))))
 
 (defun jart/face-at-point ()
   "Tells me who is responsible for ugly color under cursor"
