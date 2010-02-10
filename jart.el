@@ -2,6 +2,8 @@
 ;; my personal settings.  this is where i put all the configurations
 ;; i'm afraid others might not like.
 
+(if (file-exists-p "/home/jart/.emacs-private")
+    (load "/home/jart/.emacs-private"))
 
 ;; Make emacs a little nicer on dvorak keyboards
 (global-set-key (kbd "C-u") ctl-x-map)
@@ -22,16 +24,17 @@
 (global-set-key (kbd "C-x C-g") 'grep-find)
 
 ;; my function keys
+(global-set-key (kbd "<f1>") 'man)
 (global-set-key (kbd "<f2>") 'jart/lobstermacs-build)
 (global-set-key (kbd "<f4>") 'jart/face-at-point)
 (global-set-key (kbd "C-<f4>") 'customize-apropos-faces)
-(global-set-key (kbd "<f1>") 'man)
+(global-set-key (kbd "<f5>") 'jart/dedicate-window)
 (global-set-key (kbd "<f9>") 'eshell)
 (global-set-key (kbd "<f10>") 'compile)
+(global-set-key (kbd "<f11>") 'next-error)
+(global-set-key (kbd "<f12>") 'previous-error)
 
-(defun lob/run-buffer ()
-  (interactive)
-  (shell-command buffer-file-name))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; some mode specific stuff
 (eval-after-load 'sh-script
@@ -54,6 +57,16 @@
 (setq ring-bell-function 'ignore)       ;; disable epilepsy
 (setq visible-bell nil)                 ;; disable epilepsy
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun lob/run-buffer ()
+  (interactive)
+  (shell-command buffer-file-name))
+
+(defun jart/dedicate-window ()
+  (interactive)
+  (let ((win (get-buffer-window (current-buffer))))
+    (set-window-dedicated-p win (not (window-dedicated-p win)))))
 
 (defun jart/face-at-point ()
   "Tells me who is responsible for ugly color under cursor"
@@ -66,6 +79,15 @@
   (interactive)
   (regen-autoloads)
   (recompile-init))
+
+(defun jart/erc-on-connect (server nick)
+  (when (string-match "freenode\\.net$" server)
+    (if (equal nick "jart")
+        (erc-message "PRIVMSG" (concat "NickServ identify " jart/freenode-password))))
+  (when (string-match "xi01" server)
+    (erc-join-channel "#halo")))
+(eval-after-load 'erc
+  '(add-hook 'erc-after-connect 'jart/erc-on-connect))
 
 ;; (require 'smex)
 ;; (eval-after-load "init.el" '(lambda ()
