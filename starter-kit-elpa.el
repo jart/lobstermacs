@@ -6,7 +6,6 @@
                                    'ruby-mode
                                    'inf-ruby
                                    'js2-mode
-                                   'javascript-mode
                                    'json
                                    'css-mode
                                    'findr
