@@ -67,7 +67,13 @@
 ;; Load up ELPA, the package manager
 
 (require 'package)
-(package-initialize)
+
+;; another weird buggy (something about yas/minor-mode-menu)
+(condition-case ex
+    (package-initialize)
+  ('error (load "yasnippet-bundle.el")
+	  (package-initialize)))
+
 (require 'starter-kit-elpa)
 
 ;; Load up starter kit customizations
