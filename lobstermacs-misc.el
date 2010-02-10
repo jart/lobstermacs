@@ -12,6 +12,12 @@
       require-final-newline t
       hg-outgoing-repository "default")
 
+;; View python eggs as compressed archives
+(auto-compression-mode t)
+(if (not (member ".egg" tags-compression-info-list))
+    (setq tags-compression-info-list
+          (cons ".egg" tags-compression-info-list)))
+
 ;; Make emacs friendlier to Mac users
 (global-set-key (kbd "M-s") 'save-buffer)
 (global-set-key (kbd "M-z") 'undo)
