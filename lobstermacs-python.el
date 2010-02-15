@@ -195,6 +195,24 @@ placed anywhere within the expression.
   (assert (fboundp 'textwrap-dedent)))
 
 
+(defun lob/python-check ()
+  "Runs pyflakes and pep8 on current file
+
+This will statically analyze your code to make sure you don't
+have any obvious bugs and ensure that it conforms to the one true
+coding style.
+
+Use `next-error' and `previous-error' to hop between errors."
+  (interactive)
+  (let ((path (file-name-nondirectory buffer-file-name)))
+    (compile (format "pyflakes %s ; pep8 --repeat %s" path path))))
+
+(defun lob/python-check-dir ()
+  "Same as `lob/python-check' but for all files in the current
+directory (as well as sub-directories.)"
+  (interactive)
+  (compile "pyflakes . ; pep8 --repeat ."))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
@@ -202,10 +220,15 @@ placed anywhere within the expression.
 (eval-after-load 'python
   '(progn
      (define-key python-mode-map (kbd "<return>") 'newline-and-indent)
+
+     (define-key python-mode-map (kbd "C-c c") 'lob/python-check)
+     (define-key python-mode-map (kbd "C-c C") 'lob/python-check-dir)
+
      (define-key python-mode-map (kbd "C-x C-e") 'lob/python-eval)
      (define-key python-mode-map (kbd "C-c v") 'lob/python-eval-file)
      (define-key python-mode-map [f10] 'lob/python-eval-file)
      (define-key python-mode-map (kbd "C-<f10>") 'lob/python-eval-file-in-thread)
+
      (define-key python-mode-map (kbd "M-/") 'hippie-expand)
      (define-key lisp-mode-shared-map (kbd "C-c l") "lambda")
      ;; (add-hook 'python-mode-hook 'idle-highlight)
