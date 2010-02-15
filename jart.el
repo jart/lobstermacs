@@ -47,6 +47,9 @@
 (eval-after-load 'python
   '(progn
      (define-key python-mode-map (kbd "C-u C-e") 'lob/python-eval)))
+(eval-after-load 'cc-mode
+  '(progn
+     (define-key c-mode-map (kbd "C-h") c-backspace-function)))
 
 
 ;; various other configurations
