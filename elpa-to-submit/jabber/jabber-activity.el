@@ -42,66 +42,11 @@
 (require 'jabber-core)
 (require 'jabber-alert)
 (require 'jabber-util)
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 (defgroup jabber-activity nil
   "activity tracking options"
   :group 'jabber)
-
-(defcustom jabber-activity-make-string 'jabber-activity-make-string-default
-  "Function to call, for making the string to put in the mode
-line.  The default function returns the nick of the user."
-  :set #'(lambda (var val)
-	   (custom-set-default var val)
-	   (when (fboundp 'jabber-activity-make-name-alist)
-	     (jabber-activity-make-name-alist)
-	     (jabber-activity-mode-line-update)))
-  :type 'function
-  :group 'jabber-activity)
-
-(defcustom jabber-activity-shorten-minimum 1
-  "All strings returned by `jabber-activity-make-strings-shorten' will be
-at least this long, when possible."
-  :group 'jabber-activity
-  :type 'number)
-
-(defcustom jabber-activity-make-strings 'jabber-activity-make-strings-default
-  "Function which should return an alist of JID -> string when given a list of
-JIDs."
-  :set #'(lambda (var val)
-	   (custom-set-default var val)
-	   (when (fboundp 'jabber-activity-make-name-alist)
-	     (jabber-activity-make-name-alist)
-	     (jabber-activity-mode-line-update)))
-  :type '(choice (function-item :tag "Keep strings"
-				:value jabber-activity-make-strings-default)
-		 (function-item :tag "Shorten strings"
-				:value jabber-activity-make-strings-shorten)
-		 (function :tag "Other function"))
-  :group 'jabber-activity)
-
-(defcustom jabber-activity-count-in-title nil
-  "If non-nil, display number of active JIDs in frame title."
-  :type 'boolean
-  :group 'jabber-activity
-  :set #'(lambda (var val)
-	   (custom-set-default var val)
-	   (when (bound-and-true-p jabber-activity-mode)
-	     (jabber-activity-mode -1)
-	     (jabber-activity-mode 1))))
-
-(defcustom jabber-activity-count-in-title-format
-  '(jabber-activity-jids ("[" jabber-activity-count-string "] "))
-  "Format string used for displaying activity in frame titles.
-Same syntax as `mode-line-format'."
-  :type 'sexp
-  :group 'jabber-activity
-  :set #'(lambda (var val)
-	   (if (not (bound-and-true-p jabber-activity-mode))
-	       (custom-set-default var val)
-	     (jabber-activity-mode -1)
-	     (custom-set-default var val)
-	     (jabber-activity-mode 1))))
 
 (defcustom jabber-activity-show-p 'jabber-activity-show-p-default
   "Predicate function to call to check if the given JID should be
@@ -364,6 +309,61 @@ With a numeric arg, enable this display if arg is positive."
       (setq icon-title-format
 	    (delete jabber-activity-count-in-title-format
 		    icon-title-format)))))
+
+(defcustom jabber-activity-make-string 'jabber-activity-make-string-default
+  "Function to call, for making the string to put in the mode
+line.  The default function returns the nick of the user."
+  :set #'(lambda (var val)
+	   (custom-set-default var val)
+	   (when (fboundp 'jabber-activity-make-name-alist)
+	     (jabber-activity-make-name-alist)
+	     (jabber-activity-mode-line-update)))
+  :type 'function
+  :group 'jabber-activity)
+
+(defcustom jabber-activity-shorten-minimum 1
+  "All strings returned by `jabber-activity-make-strings-shorten' will be
+at least this long, when possible."
+  :group 'jabber-activity
+  :type 'number)
+
+(defcustom jabber-activity-make-strings 'jabber-activity-make-strings-default
+  "Function which should return an alist of JID -> string when given a list of
+JIDs."
+  :set #'(lambda (var val)
+	   (custom-set-default var val)
+	   (when (fboundp 'jabber-activity-make-name-alist)
+	     (jabber-activity-make-name-alist)
+	     (jabber-activity-mode-line-update)))
+  :type '(choice (function-item :tag "Keep strings"
+				:value jabber-activity-make-strings-default)
+		 (function-item :tag "Shorten strings"
+				:value jabber-activity-make-strings-shorten)
+		 (function :tag "Other function"))
+  :group 'jabber-activity)
+
+(defcustom jabber-activity-count-in-title nil
+  "If non-nil, display number of active JIDs in frame title."
+  :type 'boolean
+  :group 'jabber-activity
+  :set #'(lambda (var val)
+	   (custom-set-default var val)
+	   (when (bound-and-true-p jabber-activity-mode)
+	     (jabber-activity-mode -1)
+	     (jabber-activity-mode 1))))
+
+(defcustom jabber-activity-count-in-title-format
+  '(jabber-activity-jids ("[" jabber-activity-count-string "] "))
+  "Format string used for displaying activity in frame titles.
+Same syntax as `mode-line-format'."
+  :type 'sexp
+  :group 'jabber-activity
+  :set #'(lambda (var val)
+	   (if (not (bound-and-true-p jabber-activity-mode))
+	       (custom-set-default var val)
+	     (jabber-activity-mode -1)
+	     (custom-set-default var val)
+	     (jabber-activity-mode 1))))
 
 ;; XXX: define-minor-mode should probably do this for us, but it doesn't.
 (if jabber-activity-mode (jabber-activity-mode 1))

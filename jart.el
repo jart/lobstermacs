@@ -80,7 +80,7 @@
 (defun jart/lobstermacs-build ()
   "Recompiles everything so emacs loads wicked fast"
   (interactive)
-  (regen-autoloads)
+  (regen-autoloads t)
   (recompile-init))
 
 (defun jart/erc-on-connect (server nick)
