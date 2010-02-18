@@ -4,6 +4,8 @@
 ;; braces more fun to use
 ;;
 
+(eval-when-compile (require 'cc-vars))
+
 (defun lob/on-c-closing-brace ()
   (interactive)
   (insert "}")

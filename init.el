@@ -9,34 +9,38 @@
 ;; and brighter; it simply makes everything else vanish."
 ;; -Neal Stephenson, "In the Beginning was the Command Line"
 
-;; Turn off mouse interface early in startup to avoid momentary display
-;; You really don't need these; trust me.
+;; mess with gui early on to avoid a dancing flickering emacs window
+
+(prefer-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'tooltip-mode) (tooltip-mode -1))
 (unless window-system
   (if (fboundp 'menu-bar-mode) (menu-bar-mode -1)))
-
-;; this should be safe to load ahead of time because it might have gui
-;; customizations in it that we don't want to flicker and stuff
-(setq custom-file (concat dotfiles-dir "custom.el"))
-(load custom-file 'noerror)
+(when window-system
+  (mouse-wheel-mode t)
+  (blink-cursor-mode -1)
+  (add-hook 'before-make-frame-hook 'turn-off-tool-bar))
+(setq frame-title-format '(buffer-file-name "%f  -  lobstermacs" ("%b")))
 
 ;; Load path etc.
 (setq dotfiles-dir (file-name-directory
                     (or (buffer-file-name) load-file-name)))
-
 (add-to-list 'load-path dotfiles-dir)
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/jabber"))
 (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/company"))
-(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml"))
-(add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml/util"))
-(if (>= emacs-major-version 23)
-    (load (expand-file-name (concat dotfiles-dir "/elpa-to-submit/nxhtml/autostart.el")))
-  (load (expand-file-name (concat dotfiles-dir "/elpa-to-submit/nxhtml/autostart22.el"))))
+;; (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml"))
+;; (add-to-list 'load-path (concat dotfiles-dir "/elpa-to-submit/nxhtml/util"))
+;; (if (>= emacs-major-version 23)
+;;     (load (expand-file-name (concat dotfiles-dir "/elpa-to-submit/nxhtml/autostart.el")))
+;;   (load (expand-file-name (concat dotfiles-dir "/elpa-to-submit/nxhtml/autostart22.el"))))
 
 (setq autoload-file (concat dotfiles-dir "loaddefs.el"))
 (setq package-user-dir (concat dotfiles-dir "elpa"))
+(setq custom-file (concat dotfiles-dir "custom.el"))
 
 ;; Python load path
 (setenv "PYTHONPATH" (expand-file-name (concat dotfiles-dir "/python/lib/")))
@@ -53,6 +57,7 @@
 (when (and lob/is-colorful (not (featurep 'zenburn)))
   (require 'zenburn)
   (color-theme-zenburn))
+(load custom-file 'noerror)
 
 ;; These should be loaded on startup rather than autoloaded on demand
 ;; since they are likely to be used in every session
@@ -93,7 +98,7 @@
 (require 'starter-kit-js)
 
 ;; lobstermacs stuff
-(require 'lobstermacs-ido)
+;; (require 'lobstermacs-ido)
 (require 'lobstermacs-c)
 (require 'lobstermacs-rst)
 (require 'lobstermacs-lisp)
@@ -103,9 +108,6 @@
 (require 'lobstermacs-misc)
 
 (regen-autoloads)
-
-;; load user's emacs customizations again so they take precedence
-(load custom-file 'noerror)
 
 ;; You can keep system- or user-specific customizations here
 (setq system-specific-config (concat dotfiles-dir system-name ".el")

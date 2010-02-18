@@ -2,8 +2,6 @@
 ;;
 ;; Part of Lobstermacs.
 
-(prefer-coding-system 'utf-8)
-
 (setq max-specpdl-size 32000 ;; Avoid error: "Variable binding depth exceeds max-specpdl-size"
       column-number-mode 1
       make-backup-files nil
@@ -111,11 +109,13 @@
 ;; Debian Style: /etc/bind/db.something.com
 (add-to-list 'auto-mode-alist '("\\(bind\\|named\\)/db\\." . dns-mode))
 ;; RHEL Style: /var/lib/named/something.com.db
-(add-to-list 'auto-mode-alist '("\\.\\(net\\|com\\|org\\|info\\|us\\).db$" . dns-mode))
+(add-to-list 'auto-mode-alist
+	     '("\\.\\(net\\|com\\|org\\|info\\|us\\).db$" . dns-mode))
 
 ;; gettext translation files
 (add-to-list 'auto-mode-alist '("\\.po[tx]?\\'\\|\\.po\\." . po-mode))
-(modify-coding-system-alist 'file "\\.po[tx]?\\'\\|\\.po\\." 'po-find-file-coding-system)
+(modify-coding-system-alist 'file "\\.po[tx]?\\'\\|\\.po\\."
+			    'po-find-file-coding-system)
 
 ;; DISABLED because it's irritating/astonishing to not be able to use
 ;; the terminal's copy/paste feature
