@@ -100,9 +100,8 @@
 
 (regen-autoloads)
 
+;; load user's emacs customizations again so they take precedence
 (load custom-file 'noerror)
-
-(require 'lobstermacs-post-custom)
 
 ;; You can keep system- or user-specific customizations here
 (setq system-specific-config (concat dotfiles-dir system-name ".el")
