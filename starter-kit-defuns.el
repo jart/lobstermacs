@@ -165,8 +165,10 @@ Symbols matching the text at point are put first in the completion list."
         (generated-autoload-file autoload-file))
     (when (or force-regen
               (not (file-exists-p autoload-file))
-              (some (lambda (f) (file-newer-than-file-p f autoload-file))
-                    (directory-files autoload-dir t "\\.el$")))
+	      ;; TODO: @jart: What is the performance impact of this?
+	      ;; (some (lambda (f) (file-newer-than-file-p f autoload-file))
+              ;;       (directory-files autoload-dir t "\\.el$"))
+              )
       (message "Updating autoloads...")
       (let (emacs-lisp-mode-hook)
         (update-directory-autoloads autoload-dir))))

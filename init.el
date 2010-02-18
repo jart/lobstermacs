@@ -16,6 +16,11 @@
 (unless window-system
   (if (fboundp 'menu-bar-mode) (menu-bar-mode -1)))
 
+;; this should be safe to load ahead of time because it might have gui
+;; customizations in it that we don't want to flicker and stuff
+(setq custom-file (concat dotfiles-dir "custom.el"))
+(load custom-file 'noerror)
+
 ;; Load path etc.
 (setq dotfiles-dir (file-name-directory
                     (or (buffer-file-name) load-file-name)))
@@ -32,7 +37,6 @@
 
 (setq autoload-file (concat dotfiles-dir "loaddefs.el"))
 (setq package-user-dir (concat dotfiles-dir "elpa"))
-(setq custom-file (concat dotfiles-dir "custom.el"))
 
 ;; Python load path
 (setenv "PYTHONPATH" (expand-file-name (concat dotfiles-dir "/python/lib/")))

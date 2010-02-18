@@ -49,6 +49,8 @@
      (define-key python-mode-map (kbd "C-u C-e") 'lob/python-eval)))
 (eval-after-load 'cc-mode
   '(progn
+     (font-lock-add-keywords 'c-mode
+      '(("\\(pure\\|unused\\)" . font-lock-keyword-face)))
      (define-key c-mode-map (kbd "C-h") c-backspace-function)))
 
 

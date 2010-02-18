@@ -15,13 +15,6 @@ anything your code prints will be sent to this buffer."
 This was written so we can extract the printed output of a Python
 script from the Pymacs buffer without all the noise of Pymacs
 chatting with the Python process.
-
-(lob/strip-pymacs-messages
- \"<17	(version \\\"0.23\\\")
-hello
->45	eval pymacs_load_helper(\\\"ropemacs\\\", \\\"rope-\\\")
-world\")
-  => \"hello\\nworld\"
 "
   (let ((frame-start (string-match "^\\([><]\\([0-9]+\\)\t\\)" data)))
     (if frame-start
@@ -101,11 +94,12 @@ requests (unless you call `pymacs-terminate-services'.)
                   (message "Result: %S" result)
                 ;; if we used exec() show the last few lines
                 (if output
-                    (message (concat
-                              (if (> (length output) 10)
-                                  (format "%d lines truncated (See %s buffer)\n[...]\n"
-                                          (- (length output) 10) lobstermacs-python-output-buffer))
-                              (mapconcat 'identity (last output 10) "\n")))))))
+                    (message
+		     (concat (if (> (length output) 10)
+				 (format "%d lines truncated (See %s buffer)\n[...]\n"
+					 (- (length output) 10)
+					 lobstermacs-python-output-buffer))
+			     (mapconcat 'identity (last output 10) "\n")))))))
         result))))
 
 
@@ -179,21 +173,17 @@ Returns true if CODE matches following criteria:
 Smart enough to parse multi-line statements.  Your cursor can be
 placed anywhere within the expression.
 "
-  (let ((start-statement (save-excursion (python-beginning-of-statement) (point)))
-        (end-statement (save-excursion (python-end-of-statement) (point))))
+  (let ((start-statement (save-excursion
+			   (python-beginning-of-statement) (point)))
+        (end-statement (save-excursion
+			 (python-end-of-statement) (point))))
     (if (and start-statement end-statement)
-        (let ((current-line (buffer-substring-no-properties start-statement end-statement)))
+        (let ((current-line (buffer-substring-no-properties
+			     start-statement end-statement)))
           (if (and current-line
                    (string-match "[^ \t]" current-line)
                    (null (string-match ":[^ \t]*$" current-line)))
               current-line)))))
-
-
-(defadvice pymacs-start-services (after lob/python-init)
-  "Load our libraries whenever Pymacs starts a Python process"
-  (pymacs-load "textwrap" "textwrap-")
-  (assert (fboundp 'textwrap-dedent)))
-
 
 (defun lob/python-check ()
   "Runs pyflakes and pep8 on current file
@@ -236,7 +226,11 @@ directory (as well as sub-directories.)"
 
 (eval-after-load 'pymacs
   '(progn
-     (ad-activate 'lob/python-init)))
+     (defadvice pymacs-start-services (after lob/on-pymacs-start)
+       "Load our libraries whenever Pymacs starts a Python process"
+       (pymacs-load "textwrap" "textwrap-")
+       (assert (fboundp 'textwrap-dedent)))
+     (ad-activate 'pymacs-start-services)))
 
 (provide 'lobstermacs-python)
 ;; lobstermacs-python.el ends here
