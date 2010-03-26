@@ -109,6 +109,8 @@
 
 (regen-autoloads)
 
+(yas/load-directory (concat dotfiles-dir "/snippets"))
+
 ;; You can keep system- or user-specific customizations here
 (setq system-specific-config (concat dotfiles-dir system-name ".el")
       user-specific-config (concat dotfiles-dir user-login-name ".el")
