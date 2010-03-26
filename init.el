@@ -106,6 +106,7 @@
 (require 'lobstermacs-erlang)
 (require 'lobstermacs-erc)
 (require 'lobstermacs-misc)
+(provide 'lobstermacs-chrome)
 
 (regen-autoloads)
 
