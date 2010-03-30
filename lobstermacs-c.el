@@ -3,6 +3,32 @@
 ;; In this file we'll try to make programming languages with curly
 ;; braces more fun to use
 ;;
+;; Notes:
+;;
+;; If you want spaces in a c-like language, you can:
+;;
+;; a) Put this in your username.el or custom.el and restart emacs:
+;;
+;;      (setq lob/use-tabs-in-curly-langs t)
+;;
+;; b) Use one of the lobstermacs predefined styles:
+;;
+;;      (setq c-default-style "indent-tabs-2")
+;;      (setq c-default-style "indent-tabs-4")
+;;      (setq c-default-style "indent-tabs-5")
+;;      (setq c-default-style "indent-tabs-8")
+;;      (setq c-default-style "indent-spaces-2")
+;;      (setq c-default-style "indent-spaces-4")
+;;      (setq c-default-style "indent-spaces-5")
+;;      (setq c-default-style "indent-spaces-8")
+;;
+;; c) Define your own custom style (based off linux, bsd, java, etc.)
+;;
+;;       (c-add-style "mystyle"
+;; 	("linux"
+;;          (indent-tabs-mode . nil)))
+;;      (setq c-default-style "mystyle")
+;;
 
 (eval-when-compile (require 'cc-vars))
 
