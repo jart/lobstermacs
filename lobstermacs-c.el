@@ -26,6 +26,14 @@
 	'(c-semi&comma-no-newlines-before-nonblanks
 	  c-semi&comma-inside-parenlist))
 
+  ;; since we changed the emacs default to spaces only, we have to fix
+  ;; some of the predefined styles to explicitly state they want tabs
+  (loop for s in (list "linux" "k&r" "bsd" "stroustrup" "whitesmith"
+		       "ellemtel" "java" "awk")
+	do (c-add-style
+	    s (cons (cons 'indent-tabs-mode lob/use-tabs-in-curly-langs)
+		    (c-get-style-variables s c-style-alist))))
+
   ;; happy keyboard things
   (define-key c-mode-base-map (kbd "C-M-h") 'backward-kill-word))
 
@@ -48,7 +56,7 @@
                          (cons 'other "linux")))
 
      ;; add some more styles with intuitive names
-     (loop for offset in (list 2 4 6 8)
+     (loop for offset in (list 2 4 5 8)
            do (progn
                 (c-add-style (format "indent-tabs-%d" offset)
                              `("linux"
