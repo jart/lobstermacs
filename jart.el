@@ -55,7 +55,7 @@
 
 
 ;; various other configurations
-(add-to-list 'auto-mode-alist '("\\.html$" . django-nxhtml-mumamo-mode))
+;;(add-to-list 'auto-mode-alist '("\\.html$" . django-nxhtml-mumamo-mode))
 (add-hook 'rst-mode-hook 'turn-off-flyspell)
 (setq browse-url-browser-function 'browse-url-chrome)
 (setq require-final-newline t)          ;; not having this drives me crazy
