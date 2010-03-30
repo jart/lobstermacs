@@ -243,112 +243,112 @@
       (white "#f0f0f0"))
 
   (defface actionscript-preprocessor-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-preprocessor-face)))
     "*Face for preprocesor directives."
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-constant-kwds-face
-    `((t (:foreground ,cyan)))
+    '((t (:inherit font-lock-constant-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-global-funcs-face
-    `((t (:foreground ,red)))
+    '((t (:inherit font-lock-builtin-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-global-classes
-    `((t (:foreground ,blue)))
+    '((t (:inherit font-lock-type-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-global-props-face
-    `((t (:foreground ,blue)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-operators-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit default)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-specifier-kwds-face
-    `((t (:foreground ,magenta)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-package-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-class-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-other-decl-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-other-decl-2-kwds-face
-    `((t (:foreground ,blue)))
+    '((t (:inherit font-lock-keyword-face)))
     "* function, var"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-decl-level-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-conditional-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-block-stmt-1-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-simple-stmt-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-label-kwds-face
-    `((t (:foreground ,yellow)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-expr-kwds-face
-    `((t (:foreground ,red)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-other-kwds-face
-    `((t (:foreground ,red)))
+    '((t (:inherit font-lock-keyword-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-package-name-face
-    `((t (:foreground ,green)))
+    '((t (:inherit default)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-class-name-face
-    `((t (:foreground ,cyan)))
+    '((t (:inherit font-lock-type-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-function-name-face
-    `((t (:foreground ,green)))
+    '((t (:inherit font-lock-function-name-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
 
   (defface actionscript-variable-name-face
-    `((t (:foreground ,cyan)))
+    '((t (:inherit font-lock-variable-name-face)))
     "*"
     :group 'actionscript-faces :group 'faces)
   )
