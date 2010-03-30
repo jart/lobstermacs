@@ -64,6 +64,7 @@
 
 ;; Some additional file extensions
 (add-to-list 'auto-mode-alist '("\\.xslt$" . nxml-mode))
+(add-to-list 'auto-mode-alist '("\\.as$" . actionscript-mode))
 
 ;; tiny scroll bars in minibuffer is silly
 (set-window-scroll-bars (minibuffer-window) nil)
