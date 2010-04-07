@@ -119,6 +119,10 @@
 (modify-coding-system-alist 'file "\\.po[tx]?\\'\\|\\.po\\."
 			    'po-find-file-coding-system)
 
+;; NINE MEGS of strace output just to see the mercurial revision in
+;; the mode line every time I open or save a file??!!  I think not.
+(setq vc-handled-backends nil)
+
 ;; DISABLED because it's irritating/astonishing to not be able to use
 ;; the terminal's copy/paste feature
 
