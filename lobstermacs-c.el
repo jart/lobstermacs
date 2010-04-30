@@ -37,6 +37,23 @@
   (insert "}")
   (call-interactively 'c-indent-line-or-region))
 
+(defun lob/on-c-opening-brace ()
+  "Extend electric brace mode to insert the closing brace.
+
+We first run the normal `c-electric-brace' function which inserts
+the opening curly brace and all sorts of other black magic.
+After it's done we check if the current line changed (to be sure
+we're not like in a comment or something) and then we insert the
+closing brace."
+  (interactive)
+  (let ((curline (line-number-at-pos)))
+    (call-interactively 'c-electric-brace)
+    (unless (equal curline (line-number-at-pos))
+      (save-excursion
+        (call-interactively 'lob/on-c-mode-enter-key)
+        (call-interactively 'lob/on-c-closing-brace))
+      (call-interactively 'c-indent-line-or-region))))
+
 (defun lob/on-c-mode-enter-key ()
   (interactive)
   ;; get current line under cursor
@@ -66,6 +83,7 @@
   ;; goto next line when i press `{`
   (c-toggle-auto-newline 1)
   (setq-default c-electric-pound-behavior '(alignleft))
+  (define-key c-mode-base-map (kbd "{") 'lob/on-c-opening-brace)
   (define-key c-mode-base-map (kbd "}") 'lob/on-c-closing-brace)
   (define-key c-mode-base-map (kbd ";") 'self-insert-command)
   (setq c-hanging-semi&comma-criteria
