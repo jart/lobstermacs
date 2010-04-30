@@ -37,11 +37,31 @@
   (insert "}")
   (call-interactively 'c-indent-line-or-region))
 
+(defun lob/on-c-mode-enter-key ()
+  (interactive)
+  ;; get current line under cursor
+  (let ((line (buffer-substring-no-properties
+               (line-beginning-position)
+               (line-end-position))))
+    ;; does it look like a multi-line comment?
+    (if (not (null (string-match "^[ \t]*/?\\*" line)))
+        ;; then we should insert the star when we press enter
+        (c-indent-new-comment-line)
+      ;; otherwise do a normal indent
+      (newline-and-indent))))
+
 (defun lob/on-c-mode-common-hook ()
   "Sets lobstermacs default settings for curly-braced languages"
 
+  ;; http://www.delorie.com/gnu/docs/emacs/cc-mode_14.html
   ;; don't make me press tab for every darn line
-  (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
+  (define-key c-mode-base-map (kbd "RET") 'lob/on-c-mode-enter-key)
+  (define-key c-mode-base-map (kbd "<return>") 'lob/on-c-mode-enter-key)
+  (define-key c-mode-map (kbd "RET") 'lob/on-c-mode-enter-key)
+  (define-key c-mode-map (kbd "<return>") 'lob/on-c-mode-enter-key)
+  ;; (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
+  ;; Ctrl-Enter will properly continue a comment block
+  (define-key c-mode-base-map (kbd "C-<return>") 'c-indent-new-comment-line)
 
   ;; goto next line when i press `{`
   (c-toggle-auto-newline 1)
@@ -52,20 +72,37 @@
 	'(c-semi&comma-no-newlines-before-nonblanks
 	  c-semi&comma-inside-parenlist))
 
-  ;; since we changed the emacs default to spaces only, we have to fix
-  ;; some of the predefined styles to explicitly state they want tabs
-  (loop for s in (list "linux" "k&r" "bsd" "stroustrup" "whitesmith"
-		       "ellemtel" "java" "awk")
-	do (c-add-style
-	    s (cons (cons 'indent-tabs-mode lob/use-tabs-in-curly-langs)
-		    (c-get-style-variables s c-style-alist))))
-
   ;; happy keyboard things
   (define-key c-mode-base-map (kbd "C-M-h") 'backward-kill-word))
 
 (eval-after-load 'cc-vars
   '(progn
      (add-to-list 'c-mode-common-hook 'lob/on-c-mode-common-hook)
+
+     ;; since we changed the emacs default to spaces only, we have to fix
+     ;; some of the predefined styles to explicitly state they want tabs
+     (loop for s in (list "linux" "k&r" "bsd" "stroustrup" "whitesmith"
+                          "ellemtel" "java" "awk")
+           do (c-add-style
+               s (cons (cons 'indent-tabs-mode lob/use-tabs-in-curly-langs)
+                       (c-get-style-variables s c-style-alist))))
+
+     ;; ;; modify 'linux' style to enable more magic features like
+     ;; ;; repositioning curly braces.  See `c-cleanup-list'.
+     ;; ;;
+     ;; ;; (insert (format "%S" (c-get-style-variables "linux" c-style-alist)))
+     ;; ;;
+     ;; ;; Why does lisp have to make everything so hard :'(
+     ;; (c-add-style "linux"
+     ;;              (let ((style (c-get-style-variables "linux" c-style-alist)))
+     ;;                (cons (cons 'c-cleanup-list
+     ;;                            (append '(brace-catch-brace
+     ;;                                      brace-else-brace
+     ;;                                      brace-elseif-brace)
+     ;;                                    (cdr (assq 'c-cleanup-list style))))
+     ;;                      style))
+
+     (assoc 'c-cleanup-list (c-get-style-variables "linux" c-style-alist))
 
      ;; Set default styles
      ;;
