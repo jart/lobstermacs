@@ -24,17 +24,37 @@
 (global-set-key (kbd "C-x C-g") 'grep-find)
 
 ;; my function keys
+
 (global-set-key (kbd "<f1>") 'man)
 (global-set-key (kbd "<f2>") 'jart/lobstermacs-build)
 (global-set-key (kbd "<f4>") 'jart/face-at-point)
 (global-set-key (kbd "C-<f4>") 'customize-apropos-faces)
 (global-set-key (kbd "<f5>") 'toggle-truncate-lines)
-(global-set-key (kbd "<f9>") 'eshell)
+
+(global-set-key (kbd "<f6>") 'gud-next)
+(global-set-key (kbd "C-<f6>") 'gud-nexti)
+(global-set-key (kbd "<f7>") 'gud-step)
+(global-set-key (kbd "C-<f7>") 'gud-stepi)
+(global-set-key (kbd "<f8>") 'gud-finish)
+(global-set-key (kbd "C-<f8>") 'gud-cont)
+(global-set-key (kbd "<f9>") 'gud-up)
+(global-set-key (kbd "C-<f9>") 'gud-down)
+
 (global-set-key (kbd "<f10>") 'compile)
+(global-set-key (kbd "C-<f10>") 'gdb)
+(global-set-key (kbd "C-u <f10>") 'jart/fix-gdb-gui)
+
 (global-set-key (kbd "<f11>") 'next-error)
 (global-set-key (kbd "<f12>") 'previous-error)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun add-extra-keywords (keywords mode &optional face)
+  (let ((restr (c-regexp-opt
+                (loop for s in '(pure unused sentinel)
+                      collect (if (symbolp s) (format "%S" s) s))))
+        (face (or face font-lock-keyword-face)))
+    (font-lock-add-keywords mode `((,restr . ,face)))))
 
 ;; some mode specific stuff
 (eval-after-load 'sh-script
@@ -49,10 +69,9 @@
      (define-key python-mode-map (kbd "C-u C-e") 'lob/python-eval)))
 (eval-after-load 'cc-mode
   '(progn
-     (font-lock-add-keywords 'c-mode
-      '(("\\(pure\\|unused\\)" . font-lock-keyword-face)))
+     (add-extra-keywords '(pure unused sentinel noreturn
+                           nonnull deprecated hot cold) 'c-mode)
      (define-key c-mode-map (kbd "C-h") c-backspace-function)))
-
 
 ;; various other configurations
 ;;(add-to-list 'auto-mode-alist '("\\.html$" . django-nxhtml-mumamo-mode))
@@ -61,8 +80,15 @@
 (setq require-final-newline t)          ;; not having this drives me crazy
 (setq ring-bell-function 'ignore)       ;; disable epilepsy
 (setq visible-bell nil)                 ;; disable epilepsy
+(setq lua-indent-level 3)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun jart/fix-gdb-gui ()
+  (interactive)
+  (progn (gdb-many-windows t)
+         (gdb-restore-windows)))
 
 (defun lob/run-buffer ()
   (interactive)
@@ -93,6 +119,7 @@
     (erc-join-channel "#halo")))
 (eval-after-load 'erc
   '(add-hook 'erc-after-connect 'jart/erc-on-connect))
+
 
 ;; (require 'smex)
 ;; (eval-after-load "init.el" '(lambda ()
