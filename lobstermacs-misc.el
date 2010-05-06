@@ -155,5 +155,22 @@
 ;;               (string-match "^\*" (buffer-name (current-buffer))))
 ;;     (linum-mode 1)))
 
+;; Automatically indent pasted text when coding!
+;;
+;; http://www.emacswiki.org/emacs/AutoIndentation
+(dolist (command '(yank yank-pop))
+  (eval `(defadvice ,command (after indent-region activate)
+           (and (not current-prefix-arg)
+                (member major-mode
+                        '(emacs-lisp-mode lisp-mode
+                                          clojure-mode    scheme-mode
+                                          haskell-mode    ruby-mode
+                                          rspec-mode      python-mode
+                                          c-mode          c++-mode
+                                          objc-mode       latex-mode
+                                          plain-tex-mode))
+                (let ((mark-even-if-inactive transient-mark-mode))
+                  (indent-region (region-beginning) (region-end) nil))))))
+
 (provide 'lobstermacs-misc)
 ;;; lobstermacs-misc.el ends here
