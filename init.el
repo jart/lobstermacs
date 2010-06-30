@@ -99,6 +99,7 @@
 ;; lobstermacs stuff
 ;; (require 'lobstermacs-ido)
 (require 'lobstermacs-c)
+(require 'lobstermacs-go)
 (require 'lobstermacs-rst)
 (require 'lobstermacs-lisp)
 (require 'lobstermacs-python)
