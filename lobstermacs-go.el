@@ -4,6 +4,7 @@
 ;;
 
 (defun lob/go-mode-hook ()
+  (make-local-variable 'tab-width)
   (setq-default tab-width 4))
 
 (autoload (quote go-mode) "go-mode" "\
