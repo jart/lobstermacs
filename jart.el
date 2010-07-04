@@ -51,7 +51,7 @@
 
 (defun add-extra-keywords (keywords mode &optional face)
   (let ((restr (c-regexp-opt
-                (loop for s in '(pure unused sentinel)
+                (loop for s in keywords
                       collect (if (symbolp s) (format "%S" s) s))))
         (face (or face font-lock-keyword-face)))
     (font-lock-add-keywords mode `((,restr . ,face)))))
@@ -69,7 +69,11 @@
      (define-key python-mode-map (kbd "C-u C-e") 'lob/python-eval)))
 (eval-after-load 'cc-mode
   '(progn
-     (add-extra-keywords '(pure unused sentinel noreturn
+     (add-extra-keywords '(ohai kthx) 'c-mode font-lock-preprocessor-face)
+     (add-extra-keywords '(ohai kthx) 'c++-mode font-lock-preprocessor-face)
+     (add-extra-keywords '(pure sentinel noreturn
+                           nonnull deprecated hot cold) 'c++-mode)
+     (add-extra-keywords '(pure sentinel noreturn
                            nonnull deprecated hot cold) 'c-mode)
      (define-key c-mode-map (kbd "C-h") c-backspace-function)))
 
