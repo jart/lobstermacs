@@ -65,6 +65,7 @@
 ;; Some additional file extensions
 (add-to-list 'auto-mode-alist '("\\.xslt$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.as$" . java-mode))
+(add-to-list 'auto-mode-alist '("\\.asc$" . java-mode))
 (add-to-list 'auto-mode-alist '("\\.yasnippet$" . snippet-mode))
 
 ;; tiny scroll bars in minibuffer is silly
