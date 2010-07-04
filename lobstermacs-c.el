@@ -160,7 +160,7 @@ from lobstermacs-misc.el which will indent the pasted text."
      ;; http://www.chris-lott.org/resources/cstyle/LinuxKernelCodingStyle.txt
      (setq-default c-default-style
                    (list (cons 'c-mode "linux")
-                         (cons 'c++-mode "stroustrup")
+                         (cons 'c++-mode "linux")
                          (cons 'java-mode "java")
                          (cons 'awk-mode "awk")
                          (cons 'other "linux")))
