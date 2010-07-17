@@ -100,6 +100,7 @@
 ;; (require 'lobstermacs-ido)
 (require 'lobstermacs-c)
 (require 'lobstermacs-go)
+(require 'lobstermacs-asm)
 (require 'lobstermacs-rst)
 (require 'lobstermacs-lisp)
 (require 'lobstermacs-python)
