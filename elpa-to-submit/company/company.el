@@ -284,7 +284,6 @@ If this many lines are not available, prefer to display the tooltip above."
     (company-keywords . "Programming language keywords")
     (company-nxml . "nxml")
     (company-oddmuse . "Oddmuse")
-    (company-semantic . "CEDET Semantic")
     (company-tempo . "Tempo templates")
     (company-xcode . "Xcode")))
 (put 'company-safe-backends 'risky-local-variable t)
@@ -298,7 +297,7 @@ If this many lines are not available, prefer to display the tooltip above."
                 (return t))))))
 
 (defcustom company-backends '(company-elisp company-nxml company-css
-                              company-eclim company-semantic company-xcode
+                              company-eclim company-xcode
                               (company-gtags company-etags company-dabbrev-code
                                company-keywords)
                               company-oddmuse company-files company-dabbrev)
