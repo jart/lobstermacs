@@ -14,7 +14,7 @@
 
 (defun lob/go-show-asm ()
   "I show you what the Go code is your current buffer looks like
-compiled to assembly."
+compiled to assembly.  This feature is pretty flakey so be warned!"
   (interactive)
   ;; save current position so we can jump to a different frame
   (let* ((sauce buffer-file-name)
@@ -28,10 +28,12 @@ compiled to assembly."
           ;; if buffer is currently visible, go to that frame;
           ;; otherwise, create a new frame for asm output buffer
           (switch-to-buffer-other-frame go-outbuf-asm)
+          (switch-to-buffer-other-frame oldbuf)
           ;; run compiler, dumping output to our buffer
           (if (equal 0 (shell-command (format "6g -S %s" sauce) go-outbuf-asm))
               ;; command succeeded, let's highlight asm for curline
               (progn
+                (switch-to-buffer-other-frame go-outbuf-asm)
                 ;; i know what file i'm editing thx
                 (save-excursion (replace-string (concat sauce ":") "line "))
                 ;; move cursor to anything referencing curline
