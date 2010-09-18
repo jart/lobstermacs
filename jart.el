@@ -73,8 +73,8 @@
      (add-extra-keywords '(ohai kthx) 'c++-mode font-lock-preprocessor-face)
      (add-extra-keywords '(pure sentinel noreturn
                            nonnull deprecated hot cold) 'c++-mode)
-     (add-extra-keywords '(pure sentinel noreturn
-                           nonnull deprecated hot cold) 'c-mode)
+     (add-extra-keywords '(pure sentinel noreturn __volatile__
+						   __inline__ nonnull deprecated hot cold) 'c-mode)
      (define-key c-mode-map (kbd "C-h") c-backspace-function)))
 
 ;; various other configurations
