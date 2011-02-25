@@ -2,7 +2,7 @@
 ;;
 ;; Part of the Emacs Starter Kit
 
-(add-to-list 'auto-mode-alist '("\\.js$\\|\\.json$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.js$\\|\\.json$" . javascript-mode))
 
 ;; omg why won't it work?!?!?!
 
