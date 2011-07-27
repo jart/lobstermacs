@@ -22,6 +22,8 @@
 (global-set-key (kbd "C-x C-l") 'replace-regexp)
 (global-set-key (kbd "C-x C-v") vc-prefix-map)
 (global-set-key (kbd "C-x C-g") 'grep-find)
+(global-set-key (kbd "M-.") 'find-tag)
+(global-set-key (kbd "M-,") 'pop-tag-mark)
 
 ;; my function keys
 
