@@ -122,6 +122,8 @@ from lobstermacs-misc.el which will indent the pasted text."
 	'(c-semi&comma-no-newlines-before-nonblanks
 	  c-semi&comma-inside-parenlist))
 
+  (setq fill-column 78)
+
   ;; happy keyboard things
   (define-key c-mode-base-map (kbd "C-M-h") 'backward-kill-word))
 
