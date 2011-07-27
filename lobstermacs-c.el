@@ -109,6 +109,9 @@ from lobstermacs-misc.el which will indent the pasted text."
   ;; similar to C++ templates
   (add-to-list 'auto-mode-alist '("\\.def\\'" . c-mode))
 
+  ;; ragel state machine files
+  (add-to-list 'auto-mode-alist '("\\.rl\\'" . c-mode))
+
   ;; goto next line when i press `{`
   (c-toggle-auto-newline 1)
   (setq-default c-electric-pound-behavior '(alignleft))
