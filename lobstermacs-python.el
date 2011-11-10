@@ -232,5 +232,63 @@ directory (as well as sub-directories.)"
        (assert (fboundp 'textwrap-dedent)))
      (ad-activate 'pymacs-start-services)))
 
+;; ;; Uncomment this block to make this:
+;; ;;    published = models.DateTimeField(auto_now_add=True, help_text="""
+;; ;;                                     When blog post was published""")
+;; ;; Become:
+;; ;;    published = models.DateTimeField(auto_now_add=True, help_text="""
+;; ;;        When blog post was published""")
+;; ;; Credit: https://github.com/cwick/emacs
+;; (defadvice python-calculate-indentation (around fix-list-indentation)
+;;   "Fix indentation in continuation lines within lists"
+;;   (unless
+;;       (save-excursion
+;;         (beginning-of-line)
+;;         (when (python-continuation-line-p)
+;;           (let* ((syntax (syntax-ppss))
+;;                  (open-start (cadr syntax))
+;;                  (point (point)))
+;;             (when open-start
+;;               ;; Inside bracketed expression.
+;;               (goto-char (1+ open-start))
+;;               ;; Indent relative to statement start, one
+;;               ;; level per bracketing level.
+;;               (goto-char (1+ open-start))
+;;               (python-beginning-of-statement)
+;;               (setq ad-return-value (+ (current-indentation)
+;;                                        (* (car syntax) python-indent)))))))
+;;     ad-do-it))
+
+;; Makes this:
+;; foo = {
+;;     'bar': 'foobar',
+;;     'foo': 42,
+;;      }
+;;
+;; Become:
+;; foo = {
+;;     'bar': 'foobar',
+;;     'foo': 42,
+;; }
+;; Credit: https://github.com/cwick/emacs
+(defadvice python-calculate-indentation (around outdent-closing-brackets)
+  "Handle lines beginning with a closing bracket and indent them so that
+  they line up with the line containing the corresponding opening bracket."
+  (save-excursion
+    (beginning-of-line)
+    (let ((syntax (syntax-ppss)))
+      (if (and (not (eq 'string (syntax-ppss-context syntax)))
+               (python-continuation-line-p)
+               (cadr syntax)
+               (skip-syntax-forward "-")
+               (looking-at "\\s)"))
+          (progn
+            (forward-char 1)
+            (ignore-errors (backward-sexp))
+            (setq ad-return-value (current-indentation)))
+        ad-do-it))))
+
+(ad-activate 'python-calculate-indentation)
+
 (provide 'lobstermacs-python)
 ;; lobstermacs-python.el ends here
